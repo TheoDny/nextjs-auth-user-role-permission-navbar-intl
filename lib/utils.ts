@@ -3,11 +3,6 @@ import { format, parseISO } from "date-fns"
 import jwt from "jsonwebtoken"
 import { twMerge } from "tailwind-merge"
 
-if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is required")
-}
-const JWT_SECRET = process.env.JWT_SECRET
-
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
@@ -28,7 +23,11 @@ export function generateInviteToken(name: string, email: string, expiresAt: Date
         exp: expiresAt.getTime() / 1000, // Convert to seconds
     }
 
-    return jwt.sign(payload, JWT_SECRET)
+    if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is required in configuration server")
+    }
+
+    return jwt.sign(payload, process.env.JWT_SECRET)
 }
 
 export async function sleep(ms: number) {
