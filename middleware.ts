@@ -3,9 +3,11 @@ import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function middleware(request: NextRequest) {
+    console.info("middleware")
     const session = await auth.api.getSession({
         headers: await headers(),
     })
+    console.info("session", session?.user?.email)
 
     if (!session || !session.user.active) {
         return NextResponse.redirect(new URL("/sign-in", request.url))

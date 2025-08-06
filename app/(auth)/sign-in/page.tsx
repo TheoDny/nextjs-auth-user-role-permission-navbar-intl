@@ -15,7 +15,7 @@ export default async function SignInPage() {
 
     return (
         <>
-            <div className="absolute top-5 right-5 flex flex-col items-center justify-center h-screen">
+            <div className="absolute top-5 right-5">
                 <p>NEXT_PUBLIC_APP_URL: {process.env.NEXT_PUBLIC_APP_URL}</p>
                 <p>BETTER_AUTH_URL: {process.env.BETTER_AUTH_URL}</p>
                 <p>VERCEL_URL: {process.env.VERCEL_URL}</p>
