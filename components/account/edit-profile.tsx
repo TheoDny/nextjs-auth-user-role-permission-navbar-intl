@@ -119,9 +119,7 @@ export function EditProfile({ currentName, currentEmail, currentImage }: EditPro
                 image: values.image,
             })
 
-            if (result?.bindArgsValidationErrors) {
-                return toast.error(t("profileUpdate.error"))
-            } else if (result?.serverError) {
+            if (result?.serverError) {
                 return toast.error(result.serverError || t("profileUpdate.error"))
             } else if (result?.validationErrors) {
                 return toast.error(t("profileUpdate.error"))
