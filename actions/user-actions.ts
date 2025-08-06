@@ -70,12 +70,12 @@ const signUpSchema = z.object({
     password: z
         .string()
         .trim()
-        .min(8, "Password must be at least 8 characters")
+        .min(16, "Password must be at least 16 characters")
         .max(64, "Password must be at most 64 characters"),
     passwordConfirmation: z
         .string()
         .trim()
-        .min(8, "Password confirmation must be at least 8 characters")
+        .min(16, "Password confirmation must be at least 16 characters")
         .max(64, "Password confirmation must be at most 64 characters"),
     token: z.string(),
 })

@@ -26,7 +26,11 @@ export default async function SignUpPage(props: SignUpPageProps) {
         redirect("/sign-in")
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret") as {
+    if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is required in configuration server")
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
         name: string
         email: string
     }
