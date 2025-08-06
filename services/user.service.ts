@@ -324,3 +324,29 @@ export async function signUpUser(name: string, email: string, password: string) 
 
     return false
 }
+
+// Delete a user
+export async function deleteUser(id: string, currentUserId: string) {
+    try {
+        // Get user details first
+        const userToDelete = await prisma.user.findUnique({
+            where: { id },
+        })
+
+        if (!userToDelete) {
+            throw new Error("User not found")
+        }
+
+        const user = await prisma.user.delete({
+            where: { id },
+        })
+
+        addUserDisableLog({ id: user.id, name: userToDelete.name || "" })
+
+        revalidatePath("/administration/users")
+        return user
+    } catch (error) {
+        console.error("Failed to delete user:", error)
+        throw new Error("Failed to delete user")
+    }
+}

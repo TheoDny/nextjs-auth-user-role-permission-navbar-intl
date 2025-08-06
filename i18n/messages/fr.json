@@ -125,6 +125,11 @@
         "search": "Rechercher des utilisateurs...",
         "noUsers": "Aucun utilisateur trouvé",
         "assignRolesTo": "Assigner des rôles à :",
+        "delete": "Supprimer",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+        "warnings": {
+            "noRoles": "Cet utilisateur n'a aucun rôle assigné"
+        },
         "columns": {
             "name": "Nom",
             "email": "Email",
@@ -151,11 +156,15 @@
             "error": {
                 "adminUserEdit": "Vous ne pouvez pas modifier l'utilisateur administrateur",
                 "UpdateUserFail": "Erreur lors de la mise à jour de l'utilisateur",
-                "CreateUserFail": "Erreur lors de la création de l'utilisateur"
+                "CreateUserFail": "Erreur lors de la création de l'utilisateur",
+                "DeleteUserFail": "Erreur lors de la suppression de l'utilisateur",
+                "cannotDeleteSelf": "Vous ne pouvez pas vous supprimer vous-même",
+                "cannotDeleteAdmin": "Vous ne pouvez pas supprimer l'utilisateur administrateur"
             },
             "success": {
                 "UpdateUserSuccess": "Utilisateur mis à jour avec succès",
-                "CreateUserSuccess": "Utilisateur créé avec succès"
+                "CreateUserSuccess": "Utilisateur créé avec succès",
+                "DeleteUserSuccess": "Utilisateur supprimé avec succès"
             }
         }
     },
@@ -169,6 +178,8 @@
         "permissions": "Permissions",
         "cancel": "Annuler",
         "save": "Enregistrer",
+        "delete": "Supprimer",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce rôle ?",
         "assignPermissionsTo": "Assigner des permissions à :",
         "noPermissionsFound": "Aucune permission trouvée",
         "selectRoleToManagePermissions": "Sélectionnez un rôle pour gérer les permissions",
@@ -181,13 +192,21 @@
             "namePlaceholder": "Nom du rôle",
             "description": "Description",
             "descriptionPlaceholder": "Description du rôle",
+            "warning": {
+                "noPermissions": "Cet utilisateur n'a aucune permission assignée"
+            },
             "error": {
                 "UpdateRoleFail": "Erreur lors de la mise à jour du rôle",
-                "CreateRoleFail": "Erreur lors de la création du rôle"
+                "CreateRoleFail": "Erreur lors de la création du rôle",
+                "DeleteRoleFail": "Erreur lors de la suppression du rôle",
+                "cannotModifySuperAdmin": "Impossible de modifier le rôle Super Admin",
+                "cannotDeleteSuperAdmin": "Impossible de supprimer le rôle Super Admin",
+                "roleHasUsers": "Impossible de supprimer un rôle assigné à des utilisateurs"
             },
             "success": {
                 "UpdateRoleSuccess": "Rôle mis à jour avec succès",
-                "CreateRoleSuccess": "Rôle créé avec succès"
+                "CreateRoleSuccess": "Rôle créé avec succès",
+                "DeleteRoleSuccess": "Rôle supprimé avec succès"
             }
         },
         "columns": {

@@ -3,11 +3,13 @@
 import { auth } from "@/lib/auth"
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
+import { userSuperAdmin } from "@/prisma/data-seed"
 import { checkToken } from "@/services/auth.service"
 import {
     assignRolesToUser,
     changeEntitySelected,
     createUser,
+    deleteUser,
     getUsers,
     signUpUser,
     updateUser,
@@ -41,6 +43,11 @@ const updateUserSchema = z.object({
     active: z.boolean(),
     entitiesToAdd: z.array(z.string()),
     entitiesToRemove: z.array(z.string()),
+})
+
+// Schema for deleting a user
+const deleteUserSchema = z.object({
+    id: z.string(),
 })
 
 // Schema for assigning roles to a user
@@ -150,6 +157,27 @@ export const updateUserAction = actionClient.schema(updateUserSchema).action(asy
     } catch (error) {
         console.error("Failed to update user:", error)
         throw new Error("Failed to update user")
+    }
+})
+
+// Delete a user
+export const deleteUserAction = actionClient.schema(deleteUserSchema).action(async ({ parsedInput }) => {
+    try {
+        // Check for user_create permission (same as creation for deletion)
+        const session = await checkAuth({ requiredPermission: "user_create" })
+
+        if (parsedInput.id === session.user.id) {
+            throw new Error("You cannot delete yourself")
+        }
+
+        if (parsedInput.id === userSuperAdmin.id) {
+            throw new Error("You cannot delete the admin user")
+        }
+
+        return await deleteUser(parsedInput.id, session.user.id)
+    } catch (error) {
+        console.error("Failed to delete user:", error)
+        throw new Error("Failed to delete user")
     }
 })
 

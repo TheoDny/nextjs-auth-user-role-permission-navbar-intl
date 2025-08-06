@@ -1,3 +1,4 @@
+import { roleSuperAdmin, userSuperAdmin } from "./data-seed"
 import { PrismaClient } from "./generated"
 import { permissions, PermissionSeed } from "./permission"
 
@@ -24,12 +25,12 @@ const seedPermissions = async (permissionsArray: PermissionSeed[]) => {
 const seedAdminRole = async () => {
     await prisma.role.upsert({
         where: {
-            id: "cm8q88831000008jo38u2f5os",
+            id: roleSuperAdmin.id,
         },
         create: {
-            id: "cm8q88831000008jo38u2f5os",
-            name: "Super Admin",
-            description: "Role administreur with every permission",
+            id: roleSuperAdmin.id,
+            name: roleSuperAdmin.name,
+            description: roleSuperAdmin.description,
             Permissions: {
                 connect: permissions.map((permission) => {
                     return { code: permission.code }
@@ -37,8 +38,8 @@ const seedAdminRole = async () => {
             },
         },
         update: {
-            name: "Super Admin",
-            description: "Role administreur with every permission",
+            name: roleSuperAdmin.name,
+            description: roleSuperAdmin.description,
             Permissions: {
                 set: permissions.map((permission) => {
                     return { code: permission.code }
@@ -70,12 +71,12 @@ const seedAdminUser = async () => {
 
     await prisma.user.upsert({
         where: {
-            id: "UOOl0OSwsUWelQZxSOK8RxaOtb5dS71b",
+            id: userSuperAdmin.id,
         },
         create: {
-            id: "UOOl0OSwsUWelQZxSOK8RxaOtb5dS71b",
-            name: "Super Admin",
-            email: "admin@admin.com",
+            id: userSuperAdmin.id,
+            name: userSuperAdmin.name,
+            email: userSuperAdmin.email,
             emailVerified: true,
             active: true,
             entitySelectedId: "cm8skzpbi0001e58ge65z1rkz",
@@ -86,27 +87,26 @@ const seedAdminUser = async () => {
             },
             Roles: {
                 connect: {
-                    id: "cm8q88831000008jo38u2f5os",
+                    id: roleSuperAdmin.id,
                 },
             },
             accounts: {
                 create: {
-                    id: "UOOl0ORrsVWalQUxSOK8RxaKtd8dT41b",
-                    accountId: "UOOl0OSwsUWelQZxSOK8RxaOtb5dS71b",
+                    id: userSuperAdmin.accountId,
+                    accountId: userSuperAdmin.id,
                     providerId: "credential",
-                    password:
-                        "8c81a7feb9c84a593256e8bf03d5b4cf:69dcb20421f122088432d100e19fbdde223aa5c6948ec3b72868cffd71be69b477282879fb1f2ddf1aaaf260a75b525c7ec762e6a89e57cd0a8ab934f357f462",
+                    password: userSuperAdmin.password,
                 },
             },
         },
         update: {
-            name: "Super Admin",
+            name: userSuperAdmin.name,
             emailVerified: true,
             active: true,
-            entitySelectedId: "cm8skzpbi0001e58ge65z1rkz",
+            entitySelectedId: allEntities[0].id,
             Roles: {
                 set: {
-                    id: "cm8q88831000008jo38u2f5os",
+                    id: roleSuperAdmin.id,
                 },
             },
             Entities: {
@@ -117,20 +117,18 @@ const seedAdminUser = async () => {
             accounts: {
                 upsert: {
                     where: {
-                        id: "UOOl0ORrsVWalQUxSOK8RxaKtd8dT41b",
+                        id: userSuperAdmin.accountId,
                     },
                     create: {
-                        id: "UOOl0ORrsVWalQUxSOK8RxaKtd8dT41b",
-                        accountId: "UOOl0OSwsUWelQZxSOK8RxaOtb5dS71b",
+                        id: userSuperAdmin.accountId,
+                        accountId: userSuperAdmin.id,
                         providerId: "credential",
-                        password:
-                            "8c81a7feb9c84a593256e8bf03d5b4cf:69dcb20421f122088432d100e19fbdde223aa5c6948ec3b72868cffd71be69b477282879fb1f2ddf1aaaf260a75b525c7ec762e6a89e57cd0a8ab934f357f462",
+                        password: userSuperAdmin.password,
                     },
                     update: {
-                        accountId: "UOOl0OSwsUWelQZxSOK8RxaOtb5dS71b",
+                        accountId: userSuperAdmin.id,
                         providerId: "credential",
-                        password:
-                            "8c81a7feb9c84a593256e8bf03d5b4cf:69dcb20421f122088432d100e19fbdde223aa5c6948ec3b72868cffd71be69b477282879fb1f2ddf1aaaf260a75b525c7ec762e6a89e57cd0a8ab934f357f462",
+                        password: userSuperAdmin.password,
                     },
                 },
             },
