@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
         serverActions: {
             bodySizeLimit: "55mb",
         },
+        optimizePackageImports: ["@prisma/client"],
     },
 }
 
