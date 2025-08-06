@@ -56,7 +56,6 @@ export async function createUser(data: { name: string; email: string; active: bo
 
         const tokenUser = await createTokenUser(user.name as string, user.email)
         const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/sign-up?token=${tokenUser.token}`
-
         const resMail = await sendInvitationSignUp(user.name as string, user.email, inviteLink)
         if (resMail === false) {
             await prisma.user.delete({
