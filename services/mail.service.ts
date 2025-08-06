@@ -14,7 +14,7 @@ async function sendEmail(options: EmailOptions) {
     let info: any = true
     if (process.env.MAILER_ACTIVE ?? true) {
         let mailOptions = {
-            from: `"${process.env.NEXT_PUBLIC_APP_NAME}" <noreply@mail.com>`,
+            from: process.env.MAIL_EMAIL_USER,
             to: options.to.join(", "),
             subject: options.subject,
             html: options.html,
@@ -40,15 +40,15 @@ export async function sendResetPassword(email: string, resetLinkt: string) {
 }
 
 export async function sendInvitationSignUp(name: string, email: string, inviteLink: string) {
-    const options: EmailOptions = {
-        to: [email],
-        subject: `${process.env.NEXT_PUBLIC_NAME_APP} - Invitation Sign Up`,
-        html: await render(InvitationSignUp({ name, inviteLink: inviteLink, appUrl: appUrl })),
-    }
     try {
+        const options: EmailOptions = {
+            to: [email],
+            subject: `${process.env.NEXT_PUBLIC_NAME_APP} - Invitation Sign Up`,
+            html: await render(InvitationSignUp({ name, inviteLink: inviteLink, appUrl: appUrl })),
+        }
         return sendEmail(options)
     } catch (error) {
-        console.error(error)
+        console.error("Failed to send invitation email:", error)
         return false
     }
 }

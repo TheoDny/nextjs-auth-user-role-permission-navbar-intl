@@ -16,9 +16,11 @@ export default async function SignInPage() {
     return (
         <>
             <div className="absolute top-5 right-5">
-                <p>NEXT_PUBLIC_APP_URL: {process.env.NEXT_PUBLIC_APP_URL}</p>
-                <p>BETTER_AUTH_URL: {process.env.BETTER_AUTH_URL}</p>
-                <p>VERCEL_URL: {process.env.VERCEL_URL}</p>
+                <p>admin connection:</p>
+                <p>admin@admin.com</p>
+                <p>Admin0123456789!</p>
+                <br />
+                <p>The database is reset everyday at 00:00</p>
             </div>
             <SignIn />
         </>
