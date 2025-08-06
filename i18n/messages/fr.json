@@ -1,0 +1,302 @@
+{
+    "Sidebar": {
+        "administration": "Administration",
+        "users": "Gestion des utilisateurs",
+        "roles": "Gestion des rôles",
+        "logs": "Journaux d'êvenements"
+    },
+    "Navigation": {
+        "users": "Utilisateurs",
+        "roles": "Rôles",
+        "account": "Compte",
+        "logout": "Déconnexion"
+    },
+    "SignIn": {
+        "title": "Connexion",
+        "description": "Connexion à votre compte",
+        "email": "Email",
+        "password": "Mot de passe",
+        "login": "Connexion",
+        "forgotPassword": "Mot de passe oublié?",
+        "rememberMe": "Se souvenir de moi",
+        "noAccount": "Vous n'avez pas de compte?",
+        "signUp": "S'inscrire",
+        "cookieConsent": "En vous connectant, vous acceptez notre utilisation des cookies pour l'authentification et une expérience utilisateur améliorée."
+    },
+    "SignUp": {
+        "title": "Inscription",
+        "description": "Créer un nouveau compte",
+        "name": "Nom",
+        "email": "Email",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "createAccount": "Finaliser la création du compte",
+        "alreadyHaveAccount": "Vous avez déjà un compte?",
+        "signIn": "Se connecter",
+        "passwordLength": "Le mot de passe doit contenir entre 16 et 64 caractères",
+        "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
+        "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
+        "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial"
+    },
+    "ForgotPassword": {
+        "title": "Mot de passe oublié",
+        "description": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+        "email": "Email",
+        "sendLink": "Envoyer le lien",
+        "backToLogin": "Retour à la connexion"
+    },
+    "ResetPassword": {
+        "title": "Réinitialiser le mot de passe",
+        "description": "Entrez votre nouveau mot de passe ci-dessous",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "passwordPlaceholder": "Entrez le nouveau mot de passe",
+        "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe",
+        "changePassword": "Changer le mot de passe",
+        "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+        "successMessage": "Mot de passe réinitialisé avec succès",
+        "passwordLength": "Le mot de passe doit contenir entre 16 et 64 caractères",
+        "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
+        "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
+        "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial (ex: !@#$%^&*()_+-=[];':\"\\|,.<>/?)"
+    },
+    "Account": {
+        "title": "Compte",
+        "loginRequired": "Veuillez vous connecter pour voir votre compte",
+        "profile": {
+            "title": "Profil Utilisateur",
+            "description": "Vos informations de compte et paramètres",
+            "userAlt": "Utilisateur",
+            "statusActive": "Actif",
+            "statusInactive": "Inactif",
+            "selectedEntity": "Entité Sélectionnée",
+            "availableEntities": "Entités Disponibles",
+            "noEntity": "Aucune",
+            "language": "Langue",
+            "changeLanguage": "Changer de Langue"
+        },
+        "emailUpdate": {
+            "title": "Changer l'Adresse Email",
+            "description": "Mettez à jour l'adresse email de votre compte",
+            "emailLabel": "Adresse Email",
+            "editButton": "Modifier l'email",
+            "success": "Votre email a été mis à jour avec succès",
+            "error": "Un problème est survenu lors de la mise à jour de votre email"
+        },
+        "profileUpdate": {
+            "title": "Modifier le Profil",
+            "description": "Mettez à jour vos informations de profil",
+            "nameLabel": "Nom",
+            "emailLabel": "Adresse Email",
+            "uploadImage": "Télécharger une Photo de Profil",
+            "imageTypeError": "Veuillez télécharger un fichier image",
+            "editButton": "Modifier le Profil",
+            "success": "Votre profil a été mis à jour avec succès",
+            "error": "Un problème est survenu lors de la mise à jour de votre profil"
+        },
+        "permissions": {
+            "title": "Rôles & Permissions",
+            "description": "Vos rôles et permissions assignés",
+            "assignedRoles": "Rôles Assignés",
+            "permissionsList": "Permissions",
+            "noDescription": "Pas de description disponible"
+        },
+        "roles": {
+            "admin": "Administrateur",
+            "user": "Utilisateur",
+            "manager": "Gestionnaire",
+            "editor": "Éditeur",
+            "viewer": "Lecteur"
+        },
+        "roleDescriptions": {
+            "admin": "Accès complet à toutes les fonctionnalités et paramètres du système",
+            "user": "Utilisateur standard avec des permissions de base",
+            "manager": "Peut gérer les utilisateurs et le contenu dans les entités assignées",
+            "editor": "Peut créer et modifier du contenu mais pas le supprimer",
+            "viewer": "Accès en lecture seule au contenu"
+        }
+    },
+    "UserManagement": {
+        "title": "Gestion des Utilisateurs",
+        "users": "Utilisateurs",
+        "roles": "Rôles",
+        "description": "Créer, modifier et gérer les utilisateurs",
+        "newUser": "Nouvel Utilisateur",
+        "search": "Rechercher des utilisateurs...",
+        "noUsers": "Aucun utilisateur trouvé",
+        "assignRolesTo": "Assigner des rôles à :",
+        "columns": {
+            "name": "Nom",
+            "email": "Email",
+            "roles": "Rôles",
+            "entities": "Entités",
+            "status": "Statut",
+            "actions": "Actions"
+        },
+        "status": {
+            "active": "Actif",
+            "inactive": "Inactif"
+        },
+        "dialog": {
+            "create": "Créer un Utilisateur",
+            "edit": "Modifier un Utilisateur",
+            "name": "Nom de l'Utilisateur",
+            "email": "Email",
+            "roles": "Rôles",
+            "entities": "Entités",
+            "status": "Statut",
+            "selectRoles": "Sélectionner des Rôles",
+            "selectEntities": "Sélectionner des Entités",
+            "commentActive": "L'utilisateur peut se connecter",
+            "error": {
+                "adminUserEdit": "Vous ne pouvez pas modifier l'utilisateur administrateur",
+                "UpdateUserFail": "Erreur lors de la mise à jour de l'utilisateur",
+                "CreateUserFail": "Erreur lors de la création de l'utilisateur"
+            },
+            "success": {
+                "UpdateUserSuccess": "Utilisateur mis à jour avec succès",
+                "CreateUserSuccess": "Utilisateur créé avec succès"
+            }
+        }
+    },
+    "RoleManagement": {
+        "title": "Gestion des Rôles",
+        "description": "Créer, modifier et gérer les rôles",
+        "newRole": "Nouveau Rôle",
+        "search": "Rechercher des rôles...",
+        "noRolesFound": "Aucun rôle trouvé",
+        "roles": "Rôles",
+        "permissions": "Permissions",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "assignPermissionsTo": "Assigner des permissions à :",
+        "noPermissionsFound": "Aucune permission trouvée",
+        "selectRoleToManagePermissions": "Sélectionnez un rôle pour gérer les permissions",
+        "dialog": {
+            "create": "Créer un Rôle",
+            "edit": "Modifier un Rôle",
+            "createDescription": "Remplissez les détails pour créer un nouveau rôle.",
+            "editDescription": "Mettez à jour les détails du rôle ci-dessous.",
+            "name": "Nom",
+            "namePlaceholder": "Nom du rôle",
+            "description": "Description",
+            "descriptionPlaceholder": "Description du rôle",
+            "error": {
+                "UpdateRoleFail": "Erreur lors de la mise à jour du rôle",
+                "CreateRoleFail": "Erreur lors de la création du rôle"
+            },
+            "success": {
+                "UpdateRoleSuccess": "Rôle mis à jour avec succès",
+                "CreateRoleSuccess": "Rôle créé avec succès"
+            }
+        },
+        "columns": {
+            "name": "Nom",
+            "description": "Description",
+            "usersCount": "Nombre d'Utilisateurs",
+            "permissions": "Permissions",
+            "actions": "Actions"
+        }
+    },
+    "Permissions": {
+        "user_read": "Accès à la page de gestion des utilisateurs",
+        "user_create": "Envoyer un email permettant de créer un nouveau compte",
+        "user_edit": "Modifier les informations et le rôle d'un utilisateur",
+        "role_read": "Accès à la page de gestion des rôles",
+        "role_create": "Créer un nouveau rôle",
+        "role_edit": "Modifier les informations d'un rôle et les permissions associées",
+        "log_read": "Accès à la page de gestion des journaux d'événements"
+    },
+    "Common": {
+        "update": "Mettre à jour",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "add": "Ajouter",
+        "create": "Créer",
+        "view": "Voir",
+        "search": "Rechercher",
+        "loading": "Chargement...",
+        "language": "Langue",
+        "changeLanguage": "Changer de Langue",
+        "saving": "Enregistrement...",
+        "confirm": "Confirmer",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément?",
+        "success": "Succès!",
+        "error": "Erreur",
+        "required": "Obligatoire",
+        "optional": "Optionnel",
+        "yes": "Oui",
+        "no": "Non",
+        "apply": "Appliquer",
+        "reset": "Réinitialiser",
+        "close": "Fermer",
+        "back": "Retour",
+        "noOptions": "Aucune option disponible",
+        "refresh": "Rafraîchir"
+    },
+    "Logs": {
+        "label": {
+            "user_create": "Création d'un utilisateur",
+            "user_update": "Mise à jour d'un utilisateur",
+            "user_set_role": "Attribution de rôles à un utilisateur",
+            "user_set_entity": "Attribution d'entités à un utilisateur",
+            "user_disable": "Désactivation d'un utilisateur",
+            "user_enable": "Activation d'un utilisateur",
+            "user_email_verified": "Vérification de l'email d'un utilisateur",
+            "role_create": "Création d'un rôle",
+            "role_update": "Mise à jour d'un rôle",
+            "role_delete": "Suppression d'un rôle",
+            "role_set_permission": "Attribution de permissions à un rôle",
+            "entity_update": "Mise à jour d'une entité",
+            "entity_disable": "Désactivation d'une entité",
+            "entity_enable": "Activation d'une entité"
+        },
+        "title": "Journaux d'êvénements",
+        "description": "Consulter et filtrer tous les journaux d'êvénements",
+        "message": "Action",
+        "user": "Utilisateur",
+        "entity": "Entité",
+        "date": "Date",
+        "lastXDays": "Derniers {days} jours",
+        "filterByType": "Filtrer par Type",
+        "filterByUser": "Filtrer par Utilisateur",
+        "filterByEntity": "Filtrer par Entité",
+        "filterByRole": "Filtrer par Rôle",
+        "selectLogType": "Sélectionner un type de journal",
+        "selectUser": "Sélectionner un utilisateur",
+        "selectEntity": "Sélectionner une entité",
+        "selectRole": "Sélectionner un rôle",
+        "selectDateRange": "Sélectionner un intervalle de dates",
+        "noLogs": "Aucun journal trouvé",
+        "dateRange": "Intervalle de dates",
+
+        "user_create": "Utilisateur \"{name}\" créé",
+        "user_update": "Utilisateur \"{name}\" mis à jour",
+        "user_set_role": "Rôles attribués à l\"utilisateur \"{name}\"",
+        "user_set_entity": "Entités attribuées à l\"utilisateur \"{name}\"",
+        "user_disable": "Utilisateur \"{name}\" désactivé",
+        "user_enable": "Utilisateur \"{name}\" activé",
+        "user_email_verified": "Email vérifié pour l\"utilisateur \"{name}\"",
+
+        "role_create": "Rôle \"{name}\" créé",
+        "role_update": "Rôle \"{name}\" mis à jour",
+        "role_delete": "Rôle \"{name}\" supprimé",
+        "role_set_permission": "Permissions attribuées au rôle \"{name}\"",
+
+        "entity_update": "Entité \"{name}\" mise à jour",
+        "entity_disable": "Entité \"{name}\" désactivée",
+        "entity_enable": "Entité \"{name}\" activée"
+    },
+    "Unauthorized": {
+        "title": "Non autorisé",
+        "description": "Vous n'êtes pas autorisé à accéder à cette page.",
+        "backToHome": "Retour à l'accueil"
+    },
+    "Forbidden": {
+        "title": "Interdit",
+        "description": "Vous n'avez pas les permissions nécessaires pour accéder à cette page.",
+        "backToHome": "Retour à l'accueil"
+    }
+}
