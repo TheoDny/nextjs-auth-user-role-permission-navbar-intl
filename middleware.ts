@@ -16,5 +16,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     runtime: "nodejs",
-    matcher: ["/((?!sign-in|sign-up|forgot-password|reset-password|api/auth|_next).*)"],
+    matcher: ["/((?!sign-in|sign-up|forgot-password|reset-password|api/auth|api/cron|_next).*)"],
 }

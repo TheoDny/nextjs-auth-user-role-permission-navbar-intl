@@ -11,7 +11,12 @@
             "maxDuration": 30
         }
     },
-    "crons": [],
+    "crons": [
+        {
+            "path": "/api/cron/reset-database",
+            "schedule": "0 0 * * *"
+        }
+    ],
     "env": {
         "SKIP_ENV_VALIDATION": "true"
     },
