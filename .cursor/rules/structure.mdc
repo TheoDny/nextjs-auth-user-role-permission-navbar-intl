@@ -1,0 +1,103 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 📌 Conventions & File Structure
+
+> Usage with `checkAuth` ([auth-guard.ts](mdc:lib/auth-guard.ts)), `zod`, Prisma and `next-safe-action` in a Next.js 15 app with App Router and TypeScript.
+
+---
+
+## ✅ General Rules
+
+### 📁 `/actions`
+- **Name:** `[domain].actions.ts`
+- **Responsibility:** Secure, typed, and validated actions.
+- **Always imports:**
+  - `actionClient` from `/lib/safe-action`
+  - `checkAuth` from `/lib/auth-guard`
+  - `zod` schema
+- **Useful:** The list of permissions can be found in [permission.ts](mdc:prisma/permission.ts)
+
+```ts
+"use server"
+import { z } from "zod"
+import { actionClient } from "@/lib/safe-action"
+import { checkAuth } from "@/lib/auth-guard"
+import { createSomething } from "@/services/something.service"
+
+const createSomethingSchema = z.object({
+  name: z.string().min(2).max(64),
+  description: z.string().max(255),
+})
+
+export const createSomethingAction = actionClient
+  .schema(schema)
+  .action(async ({ parsedInput }) => {
+    const session = await checkAuth({ requiredPermission: "something_create" })
+
+    return await createSomething(
+      entityId: session.user.entitySelectedId,
+      {
+        name: parsedInput.name,
+    })
+  })
+```
+
+### 📁 `/services`
+- **Name:** `[domain].services.ts`
+- **Responsibility:** Functions used on the server side and communication with the database
+- **Always imports:**
+  - `prisma` from `/lib/prisma`
+
+```ts
+import { prisma } from "@/lib/prisma"
+import { Something } from "@/prisma/generated"
+
+type SomethingCreateData = {
+  name: string
+  description: string
+}
+
+export async function createSomething(entityId: string, data: SomethingCreateData): Promise<Something> {
+  return await prisma.something.create({
+    data: {
+      name: data.name,
+      description: data.description,
+      entityId: entityId,
+    },
+  })
+}
+```
+
+### 📁 `/services`
+## Server Component
+- Can call directly to the functions from the services
+
+## Client Component
+- If needed can call the functions from the actions 
+- Never call directly functions from the services
+
+# Handling server action result
+- You should usually call the server action like the example below
+  
+```ts
+const result = await createSomethingAction({
+  name: values.name,
+  description: values.description || "",
+})
+
+if (result?.serverError) {
+  console.error(result?.serverError)
+  return toast.error("Failed to create role")
+} else if (result?.validationErrors) {
+  console.error(result?.validationErrors)
+  return toast.error("Failed to create role")
+} else if (!result?.data) {
+  console.error("No data returned")
+  return toast.error("Failed to create role")
+}
+
+toast.success("Something created successfully")
+```

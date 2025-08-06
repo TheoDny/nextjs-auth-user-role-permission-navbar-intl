@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+The developement of the project is done on windows so when you have to do command line give them to me for powershell
+
+the code and commentary should be in english
+
+[package.json](mdc:package.json)
+
+main used tehnology:
+- pnpm
+- NextJs 15
+- React 19
+- Shadcn
+- nodemailer
+- next-safe-action v8
+- lucide-react
+- date-fns
+- zod
+- prisma
+- tailwind 4
+- react-email
+- next-intl
+
