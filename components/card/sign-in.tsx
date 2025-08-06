@@ -52,7 +52,7 @@ export function SignIn() {
                     setLoading(true)
                 },
                 onError: (ctx) => {
-                    setError(ctx.error.message || ctx.error.statusText)
+                    setError(ctx.error.message || ctx.error.statusText || "An error occurred")
                 },
                 onSuccess: async () => {
                     window.location.href = "/"
