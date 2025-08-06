@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { auth } from "@/lib/auth"
 import { Permission } from "@/prisma/generated"
+import { ConfirmDialogProvider } from "@/provider/ConfirmationProvider"
 import { NavigationGroupType, NavigationType } from "@/types/navigation.type"
 import { Boxes, IdCard, Logs, Users } from "lucide-react"
 import { NextIntlClientProvider } from "next-intl"
@@ -103,11 +104,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 >
                     <TooltipProvider delayDuration={100}>
                         <NextIntlClientProvider>
-                            <Toaster />
-                            <SidebarProvider>
-                                <AppSidebar data={navigation} />
-                                <SidebarInset className={"p-1.5"}>{children}</SidebarInset>
-                            </SidebarProvider>
+                            <ConfirmDialogProvider>
+                                <Toaster />
+                                <SidebarProvider>
+                                    <AppSidebar data={navigation} />
+                                    <SidebarInset className={"p-1.5"}>{children}</SidebarInset>
+                                </SidebarProvider>
+                            </ConfirmDialogProvider>
                         </NextIntlClientProvider>
                     </TooltipProvider>
                 </NextThemesProvider>

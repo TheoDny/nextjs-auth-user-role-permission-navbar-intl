@@ -53,6 +53,15 @@ export async function createRole(data: { name: string; description: string }) {
 // Update an existing role
 export async function updateRole(id: string, data: { name: string; description: string }) {
     try {
+        // Check if it's the Super Admin role
+        const existingRole = await prisma.role.findUnique({
+            where: { id },
+        })
+
+        if (existingRole?.name === "Super Admin") {
+            throw new Error("Cannot modify the Super Admin role")
+        }
+
         const role = await prisma.role.update({
             where: { id },
             data: {
@@ -78,7 +87,15 @@ export async function updateRole(id: string, data: { name: string; description: 
 // Delete a role
 export async function deleteRole(id: string) {
     try {
-        // Check if the role is assigned to any users
+        // Get role details first
+        const roleToDelete = await prisma.role.findUnique({
+            where: { id },
+        })
+
+        if (!roleToDelete) {
+            throw new Error("Role not found")
+        }
+
         const userCount = await prisma.user.count({
             where: {
                 Roles: {
@@ -91,15 +108,6 @@ export async function deleteRole(id: string) {
 
         if (userCount > 0) {
             throw new Error("Cannot delete a role that is assigned to users")
-        }
-
-        // Get role details for logging before deletion
-        const roleToDelete = await prisma.role.findUnique({
-            where: { id },
-        })
-
-        if (!roleToDelete) {
-            throw new Error("Role not found")
         }
 
         const role = await prisma.role.delete({
@@ -120,6 +128,15 @@ export async function deleteRole(id: string) {
 // Assign permissions to a role
 export async function assignPermissionsToRole(roleId: string, permissionCodes: string[]) {
     try {
+        // Check if it's the Super Admin role
+        const existingRole = await prisma.role.findUnique({
+            where: { id: roleId },
+        })
+
+        if (existingRole?.name === "Super Admin") {
+            throw new Error("Cannot modify permissions for the Super Admin role")
+        }
+
         const role = await prisma.role.update({
             where: { id: roleId },
             data: {

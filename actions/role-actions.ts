@@ -2,20 +2,34 @@
 
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
-import { assignPermissionsToRole, createRole, getRoles, updateRole } from "@/services/role.service"
+import { roleSuperAdmin } from "@/prisma/data-seed"
+import { assignPermissionsToRole, createRole, deleteRole, getRoles, updateRole } from "@/services/role.service"
 import { z } from "zod"
 
 // Schema for creating a role
 const createRoleSchema = z.object({
-    name: z.string().trim().min(2, "Name must be at least 2 characters").max(64, "Name must be at most 64 characters"),
+    name: z
+        .string()
+        .trim()
+        .min(2, "Name must be at least 2 characters")
+        .max(64, "Name must be at most 64 characters"),
     description: z.string().trim().max(255, "Description must be at most 255 characters"),
 })
 
 // Schema for updating a role
 const updateRoleSchema = z.object({
     id: z.string().trim(),
-    name: z.string().trim().min(2, "Name must be at least 2 characters").max(64, "Name must be at most 64 characters"),
+    name: z
+        .string()
+        .trim()
+        .min(2, "Name must be at least 2 characters")
+        .max(64, "Name must be at most 64 characters"),
     description: z.string().trim().max(255, "Description must be at most 255 characters"),
+})
+
+// Schema for deleting a role
+const deleteRoleSchema = z.object({
+    id: z.string().trim(),
 })
 
 // Schema for assigning permissions to a role
@@ -65,6 +79,24 @@ export const updateRoleAction = actionClient.schema(updateRoleSchema).action(asy
     } catch (error) {
         console.error("Failed to update role:", error)
         throw new Error("Failed to update role")
+    }
+})
+
+// Delete a role
+export const deleteRoleAction = actionClient.schema(deleteRoleSchema).action(async ({ parsedInput }) => {
+    try {
+        // Check for role_create permission (same as creation for deletion)
+        await checkAuth({ requiredPermission: "role_create" })
+
+        // Check if it's the Super Admin role
+        if (parsedInput.id === roleSuperAdmin.id) {
+            throw new Error("Cannot delete the Super Admin role")
+        }
+
+        return await deleteRole(parsedInput.id)
+    } catch (error) {
+        console.error("Failed to delete role:", error)
+        throw new Error("Failed to delete role")
     }
 })
 

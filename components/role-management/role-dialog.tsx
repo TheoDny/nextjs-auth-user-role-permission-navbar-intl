@@ -50,6 +50,8 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
         },
     })
 
+    const isSuperAdmin = role?.name === "Super Admin"
+
     useEffect(() => {
         if (role) {
             form.reset({
@@ -71,6 +73,11 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
     }
 
     const onSubmit = async (values: RoleFormValues) => {
+        if (isSuperAdmin) {
+            toast.error(t("error.cannotModifySuperAdmin"))
+            return
+        }
+
         setIsSubmitting(true)
 
         try {
@@ -124,7 +131,14 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>{role ? t("edit") : t("create")}</DialogTitle>
-                    <DialogDescription>{role ? t("editDescription") : t("createDescription")}</DialogDescription>
+                    <DialogDescription>
+                        {role ? t("editDescription") : t("createDescription")}
+                        {isSuperAdmin && (
+                            <div className="text-orange-600 text-sm mt-2">
+                                ⚠️ {t("error.cannotModifySuperAdmin")}
+                            </div>
+                        )}
+                    </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form
@@ -140,6 +154,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
                                     <FormControl>
                                         <Input
                                             placeholder={t("namePlaceholder")}
+                                            disabled={isSuperAdmin}
                                             {...field}
                                         />
                                     </FormControl>
@@ -157,6 +172,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
                                         <Textarea
                                             placeholder={t("descriptionPlaceholder")}
                                             className="resize-none"
+                                            disabled={isSuperAdmin}
                                             {...field}
                                         />
                                     </FormControl>
@@ -174,7 +190,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || isSuperAdmin}
                             >
                                 {isSubmitting ? tCommon("saving") : role ? tCommon("update") : tCommon("create")}
                             </Button>

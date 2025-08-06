@@ -126,6 +126,11 @@
         "noUsers": "No users found",
         "assignRolesTo": "Assign roles to:",
         "noRolesFound": "No roles found",
+        "delete": "Delete",
+        "confirmDelete": "Are you sure you want to delete this user?",
+        "warnings": {
+            "noRoles": "This user has no roles assigned"
+        },
         "columns": {
             "name": "Name",
             "email": "Email",
@@ -150,7 +155,17 @@
             "active": "Active",
             "commentActive": "User can login and access the system",
             "error": {
-                "adminUserEdit": "You cannot update the admin user"
+                "adminUserEdit": "You cannot update the admin user",
+                "UpdateUserFail": "Error while updating user",
+                "CreateUserFail": "Error while creating user",
+                "DeleteUserFail": "Error while deleting user",
+                "cannotDeleteSelf": "You cannot delete yourself",
+                "cannotDeleteAdmin": "You cannot delete the admin user"
+            },
+            "success": {
+                "UpdateUserSuccess": "User updated successfully",
+                "CreateUserSuccess": "User created successfully",
+                "DeleteUserSuccess": "User deleted successfully"
             }
         }
     },
@@ -164,6 +179,8 @@
         "permissions": "Permissions",
         "cancel": "Cancel",
         "save": "Save",
+        "delete": "Delete",
+        "confirmDelete": "Are you sure you want to delete this role?",
         "assignPermissionsTo": "Assign permissions to:",
         "noPermissionsFound": "No permissions found",
         "selectRoleToManagePermissions": "Select a role to manage permissions",
@@ -175,7 +192,23 @@
             "name": "Name",
             "namePlaceholder": "Role name",
             "description": "Description",
-            "descriptionPlaceholder": "Role description"
+            "descriptionPlaceholder": "Role description",
+            "warning": {
+                "noPermissions": "This role has no permissions assigned"
+            },
+            "error": {
+                "UpdateRoleFail": "Error while updating role",
+                "CreateRoleFail": "Error while creating role",
+                "DeleteRoleFail": "Error while deleting role",
+                "cannotModifySuperAdmin": "Cannot modify the Super Admin role",
+                "cannotDeleteSuperAdmin": "Cannot delete the Super Admin role",
+                "roleHasUsers": "Cannot delete a role that is assigned to users"
+            },
+            "success": {
+                "UpdateRoleSuccess": "Role updated successfully",
+                "CreateRoleSuccess": "Role created successfully",
+                "DeleteRoleSuccess": "Role deleted successfully"
+            }
         },
         "columns": {
             "name": "Name",
