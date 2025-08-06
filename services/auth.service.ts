@@ -4,6 +4,11 @@ import { TokenCreateUser } from "@/prisma/generated"
 import { addDays } from "date-fns"
 import jwt from "jsonwebtoken"
 
+if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is required")
+}
+const JWT_SECRET = process.env.JWT_SECRET
+
 export const getUserRolesPermissionsAndEntities = async (userId: string) => {
     const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -78,7 +83,7 @@ export async function checkToken(token: string, email: string): Promise<false | 
         }
 
         // Check if the jwt token is valid
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret")
+        const decoded = jwt.verify(token, JWT_SECRET)
 
         // Token exists and is not expired
         return decoded as { name: string; email: string }
