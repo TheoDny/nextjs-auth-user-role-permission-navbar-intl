@@ -201,10 +201,22 @@ export function RoleManagement() {
             {/* Roles Panel */}
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>{t("roles")}</CardTitle>
+                    <div className="flex flex-col">
+                        <CardTitle>{t("roles")}</CardTitle>
+                        {process.env.NEXT_PUBLIC_MAX_ROLE && (
+                            <div className="text-sm text-muted-foreground">
+                                {roles.length} / {process.env.NEXT_PUBLIC_MAX_ROLE}
+                            </div>
+                        )}
+                    </div>
                     <Button
                         size="sm"
                         onClick={handleCreateRole}
+                        disabled={
+                            process.env.NEXT_PUBLIC_MAX_ROLE
+                                ? roles.length >= parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
+                                : false
+                        }
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         {t("newRole")}

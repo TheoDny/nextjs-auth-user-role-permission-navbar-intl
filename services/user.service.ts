@@ -350,3 +350,7 @@ export async function deleteUser(id: string, currentUserId: string) {
         throw new Error("Failed to delete user")
     }
 }
+
+export async function countUsers() {
+    return await prisma.user.count()
+}

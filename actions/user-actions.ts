@@ -8,6 +8,7 @@ import { checkToken } from "@/services/auth.service"
 import {
     assignRolesToUser,
     changeEntitySelected,
+    countUsers,
     createUser,
     deleteUser,
     getUsers,
@@ -134,6 +135,16 @@ export const createUserAction = actionClient.schema(createUserSchema).action(asy
     try {
         // Check for user_create permission
         await checkAuth({ requiredPermission: "user_create" })
+
+        // Check user limit if NEXT_PUBLIC_MAX_USER is defined
+        if (process.env.NEXT_PUBLIC_MAX_USER) {
+            const maxUsers = parseInt(process.env.NEXT_PUBLIC_MAX_USER)
+            const currentUserCount = await countUsers()
+
+            if (currentUserCount >= maxUsers) {
+                throw new Error(`Maximum number of users reached (${maxUsers})`)
+            }
+        }
 
         return await createUser(parsedInput)
     } catch (error) {

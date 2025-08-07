@@ -205,10 +205,22 @@ export function UserManagement({ sessionUser }: { sessionUser: User & { Entities
             {/* Users Panel */}
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>{t("users")}</CardTitle>
+                    <div className="flex flex-col">
+                        <CardTitle>{t("users")}</CardTitle>
+                        {process.env.NEXT_PUBLIC_MAX_USER && (
+                            <div className="text-sm text-muted-foreground">
+                                {users.length} / {process.env.NEXT_PUBLIC_MAX_USER}
+                            </div>
+                        )}
+                    </div>
                     <Button
                         size="sm"
                         onClick={handleCreateUser}
+                        disabled={
+                            process.env.NEXT_PUBLIC_MAX_USER
+                                ? users.length >= parseInt(process.env.NEXT_PUBLIC_MAX_USER)
+                                : false
+                        }
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         {t("newUser")}
