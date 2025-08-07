@@ -1,4 +1,4 @@
-import { exec } from "child_process"
+import { resetDatabase } from "@/services/reset.service"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 
@@ -9,7 +9,7 @@ export async function GET() {
     }
     //execute a commond line to reset database
     console.info("Resetting database")
-    await exec("npx prisma migrate reset --force")
+    await resetDatabase()
 
     return NextResponse.json({ ok: true })
 }
