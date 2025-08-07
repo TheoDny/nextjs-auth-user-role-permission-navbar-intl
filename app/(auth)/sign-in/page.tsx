@@ -15,7 +15,7 @@ export default async function SignInPage() {
 
     return (
         <>
-            <div className="absolute top-5 right-5">
+            <div className="absolute top-5 left-5">
                 <p>admin connection:</p>
                 <p>admin@admin.com</p>
                 <p>Admin0123456789!</p>
