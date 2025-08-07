@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
 import { Label } from "@radix-ui/react-label"
-import { Loader2 } from "lucide-react"
+import { ArrowLeftIcon, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -15,12 +16,21 @@ export default function ForgotPasswordPage() {
     const t = useTranslations("ForgotPassword")
 
     return (
-        <Card className="z-50 rounded-md rounded-t-none w-full max-w-md">
-            <CardHeader>
+        <Card className="w-xs md:w-md relative">
+            <CardHeader className="mt-2">
                 <CardTitle className="text-lg md:text-xl">{t("title")}</CardTitle>
                 <CardDescription className="text-xs md:text-sm">{t("description")}</CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="absolute top-1 left-1 flex items-center gap-1 underline">
+                    <ArrowLeftIcon className="w-4 h-4" />
+                    <Link
+                        id="back"
+                        href="/sign-in"
+                    >
+                        {t("backToSignIn")}
+                    </Link>
+                </div>
                 <form
                     action={async (formData) => {
                         const email = formData.get("email")
@@ -33,6 +43,9 @@ export default function ForgotPasswordPage() {
                             {
                                 onSuccess: () => {
                                     toast.success("Email sent")
+                                    setTimeout(() => {
+                                        document.getElementById("back")?.click()
+                                    }, 1500)
                                 },
                                 onError: (ctx) => {
                                     console.error(ctx)

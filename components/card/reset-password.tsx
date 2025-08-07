@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { InputConceal } from "@/components/ui/input-conceal"
 import { authClient } from "@/lib/auth-client"
 import { Label } from "@radix-ui/react-label"
-import { CircleAlert, Loader2 } from "lucide-react"
+import { ArrowLeftIcon, CircleAlert, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -39,12 +40,21 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
     const [error, setError] = useState("")
     const tResetPassword = useTranslations("ResetPassword")
     return (
-        <Card className="z-50 rounded-md rounded-t-none w-full max-w-md">
+        <Card className="w-xs md:w-md relative">
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl">{tResetPassword("title")}</CardTitle>
                 <CardDescription className="text-xs md:text-sm">{tResetPassword("description")}</CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="absolute top-1 left-1 flex items-center gap-1 underline">
+                    <ArrowLeftIcon className="w-4 h-4" />
+                    <Link
+                        id="back"
+                        href="/sign-in"
+                    >
+                        {tResetPassword("backToSignIn")}
+                    </Link>
+                </div>
                 <form
                     action={async (formData) => {
                         setLoading(true)
