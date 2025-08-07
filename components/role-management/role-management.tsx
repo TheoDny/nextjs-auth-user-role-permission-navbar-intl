@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Pencil, Plus, Trash2, X } from "lucide-react"
+import { Check, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -10,6 +10,7 @@ import { assignPermissionsToRoleAction, deleteRoleAction, getRolesAction } from 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { roleSuperAdmin } from "@/prisma/data-seed"
@@ -27,6 +28,8 @@ export function RoleManagement() {
     const [editingRole, setEditingRole] = useState<Role | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [permissionSearchQuery, setPermissionSearchQuery] = useState("")
     const t = useTranslations("RoleManagement")
     const tPermissions = useTranslations("Permissions")
 
@@ -56,6 +59,23 @@ export function RoleManagement() {
             setSelectedPermissions([])
         }
     }, [selectedRole])
+
+    // Filter roles based on search query
+    const filteredRoles = roles.filter((role) => {
+        const searchLower = searchQuery.toLowerCase()
+        return (
+            role.name.toLowerCase().includes(searchLower) || role.description.toLowerCase().includes(searchLower)
+        )
+    })
+
+    // Filter permissions based on search query
+    const filteredPermissions = permissions.filter((permission) => {
+        const searchLower = permissionSearchQuery.toLowerCase()
+        return (
+            permission.code.toLowerCase().includes(searchLower) ||
+            tPermissions(permission.code).toLowerCase().includes(searchLower)
+        )
+    })
 
     const handleRoleSelect = (role: RolePermissions) => {
         setSelectedRole(role)
@@ -200,32 +220,43 @@ export function RoleManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
             {/* Roles Panel */}
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <div className="flex flex-col">
-                        <CardTitle>{t("roles")}</CardTitle>
-                        {process.env.NEXT_PUBLIC_MAX_ROLE && (
-                            <div className="text-sm text-muted-foreground">
-                                {roles.length} / {process.env.NEXT_PUBLIC_MAX_ROLE}
-                            </div>
-                        )}
+                <CardHeader className="flex flex-col justify-between space-y-0 pb-2">
+                    <div className="flex flex-row items-center justify-between space-x-2 w-full">
+                        <div className="flex flex-col">
+                            <CardTitle>{t("roles")}</CardTitle>
+                            {process.env.NEXT_PUBLIC_MAX_ROLE && (
+                                <div className="text-sm text-muted-foreground">
+                                    {roles.length} / {process.env.NEXT_PUBLIC_MAX_ROLE}
+                                </div>
+                            )}
+                        </div>
+                        <Button
+                            size="sm"
+                            onClick={handleCreateRole}
+                            disabled={
+                                process.env.NEXT_PUBLIC_MAX_ROLE
+                                    ? roles.length >= parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
+                                    : false
+                            }
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t("newRole")}
+                        </Button>
                     </div>
-                    <Button
-                        size="sm"
-                        onClick={handleCreateRole}
-                        disabled={
-                            process.env.NEXT_PUBLIC_MAX_ROLE
-                                ? roles.length >= parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
-                                : false
-                        }
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {t("newRole")}
-                    </Button>
+                    <div className="relative w-full">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder={t("search")}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-8"
+                        />
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <ScrollArea className="h-full pr-4">
                         <div>
-                            {roles.map((role) => (
+                            {filteredRoles.map((role) => (
                                 <div key={role.id}>
                                     <div
                                         className={`flex items-center space-x-2 p-2 m-1 rounded-md cursor-pointer ${
@@ -270,7 +301,12 @@ export function RoleManagement() {
                                     <Separator className="my-0" />
                                 </div>
                             ))}
-                            {roles.length === 0 && (
+                            {filteredRoles.length === 0 && searchQuery && (
+                                <div className="text-center py-4 text-muted-foreground">
+                                    {t("noRolesFoundSearch")}
+                                </div>
+                            )}
+                            {roles.length === 0 && !searchQuery && (
                                 <div className="text-center py-4 text-muted-foreground">{t("noRolesFound")}</div>
                             )}
                         </div>
@@ -280,26 +316,39 @@ export function RoleManagement() {
 
             {/* Permissions Panel */}
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-                    <CardTitle>{t("permissions")}</CardTitle>
-                    {selectedRole && hasPermissionsChanged() && (
-                        <div className="flex space-x-2 absolute right-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleCancelPermissions}
-                            >
-                                <X className="h-4 w-4 mr-2" />
-                                {t("cancel")}
-                            </Button>
-                            <Button
-                                size="sm"
-                                onClick={handleSavePermissions}
-                                disabled={isSubmitting || selectedRole.name === "Super Admin"}
-                            >
-                                <Check className="h-4 w-4 mr-2" />
-                                {t("save")}
-                            </Button>
+                <CardHeader className="flex flex-col justify-between space-y-2 pb-2">
+                    <div className="flex flex-row items-center justify-between space-x-2 w-full">
+                        <CardTitle>{t("permissions")}</CardTitle>
+                        {selectedRole && hasPermissionsChanged() && (
+                            <div className="flex space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleCancelPermissions}
+                                >
+                                    <X className="h-4 w-4 mr-2" />
+                                    {t("cancel")}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    onClick={handleSavePermissions}
+                                    disabled={isSubmitting || selectedRole.name === "Super Admin"}
+                                >
+                                    <Check className="h-4 w-4 mr-2" />
+                                    {t("save")}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                    {selectedRole && (
+                        <div className="relative w-full">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={t("searchPermissions")}
+                                value={permissionSearchQuery}
+                                onChange={(e) => setPermissionSearchQuery(e.target.value)}
+                                className="pl-8"
+                            />
                         </div>
                     )}
                 </CardHeader>
@@ -317,7 +366,7 @@ export function RoleManagement() {
                             </div>
                             <ScrollArea className="h-full pr-4">
                                 <div className="space-y-2">
-                                    {permissions.map((permission) => (
+                                    {filteredPermissions.map((permission) => (
                                         <div
                                             key={permission.code}
                                             className="flex items-start space-x-2 p-2 rounded-md hover:bg-muted"
@@ -341,7 +390,12 @@ export function RoleManagement() {
                                             </div>
                                         </div>
                                     ))}
-                                    {permissions.length === 0 && (
+                                    {filteredPermissions.length === 0 && permissionSearchQuery && (
+                                        <div className="text-center py-4 text-muted-foreground">
+                                            {t("noPermissionsFoundSearch")}
+                                        </div>
+                                    )}
+                                    {permissions.length === 0 && !permissionSearchQuery && (
                                         <div className="text-center py-4 text-muted-foreground">
                                             {t("noPermissionsFound")}
                                         </div>
