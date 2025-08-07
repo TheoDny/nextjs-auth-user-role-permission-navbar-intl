@@ -9,7 +9,7 @@ export async function GET() {
     }
     //execute a commond line to reset database
     console.info("Resetting database")
-    const result = await exec("npx prisma migrate reset --force")
+    await exec("npx prisma migrate reset --force")
 
     return NextResponse.json({ ok: true })
 }
