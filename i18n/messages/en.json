@@ -43,7 +43,7 @@
         "description": "Enter your email address and we'll send you a link to reset your password",
         "email": "Email",
         "sendLink": "Send Reset Link",
-        "backToLogin": "Back to login"
+        "backToSignIn": "Back to sign in"
     },
     "ResetPassword": {
         "title": "Reset Password",
@@ -58,7 +58,8 @@
         "passwordLength": "Password must be between 16 and 64 characters",
         "passwordUppercase": "Password must contain at least 1 uppercase letter",
         "passwordNumber": "Password must contain at least 1 number",
-        "passwordSpecialChar": "Password must contain at least 1 special character (ex: !@#$%^&*()_+-=[];':\"\\|,.<>/?)"
+        "passwordSpecialChar": "Password must contain at least 1 special character (ex: !@#$%^&*()_+-=[];':\"\\|,.<>/?)",
+        "backToSignIn": "Back to sign in"
     },
     "Account": {
         "title": "Account",

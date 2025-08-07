@@ -5,6 +5,7 @@ export const resetDatabase = async () => {
     await clearUsersExceptSuperAdmin()
     await clearRolesExceptSuperAdmin()
     await clearLog()
+    await clearTokenCreateUser()
 }
 
 export const clearUsersExceptSuperAdmin = async () => {
@@ -25,6 +26,10 @@ export const clearRolesExceptSuperAdmin = async () => {
             },
         },
     })
+}
+
+export const clearTokenCreateUser = async () => {
+    await prisma.tokenCreateUser.deleteMany()
 }
 
 export const clearLog = async () => {

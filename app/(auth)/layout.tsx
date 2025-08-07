@@ -1,4 +1,5 @@
 import { AuthLayout } from "@/components/auth/AuthLayout"
+import { Toaster } from "@/components/ui/sonner"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale } from "next-intl/server"
 import type { ReactNode } from "react"
@@ -27,6 +28,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             </head>
             <body className="dark">
                 <NextIntlClientProvider>
+                    <Toaster />
                     <AuthLayout>{children}</AuthLayout>
                 </NextIntlClientProvider>
             </body>

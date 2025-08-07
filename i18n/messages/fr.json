@@ -43,7 +43,7 @@
         "description": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
         "email": "Email",
         "sendLink": "Envoyer le lien",
-        "backToLogin": "Retour à la connexion"
+        "backToSignIn": "Retour à la connexion"
     },
     "ResetPassword": {
         "title": "Réinitialiser le mot de passe",
@@ -58,7 +58,8 @@
         "passwordLength": "Le mot de passe doit contenir entre 16 et 64 caractères",
         "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
         "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
-        "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial (ex: !@#$%^&*()_+-=[];':\"\\|,.<>/?)"
+        "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial (ex: !@#$%^&*()_+-=[];':\"\\|,.<>/?)",
+        "backToSignIn": "Retour à la connexion"
     },
     "Account": {
         "title": "Compte",
