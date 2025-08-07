@@ -159,7 +159,8 @@
                 "CreateUserFail": "Erreur lors de la création de l'utilisateur",
                 "DeleteUserFail": "Erreur lors de la suppression de l'utilisateur",
                 "cannotDeleteSelf": "Vous ne pouvez pas vous supprimer vous-même",
-                "cannotDeleteAdmin": "Vous ne pouvez pas supprimer l'utilisateur administrateur"
+                "cannotDeleteAdmin": "Vous ne pouvez pas supprimer l'utilisateur administrateur",
+                "maxUsersReached": "Nombre maximum d'utilisateurs atteint"
             },
             "success": {
                 "UpdateUserSuccess": "Utilisateur mis à jour avec succès",
@@ -201,7 +202,8 @@
                 "DeleteRoleFail": "Erreur lors de la suppression du rôle",
                 "cannotModifySuperAdmin": "Impossible de modifier le rôle Super Admin",
                 "cannotDeleteSuperAdmin": "Impossible de supprimer le rôle Super Admin",
-                "roleHasUsers": "Impossible de supprimer un rôle assigné à des utilisateurs"
+                "roleHasUsers": "Impossible de supprimer un rôle assigné à des utilisateurs",
+                "maxRolesReached": "Nombre maximum de rôles atteint"
             },
             "success": {
                 "UpdateRoleSuccess": "Rôle mis à jour avec succès",

@@ -160,3 +160,7 @@ export async function assignPermissionsToRole(roleId: string, permissionCodes: s
         throw new Error("Failed to assign permissions")
     }
 }
+
+export async function countRoles() {
+    return await prisma.role.count()
+}

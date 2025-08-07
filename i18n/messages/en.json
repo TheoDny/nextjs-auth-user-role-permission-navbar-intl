@@ -160,7 +160,8 @@
                 "CreateUserFail": "Error while creating user",
                 "DeleteUserFail": "Error while deleting user",
                 "cannotDeleteSelf": "You cannot delete yourself",
-                "cannotDeleteAdmin": "You cannot delete the admin user"
+                "cannotDeleteAdmin": "You cannot delete the admin user",
+                "maxUsersReached": "Maximum number of users reached"
             },
             "success": {
                 "UpdateUserSuccess": "User updated successfully",
@@ -202,7 +203,8 @@
                 "DeleteRoleFail": "Error while deleting role",
                 "cannotModifySuperAdmin": "Cannot modify the Super Admin role",
                 "cannotDeleteSuperAdmin": "Cannot delete the Super Admin role",
-                "roleHasUsers": "Cannot delete a role that is assigned to users"
+                "roleHasUsers": "Cannot delete a role that is assigned to users",
+                "maxRolesReached": "Maximum number of roles reached"
             },
             "success": {
                 "UpdateRoleSuccess": "Role updated successfully",

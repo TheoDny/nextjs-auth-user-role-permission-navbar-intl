@@ -3,7 +3,14 @@
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
 import { roleSuperAdmin } from "@/prisma/data-seed"
-import { assignPermissionsToRole, createRole, deleteRole, getRoles, updateRole } from "@/services/role.service"
+import {
+    assignPermissionsToRole,
+    countRoles,
+    createRole,
+    deleteRole,
+    getRoles,
+    updateRole,
+} from "@/services/role.service"
 import { z } from "zod"
 
 // Schema for creating a role
@@ -56,6 +63,16 @@ export const createRoleAction = actionClient.schema(createRoleSchema).action(asy
     try {
         // Check for role_create permission
         await checkAuth({ requiredPermission: "role_create" })
+
+        // Check role limit if NEXT_PUBLIC_MAX_ROLE is defined
+        if (process.env.NEXT_PUBLIC_MAX_ROLE) {
+            const maxRoles = parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
+            const currentRoleCount = await countRoles()
+
+            if (currentRoleCount >= maxRoles) {
+                throw new Error(`Maximum number of roles reached (${maxRoles})`)
+            }
+        }
 
         return await createRole({
             ...parsedInput,
