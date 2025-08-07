@@ -78,7 +78,11 @@ export function RoleManagement() {
     })
 
     const handleRoleSelect = (role: RolePermissions) => {
-        setSelectedRole(role)
+        if (selectedRole?.id === role.id) {
+            setSelectedRole(null)
+        } else {
+            setSelectedRole(role)
+        }
     }
 
     const handleCreateRole = () => {

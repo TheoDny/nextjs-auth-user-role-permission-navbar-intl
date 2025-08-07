@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Pencil, Plus, Search, Trash2, TriangleAlert, X } from "lucide-react"
+import { Check, Filter, Pencil, Plus, Search, Trash2, TriangleAlert, X } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -11,8 +11,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Combobox, ComboboxOption } from "@/components/ui/combobox"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Entity, User } from "@/prisma/generated"
@@ -35,6 +38,11 @@ export function UserManagement({ sessionUser }: { sessionUser: User & { Entities
     const [isDeleting, setIsDeleting] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [roleSearchQuery, setRoleSearchQuery] = useState("")
+
+    // Filter states
+    const [statusFilter, setStatusFilter] = useState<string>("all") // "all", "active", "inactive"
+    const [entityFilter, setEntityFilter] = useState<string[]>([])
+    const [filterOpen, setFilterOpen] = useState(false)
 
     const { confirm } = useConfirm()
 
@@ -63,11 +71,44 @@ export function UserManagement({ sessionUser }: { sessionUser: User & { Entities
         }
     }, [selectedUser])
 
-    // Filter users based on search query
-    const filteredUsers = users.filter((user) => {
-        const searchLower = searchQuery.toLowerCase()
-        return user.name?.toLowerCase().includes(searchLower) || user.email.toLowerCase().includes(searchLower)
+    // Get unique entities for the filter
+    const availableEntities: ComboboxOption[] = Array.from(
+        new Set(users.flatMap((user) => user.Entities.map((entity) => entity.id))),
+    ).map((entityId) => {
+        const entity = users.flatMap((user) => user.Entities).find((e) => e.id === entityId)
+        return {
+            value: entityId,
+            label: entity?.name || "",
+        }
     })
+
+    // Filter users based on search query and filters
+    const filteredUsers = users.filter((user) => {
+        // Search filter
+        const searchLower = searchQuery.toLowerCase()
+        const matchesSearch =
+            user.name?.toLowerCase().includes(searchLower) || user.email.toLowerCase().includes(searchLower)
+
+        // Status filter
+        const matchesStatus =
+            statusFilter === "all" ||
+            (statusFilter === "active" && user.active) ||
+            (statusFilter === "inactive" && !user.active)
+
+        // Entity filter
+        const matchesEntity =
+            entityFilter.length === 0 || user.Entities.some((entity) => entityFilter.includes(entity.id))
+
+        return matchesSearch && matchesStatus && matchesEntity
+    })
+
+    // Check if any filters are active
+    const hasActiveFilters = statusFilter !== "all" || entityFilter.length > 0
+
+    const clearFilters = () => {
+        setStatusFilter("all")
+        setEntityFilter([])
+    }
 
     // Filter roles based on search query
     const filteredRoles = roles.filter((role) => {
@@ -78,7 +119,11 @@ export function UserManagement({ sessionUser }: { sessionUser: User & { Entities
     })
 
     const handleUserSelect = (user: UserRolesAndEntities) => {
-        setSelectedUser(user)
+        if (selectedUser?.id === user.id) {
+            setSelectedUser(null)
+        } else {
+            setSelectedUser(user)
+        }
     }
 
     const handleCreateUser = () => {
@@ -244,14 +289,118 @@ export function UserManagement({ sessionUser }: { sessionUser: User & { Entities
                             {t("newUser")}
                         </Button>
                     </div>
-                    <div className="relative w-full">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder={t("search")}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-8"
-                        />
+                    <div className="flex items-center space-x-2 w-full">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                id="search-filter-users"
+                                placeholder={t("search")}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-8"
+                            />
+                        </div>
+                        <Popover
+                            open={filterOpen}
+                            onOpenChange={setFilterOpen}
+                        >
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={hasActiveFilters ? "default" : "outline"}
+                                    size="sm"
+                                    className="px-3"
+                                >
+                                    <Filter className="h-4 w-4" />
+                                    {hasActiveFilters && (
+                                        <span className="ml-1 text-xs">
+                                            {(statusFilter !== "all" ? 1 : 0) + entityFilter.length}
+                                        </span>
+                                    )}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                                className="w-80"
+                                align="end"
+                            >
+                                <div>
+                                    <div className="flex items-center justify-between">
+                                        {hasActiveFilters && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={clearFilters}
+                                                className="h-auto p-0 text-xs"
+                                            >
+                                                {t("filters.clear")}
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-sm font-medium mb-2 block">
+                                                {t("filters.status")}
+                                            </label>
+                                            <RadioGroup
+                                                value={statusFilter}
+                                                onValueChange={setStatusFilter}
+                                                className="flex space-x-4"
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem
+                                                        value="all"
+                                                        id="all"
+                                                    />
+                                                    <label
+                                                        htmlFor="all"
+                                                        className="text-sm"
+                                                    >
+                                                        {t("filters.all")}
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem
+                                                        value="active"
+                                                        id="active"
+                                                    />
+                                                    <label
+                                                        htmlFor="active"
+                                                        className="text-sm"
+                                                    >
+                                                        {t("status.active")}
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem
+                                                        value="inactive"
+                                                        id="inactive"
+                                                    />
+                                                    <label
+                                                        htmlFor="inactive"
+                                                        className="text-sm"
+                                                    >
+                                                        {t("status.inactive")}
+                                                    </label>
+                                                </div>
+                                            </RadioGroup>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-sm font-medium mb-2 block">
+                                                {t("filters.entities")}
+                                            </label>
+                                            <Combobox
+                                                options={availableEntities}
+                                                value={entityFilter}
+                                                onChange={(value) => setEntityFilter(value as string[])}
+                                                placeholder={t("filters.selectEntities")}
+                                                emptyMessage={t("filters.noEntities")}
+                                                multiple={true}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </CardHeader>
                 <CardContent>

@@ -129,6 +129,14 @@
         "assignRolesTo": "Assign roles to:",
         "noRolesFound": "No roles found",
         "noRolesFoundSearch": "No roles found matching your search",
+        "filters": {
+            "clear": "Clear all",
+            "status": "Status",
+            "all": "All",
+            "entities": "Entities",
+            "selectEntities": "Select entities...",
+            "noEntities": "No entities found"
+        },
         "delete": "Delete",
         "confirmDelete": "Are you sure you want to delete this user?",
         "warnings": {
