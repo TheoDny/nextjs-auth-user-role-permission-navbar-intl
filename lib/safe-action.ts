@@ -6,7 +6,7 @@ export const actionClient = createSafeActionClient({
         // Log to console.
         console.error("Action error:", e.name, e.message)
 
-        if (HandleServerError.has(e.name) && "code" in e) {
+        if (HandleServerError.has(e.name) && "code" in e && typeof e.code === "string") {
             return e.code
         }
 
