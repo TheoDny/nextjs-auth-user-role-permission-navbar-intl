@@ -2,10 +2,10 @@ import { prisma } from "@/lib/prisma"
 import { roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
 
 export const resetDatabase = async () => {
-    await clearUsersExceptSuperAdmin()
-    await clearRolesExceptSuperAdmin()
     await clearLog()
     await clearTokenCreateUser()
+    await clearRolesExceptSuperAdmin()
+    await clearUsersExceptSuperAdmin()
 }
 
 export const clearUsersExceptSuperAdmin = async () => {
