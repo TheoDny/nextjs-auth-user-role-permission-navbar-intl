@@ -16,6 +16,9 @@ import { sendInvitationSignUp } from "./mail.service"
 export async function getUsers() {
     try {
         const users = await prisma.user.findMany({
+            where: {
+                deletedAt: null,
+            },
             include: {
                 Roles: true,
                 Entities: true,
@@ -267,6 +270,7 @@ export async function signUpUser(name: string, email: string, password: string) 
     const user = await prisma.user.findUnique({
         where: {
             email: email,
+            deletedAt: null,
         },
         include: {
             Entities: true,
@@ -330,15 +334,19 @@ export async function deleteUser(id: string, currentUserId: string) {
     try {
         // Get user details first
         const userToDelete = await prisma.user.findUnique({
-            where: { id },
+            where: { id, deletedAt: null },
         })
 
         if (!userToDelete) {
             throw new Error("User not found")
         }
 
-        const user = await prisma.user.delete({
+        const user = await prisma.user.update({
             where: { id },
+            data: {
+                deletedAt: new Date(),
+                email: userToDelete.email + "_deleted_" + new Date().toISOString(),
+            },
         })
 
         addUserDisableLog({ id: user.id, name: userToDelete.name || "" })
@@ -352,5 +360,9 @@ export async function deleteUser(id: string, currentUserId: string) {
 }
 
 export async function countUsers() {
-    return await prisma.user.count()
+    return await prisma.user.count({
+        where: {
+            deletedAt: null,
+        },
+    })
 }
