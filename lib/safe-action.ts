@@ -3,9 +3,15 @@ import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from "next-safe-
 export const actionClient = createSafeActionClient({
     // Can also be an async function.
     handleServerError(e) {
-    // Log to console.
-        console.error("Action error:", e.message);
+        // Log to console.
+        console.error("Action error:", e.name, e.message)
 
-        return DEFAULT_SERVER_ERROR_MESSAGE;
+        if (HandleServerError.has(e.name) && "code" in e) {
+            return e.code
+        }
+
+        return DEFAULT_SERVER_ERROR_MESSAGE
     },
-});
+})
+
+const HandleServerError = new Set(["DeleteRoleUserAssignedError"])

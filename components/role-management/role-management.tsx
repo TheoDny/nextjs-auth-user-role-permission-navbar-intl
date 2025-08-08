@@ -115,8 +115,12 @@ export function RoleManagement() {
             const result = await deleteRoleAction({ id: role.id })
 
             if (result?.serverError) {
-                console.error(result?.serverError)
-                return toast.error(t("dialog.error.DeleteRoleFail"))
+                let errorMessage: string = t("dialog.error." + result?.serverError)
+                if (!errorMessage) {
+                    errorMessage = t("dialog.error.DeleteRoleFail")
+                }
+                console.error(errorMessage)
+                return toast.error(errorMessage)
             } else if (result?.validationErrors) {
                 console.error(result?.validationErrors)
                 return toast.error(t("dialog.error.DeleteRoleFail"))
