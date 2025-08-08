@@ -120,7 +120,7 @@ export function EditProfile({ currentName, currentEmail, currentImage }: EditPro
             })
 
             if (result?.serverError) {
-                return toast.error(result.serverError || t("profileUpdate.error"))
+                return toast.error(t("profileUpdate.error"))
             } else if (result?.validationErrors) {
                 return toast.error(t("profileUpdate.error"))
             } else if (!result?.data) {
