@@ -101,20 +101,15 @@ export const updateRoleAction = actionClient.schema(updateRoleSchema).action(asy
 
 // Delete a role
 export const deleteRoleAction = actionClient.schema(deleteRoleSchema).action(async ({ parsedInput }) => {
-    try {
-        // Check for role_create permission (same as creation for deletion)
-        await checkAuth({ requiredPermission: "role_create" })
+    // Check for role_create permission (same as creation for deletion)
+    await checkAuth({ requiredPermission: "role_create" })
 
-        // Check if it's the Super Admin role
-        if (parsedInput.id === roleSuperAdmin.id) {
-            throw new Error("Cannot delete the Super Admin role")
-        }
-
-        return await deleteRole(parsedInput.id)
-    } catch (error) {
-        console.error("Failed to delete role:", error)
-        throw new Error("Failed to delete role")
+    // Check if it's the Super Admin role
+    if (parsedInput.id === roleSuperAdmin.id) {
+        throw new Error("Cannot delete the Super Admin role")
     }
+
+    return await deleteRole(parsedInput.id)
 })
 
 // Assign permissions to a role

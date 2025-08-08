@@ -1,3 +1,4 @@
+import { DeleteRoleUserAssignedError } from "@/errors/DeleteRoleUserAssignedError"
 import { prisma } from "@/lib/prisma"
 import {
     addRoleCreateLog,
@@ -86,43 +87,38 @@ export async function updateRole(id: string, data: { name: string; description: 
 
 // Delete a role
 export async function deleteRole(id: string) {
-    try {
-        // Get role details first
-        const roleToDelete = await prisma.role.findUnique({
-            where: { id },
-        })
+    // Get role details first
+    const roleToDelete = await prisma.role.findUnique({
+        where: { id },
+    })
 
-        if (!roleToDelete) {
-            throw new Error("Role not found")
-        }
+    if (!roleToDelete) {
+        throw new Error("Role not found")
+    }
 
-        const userCount = await prisma.user.count({
-            where: {
-                Roles: {
-                    some: {
-                        id,
-                    },
+    const userCount = await prisma.user.count({
+        where: {
+            Roles: {
+                some: {
+                    id,
                 },
             },
-        })
+        },
+    })
 
-        if (userCount > 0) {
-            throw new Error("Cannot delete a role that is assigned to users")
-        }
-
-        const role = await prisma.role.delete({
-            where: { id },
-        })
-
-        // Add log
-        addRoleDeleteLog({ id: role.id, name: roleToDelete.name })
-
-        revalidatePath("/administration/roles")
-        return role
-    } catch (error) {
-        console.error("Failed to delete role:", error)
-        throw new Error("Failed to delete role")
+    if (userCount > 0) {
+        throw new DeleteRoleUserAssignedError("Cannot delete a role that is assigned to users")
     }
+
+    const role = await prisma.role.delete({
+        where: { id },
+    })
+
+    // Add log
+    addRoleDeleteLog({ id: role.id, name: roleToDelete.name })
+
+    revalidatePath("/administration/roles")
+    return role
 }
 
 // Assign permissions to a role
