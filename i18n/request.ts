@@ -4,7 +4,8 @@ import { cookies, headers } from "next/headers"
 export const IMPLEMENTED_LOCALE = ["en", "fr"]
 
 export default getRequestConfig(async () => {
-    let locale = (await cookies()).get("NEXT_LOCALE")?.value || "en"
+    let locale =
+        (await cookies()).get("NEXT_LOCALE")?.value || (navigator.language.split("-")[0] === "fr" ? "fr" : "en")
 
     if (!IMPLEMENTED_LOCALE.includes(locale)) {
         const h = (await headers()).get("accept-language")
