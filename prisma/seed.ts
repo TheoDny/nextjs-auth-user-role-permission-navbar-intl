@@ -1,13 +1,13 @@
-import 'dotenv/config'
-import { roleSuperAdmin, userSuperAdmin } from "./data-seed"
-import { PrismaClient } from "./generated"
 import { PrismaPg } from '@prisma/adapter-pg'
-import { permissions, PermissionSeed } from "./permission"
+import 'dotenv/config'
 import pg from 'pg'
+import { roleSuperAdmin, userSuperAdmin } from "./data-seed"
+import { PrismaClient } from "./generated/client"
+import { permissions, PermissionSeed } from "./permission"
 
 const { Pool } = pg
-
-const connectionString = process.env.DATABASE_URL!
+console.log(process.env.DATABASE_URL)
+const connectionString = process.env.DATABASE_USER ? `postgresql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}?schema=public` : process.env.DATABASE_URL!
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
@@ -167,9 +167,12 @@ async function main() {
 }
 
 main()
-    .then(() => prisma.$disconnect())
+    .then(() => {
+        prisma.$disconnect()
+        process.exit(0)
+    })
     .catch((e) => {
         console.error(e)
         prisma.$disconnect()
-        // process.exit(1);
+        process.exit(1)
     })
