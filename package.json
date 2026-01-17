@@ -20,6 +20,9 @@
     "prisma:studio": "prisma studio",
     "vercel-build": "prisma migrate deploy && prisma generate && prisma db seed && next build --turbopack"
   },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^7.0.0",
