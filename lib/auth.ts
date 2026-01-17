@@ -1,12 +1,10 @@
-import { PrismaClient } from "@/prisma/generated"
 import { getUserRolesPermissionsAndEntities } from "@/services/auth.service"
 import { sendResetPassword } from "@/services/mail.service"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
 import { customSession } from "better-auth/plugins"
-
-const prisma = new PrismaClient()
+import { prisma } from "./prisma"
 export const auth = betterAuth({
     user: {
         additionalFields: {
