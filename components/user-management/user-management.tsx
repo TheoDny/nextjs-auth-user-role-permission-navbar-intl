@@ -18,7 +18,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { Entity, User } from "@/prisma/generated"
+import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
+import { UserModel as User } from "@/prisma/generated/models/User"
 import { RolePermissions } from "@/types/role.type"
 import { UserRolesAndEntities } from "@/types/user.type"
 

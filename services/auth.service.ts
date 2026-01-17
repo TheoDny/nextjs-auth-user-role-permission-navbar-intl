@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { generateInviteToken } from "@/lib/utils"
-import { TokenCreateUser } from "@/prisma/generated"
+import { TokenCreateUserModel as TokenCreateUser } from "@/prisma/generated/models/TokenCreateUser"
 import { addDays } from "date-fns"
 import jwt from "jsonwebtoken"
 

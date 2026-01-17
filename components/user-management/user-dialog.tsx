@@ -21,7 +21,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { Entity } from "@/prisma/generated"
+import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
 import { UserRolesAndEntities } from "@/types/user.type"
 import { CirclePlus, X } from "lucide-react"
 

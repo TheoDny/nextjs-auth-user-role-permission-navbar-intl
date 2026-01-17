@@ -20,7 +20,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Role } from "@/prisma/generated"
+import { RoleModel as Role } from "@/prisma/generated/models/Role"
 import { RolePermissions } from "@/types/role.type"
 
 const roleSchema = z.object({

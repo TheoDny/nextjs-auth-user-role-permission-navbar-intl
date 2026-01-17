@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { signOut } from "@/lib/auth-client"
-import { Entity } from "@/prisma/generated"
+import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
 import { Building, ChevronsUpDown, LogOut, SquareUserRound } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
