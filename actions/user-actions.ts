@@ -89,7 +89,7 @@ const signUpSchema = z.object({
 })
 
 // Server action for updating user profile
-export const updateProfileAction = actionClient.schema(updateProfileSchema).action(async ({ parsedInput }) => {
+export const updateProfileAction = actionClient.inputSchema(updateProfileSchema).action(async ({ parsedInput }) => {
     try {
         // Get current session
         const session = await auth.api.getSession({
@@ -131,7 +131,7 @@ export async function getUsersAction() {
 }
 
 // Create a new user
-export const createUserAction = actionClient.schema(createUserSchema).action(async ({ parsedInput }) => {
+export const createUserAction = actionClient.inputSchema(createUserSchema).action(async ({ parsedInput }) => {
     try {
         // Check for user_create permission
         await checkAuth({ requiredPermission: "user_create" })
@@ -154,7 +154,7 @@ export const createUserAction = actionClient.schema(createUserSchema).action(asy
 })
 
 // Update an existing user
-export const updateUserAction = actionClient.schema(updateUserSchema).action(async ({ parsedInput }) => {
+export const updateUserAction = actionClient.inputSchema(updateUserSchema).action(async ({ parsedInput }) => {
     try {
         // Check for user_edit permission
         const session = await checkAuth({ requiredPermission: "user_edit" })
@@ -172,7 +172,7 @@ export const updateUserAction = actionClient.schema(updateUserSchema).action(asy
 })
 
 // Delete a user
-export const deleteUserAction = actionClient.schema(deleteUserSchema).action(async ({ parsedInput }) => {
+export const deleteUserAction = actionClient.inputSchema(deleteUserSchema).action(async ({ parsedInput }) => {
     try {
         // Check for user_create permission (same as creation for deletion)
         const session = await checkAuth({ requiredPermission: "user_create" })
@@ -230,7 +230,7 @@ export const changeEntitySelectedAction = actionClient
         }
     })
 
-export const signUpAction = actionClient.schema(signUpSchema).action(async ({ parsedInput }) => {
+export const signUpAction = actionClient.inputSchema(signUpSchema).action(async ({ parsedInput }) => {
     if (parsedInput.password !== parsedInput.passwordConfirmation) {
         throw new Error("Passwords do not match")
     }

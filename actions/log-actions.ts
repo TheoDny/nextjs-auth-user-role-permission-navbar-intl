@@ -13,7 +13,7 @@ const getLogsSchema = z.object({
     endDate: z.string().optional(), 
 })
 
-export const getLogsAction = actionClient.schema(getLogsSchema).action(async ({ parsedInput }) => {
+export const getLogsAction = actionClient.inputSchema(getLogsSchema).action(async ({ parsedInput }) => {
     const session = await auth.api.getSession({
         headers: await headers(),
     })

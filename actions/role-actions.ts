@@ -59,7 +59,7 @@ export async function getRolesAction() {
 }
 
 // Create a new role
-export const createRoleAction = actionClient.schema(createRoleSchema).action(async ({ parsedInput }) => {
+export const createRoleAction = actionClient.inputSchema(createRoleSchema).action(async ({ parsedInput }) => {
     try {
         // Check for role_create permission
         await checkAuth({ requiredPermission: "role_create" })
@@ -84,7 +84,7 @@ export const createRoleAction = actionClient.schema(createRoleSchema).action(asy
 })
 
 // Update an existing role
-export const updateRoleAction = actionClient.schema(updateRoleSchema).action(async ({ parsedInput }) => {
+export const updateRoleAction = actionClient.inputSchema(updateRoleSchema).action(async ({ parsedInput }) => {
     try {
         // Check for role_edit permission
         await checkAuth({ requiredPermission: "role_edit" })
@@ -100,7 +100,7 @@ export const updateRoleAction = actionClient.schema(updateRoleSchema).action(asy
 })
 
 // Delete a role
-export const deleteRoleAction = actionClient.schema(deleteRoleSchema).action(async ({ parsedInput }) => {
+export const deleteRoleAction = actionClient.inputSchema(deleteRoleSchema).action(async ({ parsedInput }) => {
     // Check for role_create permission (same as creation for deletion)
     await checkAuth({ requiredPermission: "role_create" })
 
