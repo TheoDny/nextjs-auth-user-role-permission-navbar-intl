@@ -1,6 +1,6 @@
 "use client"
 
-import { updateProfileAction } from "@/actions/user-actions"
+import { updateProfileAction } from "@/actions/user.action"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {

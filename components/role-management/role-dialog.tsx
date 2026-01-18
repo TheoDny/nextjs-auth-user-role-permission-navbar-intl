@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { createRoleAction, updateRoleAction } from "@/actions/role-actions"
+import { createRoleAction, updateRoleAction } from "@/actions/role.action"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,

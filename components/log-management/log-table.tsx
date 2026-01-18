@@ -1,6 +1,6 @@
 "use client"
 
-import { getLogsAction } from "@/actions/log-actions"
+import { getLogsAction } from "@/actions/log.action"
 import { Button } from "@/components/ui/button"
 import { Combobox, ComboboxOption } from "@/components/ui/combobox"
 import { Column, DataTable } from "@/components/ui/data-table"

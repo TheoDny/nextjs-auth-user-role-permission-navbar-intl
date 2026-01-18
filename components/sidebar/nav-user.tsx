@@ -1,6 +1,6 @@
 "use client"
 
-import { changeEntitySelectedAction } from "@/actions/user-actions"
+import { changeEntitySelectedAction } from "@/actions/user.action"
 import { ModeToggle } from "@/components/select/select-theme"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
