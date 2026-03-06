@@ -187,6 +187,18 @@
         "newRole": "Nouveau Rôle",
         "search": "Rechercher des rôles...",
         "searchPermissions": "Rechercher des permissions...",
+        "module": "Module",
+        "modules": {
+            "user": "Utilisateurs",
+            "role": "Rôles",
+            "log": "Journaux",
+            "other": "Autre"
+        },
+        "actions": {
+            "read": "Lecture",
+            "create": "Créer",
+            "edit": "Modifier"
+        },
         "noRolesFound": "Aucun rôle trouvé",
         "noRolesFoundSearch": "Aucun rôle trouvé correspondant à votre recherche",
         "roles": "Rôles",

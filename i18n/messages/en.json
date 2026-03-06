@@ -188,6 +188,18 @@
         "newRole": "New Role",
         "search": "Search roles...",
         "searchPermissions": "Search permissions...",
+        "module": "Module",
+        "modules": {
+            "user": "Users",
+            "role": "Roles",
+            "log": "Logs",
+            "other": "Other"
+        },
+        "actions": {
+            "read": "Read",
+            "create": "Create",
+            "edit": "Edit"
+        },
         "noRolesFound": "No roles found",
         "noRolesFoundSearch": "No roles found matching your search",
         "roles": "Roles",

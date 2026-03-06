@@ -2,23 +2,56 @@
 
 import { Check, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 
 import { getPermissionsAction } from "@/actions/permission.action"
 import { assignPermissionsToRoleAction, deleteRoleAction, getRolesAction } from "@/actions/role.action"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { roleSuperAdmin } from "@/prisma/data-seed"
 import { PermissionModel as Permission } from "@/prisma/generated/models/Permission"
 import { RoleModel as Role } from "@/prisma/generated/models/Role"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { RolePermissions } from "@/types/role.type"
 import { RoleDialog } from "./role-dialog"
+
+type PermissionMatrixItem = {
+    code: string
+    module: string
+    action: string
+}
+
+const COMMON_ACTIONS_ORDER = ["read", "create", "edit"]
+
+function parsePermissionCode(code: string): PermissionMatrixItem {
+    const segments = code.split("_").filter(Boolean)
+    if (segments.length < 2) {
+        return { code, module: "other", action: code }
+    }
+    return {
+        code,
+        module: segments.slice(0, -1).join("_"),
+        action: segments[segments.length - 1] || code,
+    }
+}
+
+function sortActions(actionA: string, actionB: string): number {
+    const actionAIndex = COMMON_ACTIONS_ORDER.indexOf(actionA)
+    const actionBIndex = COMMON_ACTIONS_ORDER.indexOf(actionB)
+    const hasActionAIndex = actionAIndex !== -1
+    const hasActionBIndex = actionBIndex !== -1
+    if (hasActionAIndex && hasActionBIndex) return actionAIndex - actionBIndex
+    if (hasActionAIndex) return -1
+    if (hasActionBIndex) return 1
+    return actionA.localeCompare(actionB)
+}
 
 export function RoleManagement() {
     const [roles, setRoles] = useState<RolePermissions[]>([])
@@ -46,12 +79,12 @@ export function RoleManagement() {
                 setPermissions(permissionsData)
             } catch (error) {
                 console.error(error)
-                toast.error("Failed to load data")
+                toast.error(t("dialog.error.UpdateRoleFail"))
             }
         }
 
         loadData()
-    }, [])
+    }, [t])
 
     useEffect(() => {
         if (selectedRole) {
@@ -77,6 +110,33 @@ export function RoleManagement() {
             tPermissions(permission.code).toLowerCase().includes(searchLower)
         )
     })
+
+    const matrixPermissionItems = useMemo(
+        () => filteredPermissions.map((p) => parsePermissionCode(p.code)),
+        [filteredPermissions],
+    )
+    const permissionActions = useMemo(() => {
+        const uniqueActions = Array.from(new Set(matrixPermissionItems.map((p) => p.action)))
+        return uniqueActions.sort(sortActions)
+    }, [matrixPermissionItems])
+    const permissionModules = useMemo(() => {
+        const uniqueModules = Array.from(new Set(matrixPermissionItems.map((p) => p.module)))
+        return uniqueModules.sort((a, b) => a.localeCompare(b))
+    }, [matrixPermissionItems])
+    const permissionCodeByModuleAction = useMemo(() => {
+        const map = new Map<string, string>()
+        matrixPermissionItems.forEach((item) => {
+            map.set(`${item.module}__${item.action}`, item.code)
+        })
+        return map
+    }, [matrixPermissionItems])
+
+    const getPermissionCodeForCell = (module: string, action: string) =>
+        permissionCodeByModuleAction.get(`${module}__${action}`)
+    const getActionLabel = (action: string) =>
+        t.has(`actions.${action}`) ? t(`actions.${action}`) : action
+    const getModuleLabel = (module: string) =>
+        t.has(`modules.${module}`) ? t(`modules.${module}`) : module
 
     const handleRoleSelect = (role: RolePermissions) => {
         if (selectedRole?.id === role.id) {
@@ -166,9 +226,14 @@ export function RoleManagement() {
         setSelectedPermissions((current) => {
             if (current.includes(permissionCode)) {
                 return current.filter((id) => id !== permissionCode)
-            } else {
-                return [...current, permissionCode]
             }
+            const nextPermissions = new Set([...current, permissionCode])
+            const permission = parsePermissionCode(permissionCode)
+            if (permission.action === "create" || permission.action === "edit") {
+                const readCode = getPermissionCodeForCell(permission.module, "read")
+                if (readCode) nextPermissions.add(readCode)
+            }
+            return Array.from(nextPermissions)
         })
     }
 
@@ -198,10 +263,10 @@ export function RoleManagement() {
                 setSelectedRole(updatedRole)
             }
 
-            toast.success("Permissions updated successfully")
+            toast.success(t("dialog.success.UpdateRoleSuccess"))
         } catch (error) {
             console.error(error)
-            toast.error("Failed to update permissions")
+            toast.error(t("dialog.error.UpdateRoleFail"))
         } finally {
             setIsSubmitting(false)
         }
@@ -326,10 +391,10 @@ export function RoleManagement() {
             {/* Permissions Panel */}
             <Card>
                 <CardHeader className="flex flex-col justify-between space-y-2 pb-2">
-                    <div className="flex flex-row items-center justify-between space-x-2 w-full">
+                    <div className="flex flex-row items-center justify-between space-x-2 w-full relative">
                         <CardTitle>{t("permissions")}</CardTitle>
                         {selectedRole && hasPermissionsChanged() && (
-                            <div className="flex space-x-2">
+                            <div className="absolute right-0 space-x-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -374,42 +439,75 @@ export function RoleManagement() {
                                 )}
                             </div>
                             <ScrollArea className="h-full pr-4">
-                                <div className="space-y-2">
-                                    {filteredPermissions.map((permission) => (
-                                        <div
-                                            key={permission.code}
-                                            className="flex items-start space-x-2 p-2 rounded-md hover:bg-muted"
-                                        >
-                                            <Checkbox
-                                                id={permission.code}
-                                                checked={selectedPermissions.includes(permission.code)}
-                                                onCheckedChange={() => handlePermissionToggle(permission.code)}
-                                                disabled={selectedRole.name === "Super Admin"}
-                                            />
-                                            <div className="flex-1">
-                                                <label
-                                                    htmlFor={permission.code}
-                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                                >
-                                                    {permission.code}
-                                                </label>
-                                                <div className="text-xs text-muted-foreground mt-1">
-                                                    {tPermissions(permission.code)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {filteredPermissions.length === 0 && permissionSearchQuery && (
-                                        <div className="text-center py-4 text-muted-foreground">
-                                            {t("noPermissionsFoundSearch")}
-                                        </div>
-                                    )}
-                                    {permissions.length === 0 && !permissionSearchQuery && (
-                                        <div className="text-center py-4 text-muted-foreground">
-                                            {t("noPermissionsFound")}
-                                        </div>
-                                    )}
-                                </div>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[180px]">{t("module")}</TableHead>
+                                            {permissionActions.map((action) => (
+                                                <TableHead key={action} className="text-center min-w-[120px]">
+                                                    {getActionLabel(action)}
+                                                </TableHead>
+                                            ))}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {permissionModules.map((module) => (
+                                            <TableRow key={module}>
+                                                <TableCell>
+                                                    <div className="font-medium">{getModuleLabel(module)}</div>
+                                                    <Badge variant="outline" className="mt-1">
+                                                        {module}
+                                                    </Badge>
+                                                </TableCell>
+                                                {permissionActions.map((action) => {
+                                                    const permissionCode = getPermissionCodeForCell(module, action)
+                                                    const checkboxId = permissionCode ?? `${module}-${action}`
+                                                    return (
+                                                        <TableCell key={`${module}-${action}`} className="text-center">
+                                                            {permissionCode ? (
+                                                                <div className="flex flex-col items-center gap-1">
+                                                                    <Checkbox
+                                                                        className="cursor-pointer"
+                                                                        id={checkboxId}
+                                                                        checked={selectedPermissions.includes(
+                                                                            permissionCode,
+                                                                        )}
+                                                                        onCheckedChange={() =>
+                                                                            handlePermissionToggle(permissionCode)
+                                                                        }
+                                                                        disabled={
+                                                                            selectedRole.name === "Super Admin"
+                                                                        }
+                                                                    />
+                                                                    <label
+                                                                        htmlFor={checkboxId}
+                                                                        className="text-[11px] text-muted-foreground cursor-pointer"
+                                                                    >
+                                                                        {permissionCode}
+                                                                    </label>
+                                                                </div>
+                                                            ) : (
+                                                                <span className="text-muted-foreground text-xs">
+                                                                    -
+                                                                </span>
+                                                            )}
+                                                        </TableCell>
+                                                    )
+                                                })}
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                {permissionModules.length === 0 && permissionSearchQuery && (
+                                    <div className="text-center py-4 text-muted-foreground">
+                                        {t("noPermissionsFoundSearch")}
+                                    </div>
+                                )}
+                                {permissionModules.length === 0 && permissions.length === 0 && !permissionSearchQuery && (
+                                    <div className="text-center py-4 text-muted-foreground">
+                                        {t("noPermissionsFound")}
+                                    </div>
+                                )}
                             </ScrollArea>
                         </>
                     ) : (
