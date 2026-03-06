@@ -1,36 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Auth + Roles + Permissions + i18n
 
-## Getting Started
+Application Next.js 16 avec authentification, gestion des utilisateurs, gestion des roles/permissions, multi-entites et journalisation des actions.
 
-First, run the development server:
+## Fonctionnalites principales
+
+- Authentification email/mot de passe avec `better-auth`
+- Session enrichie avec roles, permissions et entites utilisateur
+- Gestion des utilisateurs (creation, edition, activation/desactivation, verification email)
+- Gestion des roles (CRUD + attribution de permissions)
+- Permissions applicatives (ex: `user_read`, `role_edit`, `log_read`)
+- Journal d'audit des actions metier
+- Interface multilingue (`fr`, `en`) via `next-intl`
+- Reset de base via endpoint cron protege par secret
+
+## Stack technique
+
+- `next` 16 (App Router)
+- `react` 19
+- `typescript`
+- `prisma` + PostgreSQL (`@prisma/adapter-pg`)
+- `better-auth`
+- `next-safe-action`
+- `tailwindcss` + composants UI Radix/shadcn
+- `next-intl`
+
+## Prerequis
+
+- Node.js 20+
+- pnpm, npm, yarn ou bun (les scripts du projet sont definis dans `package.json`)
+- PostgreSQL 16+ (local ou Docker)
+
+## Installation rapide
+
+1. Installer les dependances
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Configurer l'environnement
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Demarrer PostgreSQL (option Docker)
 
-## Learn More
+```bash
+pnpm docker:up
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Generer Prisma et appliquer les migrations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm prisma:generate
+pnpm prisma:deploy
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Seeder les donnees initiales
 
-## Deploy on Vercel
+```bash
+pnpm prisma:seed
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6. Lancer l'application
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+```
+
+Application disponible sur [http://localhost:3000](http://localhost:3000).
+
+## Variables d'environnement
+
+Fichier de reference: `.env.example`.
+
+Variables essentielles:
+
+- `DATABASE_URL` ou `DATABASE_USER`/`DATABASE_PASSWORD`/`DATABASE_HOST`/`DATABASE_PORT`/`DATABASE_NAME`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- `JWT_SECRET`
+- `CRON_SECRET`
+- `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_NAME_APP` (utilise notamment pour les emails)
+
+Note: le layout lit `NEXT_PUBLIC_APP_NAME` pour le titre d'application. Pour eviter tout ecart d'affichage, definir **a la fois** `NEXT_PUBLIC_NAME_APP` et `NEXT_PUBLIC_APP_NAME` avec la meme valeur.
+
+## Donnees seedees
+
+Le seed Prisma cree:
+
+- Les permissions de base (`user_*`, `role_*`, `log_read`)
+- Le role `Super Admin`
+- Deux entites (`Entity 1`, `Entity 2`)
+- Un compte administrateur
+
+Identifiants admin de demonstration (affiches aussi sur l'ecran de connexion):
+
+- Email: `admin@admin.com`
+- Mot de passe: `Admin0123456789!`
+
+## Scripts utiles
+
+- `pnpm dev`: lance le serveur de developpement
+- `pnpm build`: build de production (avec `prisma generate`)
+- `pnpm start`: lance l'app en production
+- `pnpm lint`: lint Next.js
+- `pnpm prettier`: formatage du code
+- `pnpm docker:up` / `pnpm docker:down`: gestion du conteneur PostgreSQL
+- `pnpm prisma:generate`: genere le client Prisma
+- `pnpm prisma:migrate`: cree une migration (mode dev)
+- `pnpm prisma:deploy`: applique les migrations
+- `pnpm prisma:seed`: execute le seed
+- `pnpm prisma:reset`: reset de la base
+- `pnpm prisma:studio`: ouvre Prisma Studio
+
+## Routes principales
+
+- Auth:
+  - `GET|POST /api/auth/[...all]`
+  - `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password`
+- Application:
+  - `/administration/users`
+  - `/administration/roles`
+  - `/administration/log`
+- Cron:
+  - `GET /api/cron/reset-database`
+  - Header requis: `Authorization: Bearer <CRON_SECRET>`
+
+## Permissions et navigation
+
+La navigation est construite dynamiquement selon les permissions de session:
+
+- `role_read` -> menu roles
+- `user_read` -> menu utilisateurs
+- `log_read` -> menu logs
+
+Les permissions sont dedupliquees depuis les roles utilisateur au moment de la creation de session.
+
+## Internationalisation
+
+- Locales implementees: `fr`, `en`
+- Messages dans `i18n/messages/fr.json` et `i18n/messages/en.json`
+- Detection via cookie `NEXT_LOCALE`, puis fallback `accept-language`
+
+## Journalisation (audit)
+
+Le projet enregistre les actions metier (utilisateur, role, entite) dans la table `log` avec:
+
+- type d'action (`LogType`)
+- details JSON
+- auteur (user)
+- entite cible (optionnelle)
+- date d'action
+
+## Arborescence simplifiee
+
+- `app/`: pages App Router et routes API
+- `actions/`: server actions
+- `services/`: logique metier
+- `lib/`: auth, prisma, utilitaires
+- `components/`: UI et ecrans de gestion
+- `prisma/`: schema, migrations, seed
+- `i18n/`: config et messages de traduction
+
+## Verification rapide apres installation
+
+1. Connexion avec le compte admin seed
+2. Acces aux ecrans `/administration/users`, `/administration/roles`, `/administration/log`
+3. Creation d'un role puis attribution de permissions
+4. Creation d'un utilisateur et envoi d'invitation (si SMTP configure)
+
+## Remarques
+
+- L'endpoint cron de reset est sensible: ne jamais exposer `CRON_SECRET`.
+- En production, definir des secrets robustes pour `BETTER_AUTH_SECRET` et `JWT_SECRET`.
+- Pour l'envoi d'emails, configurer les variables SMTP (`MAIL_*`).
