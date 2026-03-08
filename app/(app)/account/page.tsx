@@ -1,14 +1,8 @@
 import { Account } from "@/components/account/account"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { pageCheckAuth } from "@/lib/auth-guard"
 
 export default async function AccountPage() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
-    if (!session) {
-        return null
-    }
+    const session = await pageCheckAuth()
 
     return (
         <div className="p-2">

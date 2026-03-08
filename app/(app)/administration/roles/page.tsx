@@ -1,9 +1,13 @@
 import { RoleManagement } from "@/components/role-management/role-management"
 import { Skeleton } from "@/components/ui/skeleton"
+import { pageCheckAuth } from "@/lib/auth-guard"
+import { getPermissions } from "@/services/permission.service"
+import { getRoles } from "@/services/role.service"
 import { getTranslations } from "next-intl/server"
 import { Suspense } from "react"
 
 export default async function RolesPage() {
+    const session = await pageCheckAuth({ requiredPermission: "role_read" })
     const t = await getTranslations("RoleManagement")
 
     return (
@@ -14,11 +18,17 @@ export default async function RolesPage() {
             </div>
             <div className="h-[calc(100vh-100px)]">
                 <Suspense fallback={<RoleManagementSkeleton />}>
-                    <RoleManagement />
+                    <RoleManagementContent />
                 </Suspense>
             </div>
         </div>
     )
+}
+
+async function RoleManagementContent() {
+    const [roles, permissions] = await Promise.all([getRoles(), getPermissions()])
+
+    return <RoleManagement preloadedRoles={roles} permissions={permissions} />
 }
 
 function RoleManagementSkeleton() {

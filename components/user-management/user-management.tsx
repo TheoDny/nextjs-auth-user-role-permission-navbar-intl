@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { getRolesAction } from "@/actions/role.action"
 import { assignRolesToUserAction, deleteUserAction, getUsersAction } from "@/actions/user.action"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -27,10 +26,14 @@ import { userSuperAdmin } from "@/prisma/data-seed"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { UserDialog } from "./user-dialog"
 
-export function UserManagement({ sessionUser }: { sessionUser: User & { Entities: Entity[] } }) {
+type UserManagementProps = {
+    sessionUser: User & { Entities: Entity[] }
+    preloadedUsers: UserRolesAndEntities[]
+    roles: RolePermissions[]
+}
+export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManagementProps) {
     const t = useTranslations("UserManagement")
-    const [users, setUsers] = useState<UserRolesAndEntities[]>([])
-    const [roles, setRoles] = useState<RolePermissions[]>([])
+    const [users, setUsers] = useState<UserRolesAndEntities[]>(preloadedUsers)
     const [selectedUser, setSelectedUser] = useState<UserRolesAndEntities | null>(null)
     const [selectedRoles, setSelectedRoles] = useState<string[]>([])
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -46,23 +49,6 @@ export function UserManagement({ sessionUser }: { sessionUser: User & { Entities
     const [filterOpen, setFilterOpen] = useState(false)
 
     const { confirm } = useConfirm()
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const usersData = await getUsersAction()
-                setUsers(usersData)
-
-                const rolesData = await getRolesAction()
-                setRoles(rolesData)
-            } catch (error) {
-                console.error(error)
-                toast.error("Failed to load data")
-            }
-        }
-
-        loadData()
-    }, [])
 
     useEffect(() => {
         if (selectedUser) {

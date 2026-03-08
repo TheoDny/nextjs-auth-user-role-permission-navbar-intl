@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 
-import { getPermissionsAction } from "@/actions/permission.action"
 import { assignPermissionsToRoleAction, deleteRoleAction, getRolesAction } from "@/actions/role.action"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -16,8 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { roleSuperAdmin } from "@/prisma/data-seed"
-import { PermissionModel as Permission } from "@/prisma/generated/models/Permission"
-import { RoleModel as Role } from "@/prisma/generated/models/Role"
+import { Permission, Role } from "@/prisma/generated/client"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { RolePermissions } from "@/types/role.type"
 import { RoleDialog } from "./role-dialog"
@@ -53,9 +51,14 @@ function sortActions(actionA: string, actionB: string): number {
     return actionA.localeCompare(actionB)
 }
 
-export function RoleManagement() {
-    const [roles, setRoles] = useState<RolePermissions[]>([])
-    const [permissions, setPermissions] = useState<Permission[]>([])
+
+type RoleManagementProps = {
+    preloadedRoles: RolePermissions[]
+    permissions: Permission[]
+}
+
+export function RoleManagement({ preloadedRoles, permissions }: RoleManagementProps) {
+    const [roles, setRoles] = useState<RolePermissions[]>(preloadedRoles)
     const [selectedRole, setSelectedRole] = useState<RolePermissions | null>(null)
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([])
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -68,23 +71,6 @@ export function RoleManagement() {
     const tPermissions = useTranslations("Permissions")
 
     const { confirm } = useConfirm()
-
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const rolesData = await getRolesAction()
-                setRoles(rolesData)
-
-                const permissionsData = await getPermissionsAction()
-                setPermissions(permissionsData)
-            } catch (error) {
-                console.error(error)
-                toast.error(t("dialog.error.UpdateRoleFail"))
-            }
-        }
-
-        loadData()
-    }, [t])
 
     useEffect(() => {
         if (selectedRole) {

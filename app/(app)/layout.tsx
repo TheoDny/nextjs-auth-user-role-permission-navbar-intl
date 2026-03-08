@@ -2,7 +2,7 @@ import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { auth } from "@/lib/auth"
+import { pageCheckAuth } from "@/lib/auth-guard"
 import { PermissionModel as Permission } from "@/prisma/generated/models/Permission"
 import { ConfirmDialogProvider } from "@/provider/ConfirmationProvider"
 import { NavigationGroupType, NavigationType } from "@/types/navigation.type"
@@ -10,8 +10,6 @@ import { Boxes, IdCard, Logs, Users } from "lucide-react"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getTranslations } from "next-intl/server"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
-import { headers } from "next/headers"
-import { unauthorized } from "next/navigation"
 import type { ReactNode } from "react"
 import "../globals.css"
 
@@ -22,16 +20,10 @@ interface RootLayoutProps {
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App name"
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
+    const session = await pageCheckAuth()
 
     const locale = await getLocale()
     const tSidebar = await getTranslations("Sidebar")
-
-    if (!session) {
-        unauthorized()
-    }
 
     const buildNavigation = async (session: any): Promise<NavigationType> => {
         const navigation: NavigationType = {

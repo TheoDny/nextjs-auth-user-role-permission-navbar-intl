@@ -1,31 +1,23 @@
 import { LogTable } from "@/components/log-management/log-table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { auth } from "@/lib/auth"
+import { pageCheckAuth } from "@/lib/auth-guard"
+import { sleep } from "@/lib/utils"
 import { getLogs } from "@/services/log.service"
 import { LogEntry } from "@/types/log.type"
 import { subDays } from "date-fns"
 import { getTranslations } from "next-intl/server"
-import { headers } from "next/headers"
-import { unauthorized } from "next/navigation"
 import { Suspense } from "react"
 
 export default async function LogPage() {
-    const sevenDaysAgo = subDays(new Date(), 7)
+    const session = await pageCheckAuth({ requiredPermission: "log_read" })
+
+    const defaultSevenDaysAgo = subDays(new Date(), 7)
     const t = await getTranslations("Logs")
-
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
-
-    if (!session) {
-        unauthorized()
-    }
 
     const entityIds = session.user.Entities.map((entity: { id: string }) => entity.id)
 
-    // Get logs for initial load (last 7 days)
-    const logs: LogEntry[] = await getLogs(entityIds, sevenDaysAgo)
+
 
     return (
         <div className="container mx-auto py-6">
@@ -36,12 +28,19 @@ export default async function LogPage() {
                 </CardHeader>
                 <CardContent>
                     <Suspense fallback={<LogTableSkeleton />}>
-                        <LogTable logs={logs} />
+                        <LogTableContent entityIds={entityIds} defaultDaysAgo={defaultSevenDaysAgo} />
                     </Suspense>
                 </CardContent>
             </Card>
         </div>
     )
+}
+
+async function LogTableContent({ entityIds, defaultDaysAgo }: { entityIds: string[], defaultDaysAgo: Date }) {
+    const logs: LogEntry[] = await getLogs(entityIds, defaultDaysAgo)
+    await sleep(3000)
+
+    return <LogTable logs={logs} />
 }
 
 function LogTableSkeleton() {
