@@ -1,23 +1,15 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { UserManagement } from "@/components/user-management/user-management"
-import { auth } from "@/lib/auth"
+import { pageCheckAuth } from "@/lib/auth-guard"
 import { Entity, User } from "@/prisma/generated/client"
 import { getRoles } from "@/services/role.service"
 import { getUsers } from "@/services/user.service"
 import { getTranslations } from "next-intl/server"
-import { headers } from "next/headers"
 import { Suspense } from "react"
 
 export default async function UsersPage() {
+    const session = await pageCheckAuth({ requiredPermission: "user_read" })
     const t = await getTranslations("UserManagement")
-
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
-
-    if (!session) {
-        return null
-    }
 
     delete session.user.image
 
