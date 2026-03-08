@@ -9,33 +9,97 @@ import { LogType } from "@/prisma/generated/enums"
 import { LogEntry } from "@/types/log.type"
 import { format, subDays } from "date-fns"
 import { useTranslations } from "next-intl"
-import { useEffect, useRef, useState } from "react"
+import { parseAsArrayOf, parseAsIsoDateTime, parseAsString, useQueryState } from "nuqs"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { DateRange } from "react-day-picker"
 import { Skeleton } from "../ui/skeleton"
 
 export function LogTable({ logs }: { logs: LogEntry[] }) {
     const t = useTranslations("Logs")
     const tCommon = useTranslations("Common")
-    const [filterLoading, setFilterLoading] = useState(true)
-    const [filteredLogs, setFilteredLogs] = useState<LogEntry[]>([])
-    const [dateRange, setDateRange] = useState<DateRange | undefined>({
-        from: subDays(new Date(), 7),
-        to: new Date(),
-    })
+    const defaultDateRange = useMemo(
+        () => ({
+            from: subDays(new Date(), 7),
+            to: new Date(),
+        }),
+        [],
+    )
+    const [allLogs, setAllLogs] = useState<LogEntry[]>(logs)
+    const [isInitialLoading, setIsInitialLoading] = useState(logs.length === 0)
     const [isLoadingData, setIsLoadingData] = useState(false)
     const hasMountedRef = useRef(false)
+    const latestRequestRef = useRef(0)
 
-    const [filters, setFilters] = useState<{
+    const [fromQuery, setFromQuery] = useQueryState(
+        "from",
+        parseAsIsoDateTime.withOptions({
+            history: "replace",
+            scroll: false,
+        }),
+    )
+    const [toQuery, setToQuery] = useQueryState(
+        "to",
+        parseAsIsoDateTime.withOptions({
+            history: "replace",
+            scroll: false,
+        }),
+    )
+
+    const [logTypeQuery, setLogTypeQuery] = useQueryState(
+        "types",
+        parseAsArrayOf(parseAsString).withOptions({
+            history: "replace",
+            scroll: false,
+            clearOnDefault: true,
+        }),
+    )
+    const [userQuery, setUserQuery] = useQueryState(
+        "users",
+        parseAsArrayOf(parseAsString).withOptions({
+            history: "replace",
+            scroll: false,
+            clearOnDefault: true,
+        }),
+    )
+    const [entityQuery, setEntityQuery] = useQueryState(
+        "entities",
+        parseAsArrayOf(parseAsString).withOptions({
+            history: "replace",
+            scroll: false,
+            clearOnDefault: true,
+        }),
+    )
+    const [roleQuery, setRoleQuery] = useQueryState(
+        "roles",
+        parseAsArrayOf(parseAsString).withOptions({
+            history: "replace",
+            scroll: false,
+            clearOnDefault: true,
+        }),
+    )
+
+    const dateRange = useMemo<DateRange>(
+        () => ({
+            from: fromQuery ?? defaultDateRange.from,
+            to: toQuery ?? fromQuery ?? defaultDateRange.to,
+        }),
+        [defaultDateRange.from, defaultDateRange.to, fromQuery, toQuery],
+    )
+
+    const filters = useMemo<{
         logType: string[]
         user: string[]
         entity: string[]
         role: string[]
-    }>({
-        logType: [],
-        user: [],
-        entity: [],
-        role: [],
-    })
+    }>(
+        () => ({
+            logType: logTypeQuery ?? [],
+            user: userQuery ?? [],
+            entity: entityQuery ?? [],
+            role: roleQuery ?? [],
+        }),
+        [entityQuery, logTypeQuery, roleQuery, userQuery],
+    )
 
     // Définition des colonnes pour la table
     const columns: Column<LogEntry>[] = [
@@ -63,13 +127,14 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
 
     // Charger les logs avec les dates sélectionnées
     const loadLogs = async () => {
-        if (!dateRange?.from) return
+        if (!dateRange.from) return
 
+        const requestId = ++latestRequestRef.current
         setIsLoadingData(true)
         try {
             let result = await getLogsAction({
                 startDate: dateRange.from.toISOString(),
-                endDate: (dateRange.to || dateRange.from).toISOString(),
+                endDate: (dateRange.to ?? dateRange.from).toISOString(),
             })
 
             if (result?.serverError) {
@@ -83,11 +148,15 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                 result = { data: [] }
             }
 
-            setFilteredLogs(result.data as LogEntry[])
+            if (requestId !== latestRequestRef.current) return
+
+            setAllLogs(result.data as LogEntry[])
+            setIsInitialLoading(false)
             setIsLoadingData(false)
-            setFilterLoading(false)
         } catch (error) {
+            if (requestId !== latestRequestRef.current) return
             console.error("Error loading logs:", error)
+            setIsInitialLoading(false)
             setIsLoadingData(false)
         }
     }
@@ -99,17 +168,19 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
             return
         }
 
-        if (dateRange?.from) {
-            loadLogs()
-        }
+        if (!dateRange.from) return
+
+        const timeoutId = setTimeout(() => {
+            void loadLogs()
+        }, 150)
+
+        return () => clearTimeout(timeoutId)
     }, [dateRange])
 
     // Charger les logs initiaux
     useEffect(() => {
-        if (logs.length > 0) {
-            setFilteredLogs(logs)
-            setFilterLoading(false)
-        }
+        setAllLogs(logs)
+        setIsInitialLoading(false)
     }, [logs])
 
     // Get log types for filter
@@ -138,11 +209,8 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
         }))
     }
 
-    // Apply filters when they change
-    useEffect(() => {
-        setFilterLoading(true)
-
-        let result = [...filteredLogs]
+    const filteredLogs = useMemo(() => {
+        let result = [...allLogs]
 
         if (filters.logType.length > 0) {
             result = result.filter((log) => filters.logType.includes(log.type))
@@ -162,23 +230,45 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
             )
         }
 
-        setFilteredLogs(result)
-        setFilterLoading(false)
-    }, [filters])
+        return result
+    }, [allLogs, filters])
 
     // Handle filter change
-    const handleFilterChange = (key: string, value: string | string[]) => {
-        setFilters((prev) => ({ ...prev, [key]: value }))
+    const handleFilterChange = (
+        key: "logType" | "user" | "entity" | "role",
+        value: string | string[],
+    ) => {
+        const nextValue = Array.isArray(value) ? value : value ? [value] : []
+
+        switch (key) {
+            case "logType":
+                void setLogTypeQuery(nextValue.length > 0 ? nextValue : null)
+                break
+            case "user":
+                void setUserQuery(nextValue.length > 0 ? nextValue : null)
+                break
+            case "entity":
+                void setEntityQuery(nextValue.length > 0 ? nextValue : null)
+                break
+            case "role":
+                void setRoleQuery(nextValue.length > 0 ? nextValue : null)
+                break
+        }
     }
 
     // Reset all filters
     const resetFilters = () => {
-        setFilters({
-            logType: [],
-            user: [],
-            entity: [],
-            role: [],
-        })
+        void setLogTypeQuery(null)
+        void setUserQuery(null)
+        void setEntityQuery(null)
+        void setRoleQuery(null)
+    }
+
+    const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
+        const nextFrom = newDateRange?.from ?? null
+        const nextTo = newDateRange?.to ?? newDateRange?.from ?? null
+        void setFromQuery(nextFrom)
+        void setToQuery(nextTo)
     }
 
     // Format date based on locale
@@ -239,7 +329,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                     <label className="text-sm font-medium mb-1 block">{t("dateRange")}</label>
                     <DatePickerRange
                         date={dateRange}
-                        setDate={setDateRange}
+                        setDate={handleDateRangeChange}
                         preSelectedRanges={preSelectedRanges}
                         textHolder={t("selectDateRange")}
                         className="w-full"
@@ -281,7 +371,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                 <div>
                     <label className="text-sm font-medium mb-1 block">{t("filterByUser")}</label>
                     <Combobox
-                        options={getFilterOptions(logs, "user")}
+                        options={getFilterOptions(allLogs, "user")}
                         value={filters.user}
                         onChange={(value) => handleFilterChange("user", value)}
                         placeholder={t("selectUser")}
@@ -292,7 +382,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                 <div>
                     <label className="text-sm font-medium mb-1 block">{t("filterByEntity")}</label>
                     <Combobox
-                        options={getFilterOptions(logs, "entity")}
+                        options={getFilterOptions(allLogs, "entity")}
                         value={filters.entity}
                         onChange={(value) => handleFilterChange("entity", value)}
                         placeholder={t("selectEntity")}
@@ -303,7 +393,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                 <div>
                     <label className="text-sm font-medium mb-1 block">{t("filterByRole")}</label>
                     <Combobox
-                        options={getFilterOptions(logs, "role")}
+                        options={getFilterOptions(allLogs, "role")}
                         value={filters.role}
                         onChange={(value) => handleFilterChange("role", value)}
                         placeholder={t("selectRole")}
@@ -312,7 +402,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                     />
                 </div>
             </div>
-            {filterLoading || isLoadingData ? (
+            {isInitialLoading || isLoadingData ? (
                 <div>
                     <Skeleton className="h-[35px] w-full mb-0.5" />
                     <Skeleton className="h-[395px] w-full mb-0.5" />
