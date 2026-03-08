@@ -9,7 +9,7 @@ import { LogType } from "@/prisma/generated/enums"
 import { LogEntry } from "@/types/log.type"
 import { format, subDays } from "date-fns"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { DateRange } from "react-day-picker"
 import { Skeleton } from "../ui/skeleton"
 
@@ -23,6 +23,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
         to: new Date(),
     })
     const [isLoadingData, setIsLoadingData] = useState(false)
+    const hasMountedRef = useRef(false)
 
     const [filters, setFilters] = useState<{
         logType: string[]
@@ -93,6 +94,11 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
 
     // Charger les logs au changement de dates
     useEffect(() => {
+        if (!hasMountedRef.current) {
+            hasMountedRef.current = true
+            return
+        }
+
         if (dateRange?.from) {
             loadLogs()
         }

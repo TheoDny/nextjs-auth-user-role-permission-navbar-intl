@@ -2,7 +2,6 @@ import { LogTable } from "@/components/log-management/log-table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { pageCheckAuth } from "@/lib/auth-guard"
-import { sleep } from "@/lib/utils"
 import { getLogs } from "@/services/log.service"
 import { LogEntry } from "@/types/log.type"
 import { subDays } from "date-fns"
@@ -38,7 +37,6 @@ export default async function LogPage() {
 
 async function LogTableContent({ entityIds, defaultDaysAgo }: { entityIds: string[], defaultDaysAgo: Date }) {
     const logs: LogEntry[] = await getLogs(entityIds, defaultDaysAgo)
-    await sleep(3000)
 
     return <LogTable logs={logs} />
 }
