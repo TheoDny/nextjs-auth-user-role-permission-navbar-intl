@@ -25,7 +25,6 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
         [],
     )
     const [allLogs, setAllLogs] = useState<LogEntry[]>(logs)
-    const [isInitialLoading, setIsInitialLoading] = useState(logs.length === 0)
     const [isLoadingData, setIsLoadingData] = useState(false)
     const hasMountedRef = useRef(false)
     const latestRequestRef = useRef(0)
@@ -151,12 +150,10 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
             if (requestId !== latestRequestRef.current) return
 
             setAllLogs(result.data as LogEntry[])
-            setIsInitialLoading(false)
             setIsLoadingData(false)
         } catch (error) {
             if (requestId !== latestRequestRef.current) return
             console.error("Error loading logs:", error)
-            setIsInitialLoading(false)
             setIsLoadingData(false)
         }
     }
@@ -176,12 +173,6 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
 
         return () => clearTimeout(timeoutId)
     }, [dateRange])
-
-    // Charger les logs initiaux
-    useEffect(() => {
-        setAllLogs(logs)
-        setIsInitialLoading(false)
-    }, [logs])
 
     // Get log types for filter
     const logTypes = Object.values(LogType).map((type) => ({
@@ -402,7 +393,7 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                     />
                 </div>
             </div>
-            {isInitialLoading || isLoadingData ? (
+            {isLoadingData ? (
                 <div>
                     <Skeleton className="h-[35px] w-full mb-0.5" />
                     <Skeleton className="h-[395px] w-full mb-0.5" />

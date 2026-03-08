@@ -88,6 +88,7 @@ export function Combobox({
         >
             <PopoverTrigger asChild>
                 <Button
+                    aria-controls="combobox"
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
