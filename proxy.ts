@@ -12,5 +12,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!sign-in|sign-up|forgot-password|reset-password|api/auth|api/cron|_next).*)"],
+    matcher: ["/((?!sign-in|sign-up|forgot-password|reset-password|unauthorized|api/auth|api/cron|_next).*)"],
 }

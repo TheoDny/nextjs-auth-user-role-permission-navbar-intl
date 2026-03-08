@@ -45,7 +45,7 @@ export async function pageCheckAuth(options: AuthGuardOptions = {}) {
     })
 
     if (!session) {
-        return redirect("/unauthorized?type=noSession")
+        return redirect("/sign-in")
     }
     if (!session.user.active) {
         return redirect(`/unauthorized?type=userInactive&userName=${session.user.name}`)
