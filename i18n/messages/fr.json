@@ -338,8 +338,18 @@
         "entity_enable": "Entité \"{name}\" activée"
     },
     "Unauthorized": {
-        "title": "Non autorisé",
-        "description": "Vous n'êtes pas autorisé à accéder à cette page.",
+        "noSession": {
+            "title": "Non autorisé",
+            "description": "Vous n'êtes pas autorisé à accéder à cette page, aucune session n'est active."
+        },
+        "userInactive": {
+            "title": "Non autorisé",
+            "description": "Vous n'êtes pas autorisé à accéder à cette page, votre compte \"{userName}\" est inactif."
+        },
+        "missingPermission": {
+            "title": "Non autorisé",
+            "description": "Vous n'êtes pas autorisé à accéder à cette page, vous n'avez pas lapen permission \"{permission}\"."
+        },
         "backToHome": "Retour à l'accueil"
     },
     "Forbidden": {

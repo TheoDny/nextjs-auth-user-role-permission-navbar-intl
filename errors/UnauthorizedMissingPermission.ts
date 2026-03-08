@@ -1,8 +1,8 @@
-export class UnauthorizedMissingPermission extends Error {
-    code = "missingPermission"
+import { UnauthorizedError } from "./UnauthorizedError"
 
-    constructor(message: string) {
-        super(message)
-        this.name = "UnauthorizedMissingPermission"
+export class UnauthorizedMissingPermissionError extends UnauthorizedError {
+    constructor(permissionName?: string) {
+        super("Unauthorized: Missing permission" + permissionName)
+        this.name = "UnauthorizedMissingPermissionError"
     }
 }

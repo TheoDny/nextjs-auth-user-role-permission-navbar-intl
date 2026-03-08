@@ -1,13 +1,10 @@
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { getSessionCookie } from "better-auth/cookies"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function proxy(request: NextRequest) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
+    const sessionCookie = getSessionCookie(request)
 
-    if (!session || !session.user.active) {
+    if (!sessionCookie) {
         return NextResponse.redirect(new URL("/sign-in", request.url))
     }
 
@@ -15,5 +12,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!sign-in|sign-up|forgot-password|reset-password|api/auth|api/cron|_next).*)"]
+    matcher: ["/((?!sign-in|sign-up|forgot-password|reset-password|api/auth|api/cron|_next).*)"],
 }

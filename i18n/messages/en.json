@@ -336,8 +336,18 @@
         "entity_enable": "Entity \"{name}\" enabled"
     },
     "Unauthorized": {
-        "title": "Unauthorized",
-        "description": "You are not authorized to access this page.",
+        "NoSession": {
+            "title": "Unauthorized",
+            "description": "You are not authorized to access this page, no session is active."
+        },
+        "UserInactive": {
+            "title": "Unauthorized",
+            "description": "You are not authorized to access this page, your account \"{userName}\" is inactive."
+        },
+        "MissingPermission": {
+            "title": "Unauthorized",
+            "description": "You are not authorized to access this page, you do not have the permission \"{permission}\"."
+        },
         "backToHome": "Back to Home"
     },
     "Forbidden": {
