@@ -1,13 +1,13 @@
 "use client"
 
+import { Check, ChevronsUpDown } from "lucide-react"
 import * as React from "react"
-import { Check, ChevronsUpDown, X } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 export type ComboboxOption = {
     value: string
@@ -36,6 +36,7 @@ export function Combobox({
     multiple = false,
 }: ComboboxProps) {
     const [open, setOpen] = React.useState(false)
+    const maxVisibleBadges = 2
 
     // If multiple is true, ensure value is an array
     const values = multiple
@@ -46,6 +47,8 @@ export function Combobox({
 
     // Get the selected options for display
     const selectedOptions = options.filter((option) => values.includes(option.value))
+    const visibleSelectedOptions = selectedOptions.slice(0, maxVisibleBadges)
+    const hiddenSelectedCount = selectedOptions.length - visibleSelectedOptions.length
 
     // Handle the selection of an option
     const handleSelect = (optionValue: string) => {
@@ -89,29 +92,32 @@ export function Combobox({
                     role="combobox"
                     aria-expanded={open}
                     className={cn(
-                        "w-full justify-between",
-                        multiple && values.length > 0 ? "h-auto min-h-10" : "",
+                        "h-10 w-full justify-between",
                         className,
                     )}
                     disabled={disabled}
                 >
-                    <div className="flex flex-wrap gap-1 items-center">
+                    <div className="flex min-w-0 items-center gap-1 overflow-hidden">
                         {multiple ? (
                             values.length > 0 ? (
-                                <div className="flex flex-wrap gap-1">
-                                    {selectedOptions.map((option) => (
+                                <div className="flex min-w-0 items-center gap-1 overflow-hidden">
+                                    {visibleSelectedOptions.map((option) => (
                                         <Badge
                                             variant="secondary"
                                             key={option.value}
-                                            className="flex items-center gap-1"
+                                            className="inline-flex max-w-[140px] items-center gap-1 truncate"
                                         >
-                                            {option.label}
-                                            <X
-                                                className="h-3 w-3 cursor-pointer"
-                                                onClick={(e) => removeItem(option.value, e)}
-                                            />
+                                            <span className="truncate">{option.label}</span>
                                         </Badge>
                                     ))}
+                                    {hiddenSelectedCount > 0 ? (
+                                        <Badge
+                                            variant="secondary"
+                                            className="shrink-0"
+                                        >
+                                            ...
+                                        </Badge>
+                                    ) : null}
                                 </div>
                             ) : (
                                 <span className="text-muted-foreground">{placeholder}</span>
