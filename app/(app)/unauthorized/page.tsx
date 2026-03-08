@@ -1,4 +1,4 @@
-import Unauthorized from "@/components/auth/unauthorized"
+import Unauthorized from "@/components/auth/Unauthorized"
 
 export default async function UnauthorizedPage({
     searchParams,
