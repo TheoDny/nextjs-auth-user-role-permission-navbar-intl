@@ -106,6 +106,9 @@ Identifiants admin de demonstration (affiches aussi sur l'ecran de connexion):
 - `pnpm dev`: lance le serveur de developpement
 - `pnpm build`: build de production (avec `prisma generate`)
 - `pnpm start`: lance l'app en production
+- `pnpm test`: execute les tests unitaires/integration avec Vitest
+- `pnpm test:watch`: lance Vitest en mode watch
+- `pnpm test:coverage`: genere un rapport de couverture
 - `pnpm lint`: lint Next.js
 - `pnpm prettier`: formatage du code
 - `pnpm docker:up` / `pnpm docker:down`: gestion du conteneur PostgreSQL
@@ -171,6 +174,19 @@ Le projet enregistre les actions metier (utilisateur, role, entite) dans la tabl
 2. Acces aux ecrans `/administration/users`, `/administration/roles`, `/administration/log`
 3. Creation d'un role puis attribution de permissions
 4. Creation d'un utilisateur et envoi d'invitation (si SMTP configure)
+
+## Tests automatises
+
+- Framework: `Vitest` + `@testing-library/react` (`jsdom`)
+- Fichier de configuration: `vitest.config.ts`
+- Setup global: `vitest.setup.ts`
+- Exemple de test composant: `components/card/sign-in.test.tsx`
+
+Execution:
+
+```bash
+pnpm test
+```
 
 ## Remarques
 
