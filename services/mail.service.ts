@@ -1,14 +1,15 @@
-import { InvitationSignUp } from "@/emails/invitation-sign-up"
+import InvitationSignUp from "@/emails/invitation-sign-up"
 import ResetPassword from "@/emails/reset-password"
 import { transporter } from "@/lib/mail"
 import { render } from "@react-email/render"
 
-export interface EmailOptions {
+interface EmailOptions {
     to: string[]
     subject: string
     html: string
     attachments?: { filename: string; path: string }[]
 }
+
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 async function sendEmail(options: EmailOptions) {
     let info: any = true

@@ -52,23 +52,34 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
 
     const isSuperAdmin = role?.name === "Super Admin"
 
-    useEffect(() => {
+    const resetFormValues = () => {
         if (role) {
             form.reset({
                 name: role.name,
                 description: role.description || "",
             })
-        } else {
-            form.reset({
-                name: "",
-                description: "",
-            })
+            return
         }
-    }, [open, role, form])
+        form.reset({
+            name: "",
+            description: "",
+        })
+    }
+
+    useEffect(() => {
+        resetFormValues()
+    }, [role])
+
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen) {
+            resetFormValues()
+        }
+        onOpenChange(nextOpen)
+    }
 
     const handleClose = () => {
-        form.reset()
-        onOpenChange(false)
+        resetFormValues()
+        handleOpenChange(false)
         onClose()
     }
 
@@ -113,7 +124,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
             }
 
             form.reset()
-            onOpenChange(false)
+            handleOpenChange(false)
             onClose(result.data)
         } catch (error) {
             console.error(error)
@@ -126,7 +137,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
     return (
         <Dialog
             open={open}
-            onOpenChange={onOpenChange}
+            onOpenChange={handleOpenChange}
         >
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

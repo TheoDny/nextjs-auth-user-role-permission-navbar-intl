@@ -57,7 +57,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
         },
     })
 
-    useEffect(() => {
+    const resetFormValues = () => {
         if (user) {
             form.reset({
                 name: user.name ?? "",
@@ -71,11 +71,24 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
                 active: true,
             })
         }
-    }, [open, user, form])
+        setEntitiesToAdd([])
+        setEntitiesToRemove([])
+    }
+
+    useEffect(() => {
+        resetFormValues()
+    }, [user])
+
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (nextOpen) {
+            resetFormValues()
+        }
+        onOpenChange(nextOpen)
+    }
 
     const handleClose = () => {
-        form.reset()
-        onOpenChange(false)
+        resetFormValues()
+        handleOpenChange(false)
         onClose()
     }
 
@@ -123,7 +136,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
             }
 
             form.reset()
-            onOpenChange(false)
+            handleOpenChange(false)
             onClose(result.data)
         } catch (error) {
             console.error(error)
@@ -136,7 +149,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
     return (
         <Dialog
             open={open}
-            onOpenChange={onOpenChange}
+            onOpenChange={handleOpenChange}
         >
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

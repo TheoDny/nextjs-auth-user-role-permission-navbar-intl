@@ -2,7 +2,7 @@
 
 import { Check, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useReducer } from "react"
 import { toast } from "sonner"
 
 import { assignPermissionsToRoleAction, deleteRoleAction, getRolesAction } from "@/actions/role.action"
@@ -51,38 +51,71 @@ function sortActions(actionA: string, actionB: string): number {
     return actionA.localeCompare(actionB)
 }
 
+const getRolePermissionCodes = (role: RolePermissions | null) =>
+    role ? role.Permissions.map((permission) => permission.code) : []
+
 
 type RoleManagementProps = {
     preloadedRoles: RolePermissions[]
     permissions: Permission[]
 }
 
+type RoleManagementState = {
+    roles: RolePermissions[]
+    selectedRole: RolePermissions | null
+    selectedPermissions: string[]
+    isDialogOpen: boolean
+    editingRole: Role | null
+    isSubmitting: boolean
+    isDeleting: boolean
+    searchQuery: string
+    permissionSearchQuery: string
+}
+
+type RoleManagementAction =
+    | {
+          type: "merge"
+          payload: Partial<RoleManagementState>
+      }
+    | {
+          type: "setSelectedPermissions"
+          payload: string[]
+      }
+
+const roleManagementReducer = (
+    state: RoleManagementState,
+    action: RoleManagementAction,
+): RoleManagementState => {
+    switch (action.type) {
+        case "merge":
+            return { ...state, ...action.payload }
+        case "setSelectedPermissions":
+            return { ...state, selectedPermissions: action.payload }
+        default:
+            return state
+    }
+}
+
 export function RoleManagement({ preloadedRoles, permissions }: RoleManagementProps) {
-    const [roles, setRoles] = useState<RolePermissions[]>(preloadedRoles)
-    const [selectedRole, setSelectedRole] = useState<RolePermissions | null>(null)
-    const [selectedPermissions, setSelectedPermissions] = useState<string[]>([])
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [editingRole, setEditingRole] = useState<Role | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
-    const [searchQuery, setSearchQuery] = useState("")
-    const [permissionSearchQuery, setPermissionSearchQuery] = useState("")
+    const [state, dispatch] = useReducer(roleManagementReducer, {
+        roles: preloadedRoles,
+        selectedRole: null,
+        selectedPermissions: [],
+        isDialogOpen: false,
+        editingRole: null,
+        isSubmitting: false,
+        isDeleting: false,
+        searchQuery: "",
+        permissionSearchQuery: "",
+    })
     const t = useTranslations("RoleManagement")
     const tPermissions = useTranslations("Permissions")
 
     const { confirm } = useConfirm()
-
-    useEffect(() => {
-        if (selectedRole) {
-            setSelectedPermissions(selectedRole.Permissions.map((permission) => permission.code))
-        } else {
-            setSelectedPermissions([])
-        }
-    }, [selectedRole])
-
+    
     // Filter roles based on search query
-    const filteredRoles = roles.filter((role) => {
-        const searchLower = searchQuery.toLowerCase()
+    const filteredRoles = state.roles.filter((role) => {
+        const searchLower = state.searchQuery.toLowerCase()
         return (
             role.name.toLowerCase().includes(searchLower) || role.description.toLowerCase().includes(searchLower)
         )
@@ -90,7 +123,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
 
     // Filter permissions based on search query
     const filteredPermissions = permissions.filter((permission) => {
-        const searchLower = permissionSearchQuery.toLowerCase()
+        const searchLower = state.permissionSearchQuery.toLowerCase()
         return (
             permission.code.toLowerCase().includes(searchLower) ||
             tPermissions(permission.code).toLowerCase().includes(searchLower)
@@ -125,16 +158,24 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
         t.has(`modules.${module}`) ? t(`modules.${module}`) : module
 
     const handleRoleSelect = (role: RolePermissions) => {
-        if (selectedRole?.id === role.id) {
-            setSelectedRole(null)
+        if (state.selectedRole?.id === role.id) {
+            dispatch({
+                type: "merge",
+                payload: { selectedRole: null, selectedPermissions: [] },
+            })
         } else {
-            setSelectedRole(role)
+            dispatch({
+                type: "merge",
+                payload: { selectedRole: role, selectedPermissions: getRolePermissionCodes(role) },
+            })
         }
     }
 
     const handleCreateRole = () => {
-        setEditingRole(null)
-        setIsDialogOpen(true)
+        dispatch({
+            type: "merge",
+            payload: { editingRole: null, isDialogOpen: true },
+        })
     }
 
     const handleEditRole = (role: Role) => {
@@ -142,8 +183,10 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
             toast.error(t("dialog.error.cannotModifySuperAdmin"))
             return
         }
-        setEditingRole(role)
-        setIsDialogOpen(true)
+        dispatch({
+            type: "merge",
+            payload: { editingRole: role, isDialogOpen: true },
+        })
     }
 
     const handleDeleteRole = async (role: Role) => {
@@ -156,7 +199,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
             return
         }
 
-        setIsDeleting(true)
+        dispatch({ type: "merge", payload: { isDeleting: true } })
 
         try {
             const result = await deleteRoleAction({ id: role.id })
@@ -179,74 +222,97 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
             toast.success(t("dialog.success.DeleteRoleSuccess"))
 
             // Clear selection if deleted role was selected
-            if (selectedRole?.id === role.id) {
-                setSelectedRole(null)
+            if (state.selectedRole?.id === role.id) {
+                dispatch({
+                    type: "merge",
+                    payload: { selectedRole: null, selectedPermissions: [] },
+                })
             }
 
             // Refresh the roles list
             const rolesData = await getRolesAction()
-            setRoles(rolesData)
+            dispatch({ type: "merge", payload: { roles: rolesData } })
         } catch (error) {
             console.error(error)
             toast.error(t("dialog.error.DeleteRoleFail"))
         } finally {
-            setIsDeleting(false)
+            dispatch({ type: "merge", payload: { isDeleting: false } })
         }
     }
 
     const handleRoleDialogClose = (newRole?: RolePermissions) => {
-        setIsDialogOpen(false)
+        dispatch({ type: "merge", payload: { isDialogOpen: false } })
 
         if (newRole) {
             // If we're editing the currently selected role, update the selection
-            if (selectedRole && selectedRole.id === newRole.id) {
-                setSelectedRole(newRole)
+            if (state.selectedRole && state.selectedRole.id === newRole.id) {
+                dispatch({
+                    type: "merge",
+                    payload: {
+                        selectedRole: newRole,
+                        selectedPermissions: getRolePermissionCodes(newRole),
+                    },
+                })
             }
 
             // Refresh the roles list
-            getRolesAction().then(setRoles)
+            getRolesAction().then((rolesData) => {
+                dispatch({ type: "merge", payload: { roles: rolesData } })
+            })
         }
     }
 
     const handlePermissionToggle = (permissionCode: string) => {
-        setSelectedPermissions((current) => {
-            if (current.includes(permissionCode)) {
-                return current.filter((id) => id !== permissionCode)
-            }
-            const nextPermissions = new Set([...current, permissionCode])
-            const permission = parsePermissionCode(permissionCode)
-            if (permission.action === "create" || permission.action === "edit") {
-                const readCode = getPermissionCodeForCell(permission.module, "read")
-                if (readCode) nextPermissions.add(readCode)
-            }
-            return Array.from(nextPermissions)
+        const current = state.selectedPermissions
+        if (current.includes(permissionCode)) {
+            dispatch({
+                type: "setSelectedPermissions",
+                payload: current.filter((id) => id !== permissionCode),
+            })
+            return
+        }
+        const nextPermissions = new Set([...current, permissionCode])
+        const permission = parsePermissionCode(permissionCode)
+        if (permission.action === "create" || permission.action === "edit") {
+            const readCode = getPermissionCodeForCell(permission.module, "read")
+            if (readCode) nextPermissions.add(readCode)
+        }
+        dispatch({
+            type: "setSelectedPermissions",
+            payload: Array.from(nextPermissions),
         })
     }
 
     const handleSavePermissions = async () => {
-        if (!selectedRole) return
+        if (!state.selectedRole) return
 
-        if (selectedRole.id === roleSuperAdmin.id) {
+        if (state.selectedRole.id === roleSuperAdmin.id) {
             toast.error(t("dialog.error.cannotModifySuperAdmin"))
             return
         }
 
-        setIsSubmitting(true)
+        dispatch({ type: "merge", payload: { isSubmitting: true } })
 
         try {
             await assignPermissionsToRoleAction({
-                roleId: selectedRole.id,
-                permissionCodes: selectedPermissions,
+                roleId: state.selectedRole.id,
+                permissionCodes: state.selectedPermissions,
             })
 
             // Refresh the roles list
             const rolesData = await getRolesAction()
-            setRoles(rolesData)
+            dispatch({ type: "merge", payload: { roles: rolesData } })
 
             // Update the selected role
-            const updatedRole = rolesData.find((r) => r.id === selectedRole.id)
+            const updatedRole = rolesData.find((r) => r.id === state.selectedRole?.id)
             if (updatedRole) {
-                setSelectedRole(updatedRole)
+                dispatch({
+                    type: "merge",
+                    payload: {
+                        selectedRole: updatedRole,
+                        selectedPermissions: getRolePermissionCodes(updatedRole),
+                    },
+                })
             }
 
             toast.success(t("dialog.success.UpdateRoleSuccess"))
@@ -254,27 +320,32 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
             console.error(error)
             toast.error(t("dialog.error.UpdateRoleFail"))
         } finally {
-            setIsSubmitting(false)
+            dispatch({ type: "merge", payload: { isSubmitting: false } })
         }
     }
 
     const handleCancelPermissions = () => {
-        if (selectedRole) {
-            setSelectedPermissions(selectedRole.Permissions.map((permission) => permission.code))
+        if (state.selectedRole) {
+            dispatch({
+                type: "setSelectedPermissions",
+                payload: state.selectedRole.Permissions.map((permission) => permission.code),
+            })
         }
     }
 
     const hasPermissionsChanged = () => {
-        if (!selectedRole) return false
+        if (!state.selectedRole) return false
 
-        const currentPermissionCodes = selectedRole.Permissions.map((p) => p.code).sort()
-        const newPermissionCodes = [...selectedPermissions].sort()
+        const currentPermissionCodes = state.selectedRole.Permissions.map((p) => p.code).sort()
+        const newPermissionCodes = [...state.selectedPermissions].sort()
 
         return (
             currentPermissionCodes.length !== newPermissionCodes.length ||
             currentPermissionCodes.some((code, index) => code !== newPermissionCodes[index])
         )
     }
+
+    const isSuperAdminSelected = state.selectedRole?.name === "Super Admin"
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
@@ -286,7 +357,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                             <CardTitle>{t("roles")}</CardTitle>
                             {process.env.NEXT_PUBLIC_MAX_ROLE && (
                                 <div className="text-sm text-muted-foreground">
-                                    {roles.length} / {process.env.NEXT_PUBLIC_MAX_ROLE}
+                                    {state.roles.length} / {process.env.NEXT_PUBLIC_MAX_ROLE}
                                 </div>
                             )}
                         </div>
@@ -295,7 +366,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                             onClick={handleCreateRole}
                             disabled={
                                 process.env.NEXT_PUBLIC_MAX_ROLE
-                                    ? roles.length >= parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
+                                    ? state.roles.length >= parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
                                     : false
                             }
                         >
@@ -307,8 +378,8 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t("search")}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            value={state.searchQuery}
+                            onChange={(e) => dispatch({ type: "merge", payload: { searchQuery: e.target.value } })}
                             className="pl-8"
                         />
                     </div>
@@ -320,13 +391,21 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                 <div key={role.id}>
                                     <div
                                         className={`flex items-center space-x-2 p-2 m-1 rounded-md cursor-pointer ${
-                                            selectedRole?.id === role.id ? "bg-primary/10" : "hover:bg-muted"
+                                            state.selectedRole?.id === role.id ? "bg-primary/10" : "hover:bg-muted"
                                         }`}
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => handleRoleSelect(role)}
                                         onDoubleClick={() => handleEditRole(role)}
+                                        onKeyDown={(event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                                event.preventDefault()
+                                                handleRoleSelect(role)
+                                            }
+                                        }}
                                     >
                                         <Checkbox
-                                            checked={selectedRole?.id === role.id}
+                                            checked={state.selectedRole?.id === role.id}
                                             onCheckedChange={() => handleRoleSelect(role)}
                                         />
                                         <div className="flex-1">
@@ -352,7 +431,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                     e.stopPropagation()
                                                     handleDeleteRole(role)
                                                 }}
-                                                disabled={role.name === "Super Admin" || isDeleting}
+                                                disabled={role.name === "Super Admin" || state.isDeleting}
                                             >
                                                 <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
@@ -361,12 +440,12 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                     <Separator className="my-0" />
                                 </div>
                             ))}
-                            {filteredRoles.length === 0 && searchQuery && (
+                            {filteredRoles.length === 0 && state.searchQuery && (
                                 <div className="text-center py-4 text-muted-foreground">
                                     {t("noRolesFoundSearch")}
                                 </div>
                             )}
-                            {roles.length === 0 && !searchQuery && (
+                            {state.roles.length === 0 && !state.searchQuery && (
                                 <div className="text-center py-4 text-muted-foreground">{t("noRolesFound")}</div>
                             )}
                         </div>
@@ -379,7 +458,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                 <CardHeader className="flex flex-col justify-between space-y-2 pb-2">
                     <div className="flex flex-row items-center justify-between space-x-2 w-full relative">
                         <CardTitle>{t("permissions")}</CardTitle>
-                        {selectedRole && hasPermissionsChanged() && (
+                        {state.selectedRole && hasPermissionsChanged() && (
                             <div className="absolute right-0 space-x-2">
                                 <Button
                                     variant="outline"
@@ -392,7 +471,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                 <Button
                                     size="sm"
                                     onClick={handleSavePermissions}
-                                    disabled={isSubmitting || selectedRole.name === "Super Admin"}
+                                    disabled={state.isSubmitting || isSuperAdminSelected}
                                 >
                                     <Check className="h-4 w-4 mr-2" />
                                     {t("save")}
@@ -400,25 +479,30 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                             </div>
                         )}
                     </div>
-                    {selectedRole && (
+                    {state.selectedRole && (
                         <div className="relative w-full">
                             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t("searchPermissions")}
-                                value={permissionSearchQuery}
-                                onChange={(e) => setPermissionSearchQuery(e.target.value)}
+                                value={state.permissionSearchQuery}
+                                onChange={(e) =>
+                                    dispatch({
+                                        type: "merge",
+                                        payload: { permissionSearchQuery: e.target.value },
+                                    })
+                                }
                                 className="pl-8"
                             />
                         </div>
                     )}
                 </CardHeader>
                 <CardContent>
-                    {selectedRole ? (
+                    {state.selectedRole ? (
                         <>
                             <div className="mb-4 p-3 bg-muted rounded-md">
                                 <div className="font-medium">{t("assignPermissionsTo")}</div>
-                                <div className="text-sm text-muted-foreground">{selectedRole.name}</div>
-                                {selectedRole.name === "Super Admin" && (
+                                <div className="text-sm text-muted-foreground">{state.selectedRole.name}</div>
+                                {isSuperAdminSelected && (
                                     <div className="text-xs text-orange-600 mt-1">
                                         {t("dialog.error.cannotModifySuperAdmin")}
                                     </div>
@@ -455,15 +539,13 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                                     <Checkbox
                                                                         className="cursor-pointer"
                                                                         id={checkboxId}
-                                                                        checked={selectedPermissions.includes(
+                                                                        checked={state.selectedPermissions.includes(
                                                                             permissionCode,
                                                                         )}
                                                                         onCheckedChange={() =>
                                                                             handlePermissionToggle(permissionCode)
                                                                         }
-                                                                        disabled={
-                                                                            selectedRole.name === "Super Admin"
-                                                                        }
+                                                                        disabled={isSuperAdminSelected}
                                                                     />
                                                                     <label
                                                                         htmlFor={checkboxId}
@@ -484,12 +566,14 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                         ))}
                                     </TableBody>
                                 </Table>
-                                {permissionModules.length === 0 && permissionSearchQuery && (
+                                {permissionModules.length === 0 && state.permissionSearchQuery && (
                                     <div className="text-center py-4 text-muted-foreground">
                                         {t("noPermissionsFoundSearch")}
                                     </div>
                                 )}
-                                {permissionModules.length === 0 && permissions.length === 0 && !permissionSearchQuery && (
+                                {permissionModules.length === 0 &&
+                                    permissions.length === 0 &&
+                                    !state.permissionSearchQuery && (
                                     <div className="text-center py-4 text-muted-foreground">
                                         {t("noPermissionsFound")}
                                     </div>
@@ -505,9 +589,9 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
             </Card>
 
             <RoleDialog
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                role={editingRole}
+                open={state.isDialogOpen}
+                onOpenChange={(open) => dispatch({ type: "merge", payload: { isDialogOpen: open } })}
+                role={state.editingRole}
                 onClose={handleRoleDialogClose}
             />
         </div>

@@ -13,7 +13,10 @@ function InputConceal({ ...props }: React.ComponentProps<"input">) {
                 type={isVisible ? "text" : "password"}
                 {...props}
             />
-            <span
+            <button
+                type="button"
+                aria-label={isVisible ? "Hide password" : "Show password"}
+                aria-pressed={isVisible}
                 className="absolute right-6 top-1/2 -translate-y-1/2 cursor-pointer bg-transparent hover:bg-transparent dark:hover:bg-transparent"
                 onClick={(e) => {
                     e.stopPropagation()
@@ -22,7 +25,7 @@ function InputConceal({ ...props }: React.ComponentProps<"input">) {
                 }}
             >
                 {isVisible ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </span>
+            </button>
         </div>
     )
 }

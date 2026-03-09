@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth"
+import { checkAuth } from "@/lib/auth-guard"
 import { prisma } from "@/lib/prisma"
 import {
     DataLog,
@@ -80,7 +81,7 @@ export const getLogs = async (
     }))
 }
 
-export const addLog = async (dataLog: DataLog): Promise<boolean> => {
+const addLog = async (dataLog: DataLog): Promise<boolean> => {
     try {
         const log = await prisma.log.create({
             data: {
@@ -417,25 +418,20 @@ export const addRoleSetPermissionLog = async (
     }
 }
 
-export const addEntityUpdateLog = async (
+const addEntityUpdateLog = async (
     entity: { id: string; name: string },
     entityId?: string,
     userId?: string,
 ): Promise<boolean> => {
     try {
         if (!userId || !entityId) {
-            const session = await auth.api.getSession({
-                headers: await headers(),
-            })
-            if (!session?.user) {
-                throw new Error("User session not found")
-            }
+            const session = await checkAuth()
 
             if (!entityId) {
-                entityId = session?.user.entitySelectedId
+                entityId = session.user.entitySelectedId
             }
             if (!userId) {
-                userId = session?.user.id
+                userId = session.user.id
             }
         }
         const dataLog: DataLogEntityUpdate = {
@@ -459,25 +455,20 @@ export const addEntityUpdateLog = async (
     }
 }
 
-export const addEntityDisableLog = async (
+const addEntityDisableLog = async (
     entity: { id: string; name: string },
     entityId?: string,
     userId?: string,
 ): Promise<boolean> => {
     try {
         if (!userId || !entityId) {
-            const session = await auth.api.getSession({
-                headers: await headers(),
-            })
-            if (!session?.user) {
-                throw new Error("User session not found")
-            }
+            const session = await checkAuth()
 
             if (!entityId) {
-                entityId = session?.user.entitySelectedId
+                entityId = session.user.entitySelectedId
             }
             if (!userId) {
-                userId = session?.user.id
+                userId = session.user.id
             }
         }
         const dataLog: DataLogEntityDisable = {

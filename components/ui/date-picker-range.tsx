@@ -1,19 +1,19 @@
 "use client"
 
-import * as React from "react"
 import { format, setHours, setMinutes } from "date-fns"
-import { Calendar as CalendarIcon, Clock } from "lucide-react"
-import { DateRange } from "react-day-picker"
 import { fr } from "date-fns/locale"
+import { Calendar as CalendarIcon, Clock } from "lucide-react"
+import * as React from "react"
+import { DateRange } from "react-day-picker"
 
+import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { Close as PopoverClose } from "@radix-ui/react-popover"
 import { Button } from "./button"
 import { Calendar } from "./calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "./popover"
-import { Close as PopoverClose } from "@radix-ui/react-popover"
-import { Separator } from "@/components/ui/separator"
-import { Label } from "./label"
 import { Input } from "./input"
+import { Label } from "./label"
+import { Popover, PopoverContent, PopoverTrigger } from "./popover"
 
 type DatePickerRangeProps = React.HTMLAttributes<HTMLDivElement> & {
     date: DateRange | undefined
@@ -271,9 +271,9 @@ export function DatePickerRange({
                                 <div className="p-3 flex flex-col space-y-1">
                                     <h3 className="text-sm font-medium text-center">{predefinedText.label}</h3>
                                     <Separator />
-                                    {preSelectedRanges.map((range, index) => (
+                                    {preSelectedRanges.map((range) => (
                                         <Button
-                                            key={index}
+                                            key={`${range.label}-${range.dateRange.from?.toISOString() ?? "from"}-${range.dateRange.to?.toISOString() ?? "to"}`}
                                             variant="outline"
                                             onClick={() => setDate(range.dateRange)}
                                         >

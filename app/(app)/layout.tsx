@@ -21,10 +21,11 @@ interface RootLayoutProps {
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App name"
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-    const session = await pageCheckAuth()
-
-    const locale = await getLocale()
-    const tSidebar = await getTranslations("Sidebar")
+    const [session, locale, tSidebar] = await Promise.all([
+        pageCheckAuth(),
+        getLocale(),
+        getTranslations("Sidebar"),
+    ])
 
     const buildNavigation = async (session: any): Promise<NavigationType> => {
         const navigation: NavigationType = {

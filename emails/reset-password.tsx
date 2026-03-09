@@ -6,7 +6,7 @@ interface ResetPasswordProps {
 }
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "NEXT_PUBLIC_APP_NAME"
 
-export const ResetPassword = ({ resetLink, appUrl }: ResetPasswordProps) => (
+const ResetPassword = ({ resetLink, appUrl }: ResetPasswordProps) => (
     <Html>
         <Head />
         <Preview>Réinitialisation de votre mot de passe</Preview>

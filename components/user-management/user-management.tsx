@@ -2,7 +2,7 @@
 
 import { Check, Filter, Pencil, Plus, Search, Trash2, TriangleAlert, X } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useReducer } from "react"
 import { toast } from "sonner"
 
 import { assignRolesToUserAction, deleteUserAction, getUsersAction } from "@/actions/user.action"
@@ -31,38 +31,60 @@ type UserManagementProps = {
     preloadedUsers: UserRolesAndEntities[]
     roles: RolePermissions[]
 }
+
+type UserManagementState = {
+    users: UserRolesAndEntities[]
+    selectedUser: UserRolesAndEntities | null
+    selectedRoles: string[]
+    isDialogOpen: boolean
+    editingUser: UserRolesAndEntities | null
+    isSubmitting: boolean
+    isDeleting: boolean
+    searchQuery: string
+    roleSearchQuery: string
+    statusFilter: string
+    entityFilter: string[]
+    filterOpen: boolean
+}
+
+type UserManagementAction = {
+    type: "merge"
+    payload: Partial<UserManagementState>
+}
+
+const userManagementReducer = (
+    state: UserManagementState,
+    action: UserManagementAction,
+): UserManagementState => {
+    return { ...state, ...action.payload }
+}
+
 export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManagementProps) {
     const t = useTranslations("UserManagement")
-    const [users, setUsers] = useState<UserRolesAndEntities[]>(preloadedUsers)
-    const [selectedUser, setSelectedUser] = useState<UserRolesAndEntities | null>(null)
-    const [selectedRoles, setSelectedRoles] = useState<string[]>([])
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [editingUser, setEditingUser] = useState<UserRolesAndEntities | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
-    const [searchQuery, setSearchQuery] = useState("")
-    const [roleSearchQuery, setRoleSearchQuery] = useState("")
-
-    // Filter states
-    const [statusFilter, setStatusFilter] = useState<string>("all") // "all", "active", "inactive"
-    const [entityFilter, setEntityFilter] = useState<string[]>([])
-    const [filterOpen, setFilterOpen] = useState(false)
+    const [state, dispatch] = useReducer(userManagementReducer, {
+        users: preloadedUsers,
+        selectedUser: null,
+        selectedRoles: [],
+        isDialogOpen: false,
+        editingUser: null,
+        isSubmitting: false,
+        isDeleting: false,
+        searchQuery: "",
+        roleSearchQuery: "",
+        statusFilter: "all",
+        entityFilter: [],
+        filterOpen: false,
+    })
 
     const { confirm } = useConfirm()
 
-    useEffect(() => {
-        if (selectedUser) {
-            setSelectedRoles(selectedUser.Roles.map((role) => role.id))
-        } else {
-            setSelectedRoles([])
-        }
-    }, [selectedUser])
+    const getUserRoleIds = (user: UserRolesAndEntities | null) => (user ? user.Roles.map((role) => role.id) : [])
 
     // Get unique entities for the filter
     const availableEntities: ComboboxOption[] = Array.from(
-        new Set(users.flatMap((user) => user.Entities.map((entity) => entity.id))),
+        new Set(state.users.flatMap((user) => user.Entities.map((entity) => entity.id))),
     ).map((entityId) => {
-        const entity = users.flatMap((user) => user.Entities).find((e) => e.id === entityId)
+        const entity = state.users.flatMap((user) => user.Entities).find((e) => e.id === entityId)
         return {
             value: entityId,
             label: entity?.name || "",
@@ -70,57 +92,69 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
     })
 
     // Filter users based on search query and filters
-    const filteredUsers = users.filter((user) => {
+    const filteredUsers = state.users.filter((user) => {
         // Search filter
-        const searchLower = searchQuery.toLowerCase()
+        const searchLower = state.searchQuery.toLowerCase()
         const matchesSearch =
             user.name?.toLowerCase().includes(searchLower) || user.email.toLowerCase().includes(searchLower)
 
         // Status filter
         const matchesStatus =
-            statusFilter === "all" ||
-            (statusFilter === "active" && user.active) ||
-            (statusFilter === "inactive" && !user.active)
+            state.statusFilter === "all" ||
+            (state.statusFilter === "active" && user.active) ||
+            (state.statusFilter === "inactive" && !user.active)
 
         // Entity filter
         const matchesEntity =
-            entityFilter.length === 0 || user.Entities.some((entity) => entityFilter.includes(entity.id))
+            state.entityFilter.length === 0 || user.Entities.some((entity) => state.entityFilter.includes(entity.id))
 
         return matchesSearch && matchesStatus && matchesEntity
     })
 
     // Check if any filters are active
-    const hasActiveFilters = statusFilter !== "all" || entityFilter.length > 0
+    const hasActiveFilters = state.statusFilter !== "all" || state.entityFilter.length > 0
 
     const clearFilters = () => {
-        setStatusFilter("all")
-        setEntityFilter([])
+        dispatch({
+            type: "merge",
+            payload: { statusFilter: "all", entityFilter: [] },
+        })
     }
 
     // Filter roles based on search query
     const filteredRoles = roles.filter((role) => {
-        const searchLower = roleSearchQuery.toLowerCase()
+        const searchLower = state.roleSearchQuery.toLowerCase()
         return (
             role.name.toLowerCase().includes(searchLower) || role.description.toLowerCase().includes(searchLower)
         )
     })
 
     const handleUserSelect = (user: UserRolesAndEntities) => {
-        if (selectedUser?.id === user.id) {
-            setSelectedUser(null)
+        if (state.selectedUser?.id === user.id) {
+            dispatch({
+                type: "merge",
+                payload: { selectedUser: null, selectedRoles: [] },
+            })
         } else {
-            setSelectedUser(user)
+            dispatch({
+                type: "merge",
+                payload: { selectedUser: user, selectedRoles: getUserRoleIds(user) },
+            })
         }
     }
 
     const handleCreateUser = () => {
-        setEditingUser(null)
-        setIsDialogOpen(true)
+        dispatch({
+            type: "merge",
+            payload: { editingUser: null, isDialogOpen: true },
+        })
     }
 
     const handleEditUser = (user: UserRolesAndEntities) => {
-        setEditingUser(user)
-        setIsDialogOpen(true)
+        dispatch({
+            type: "merge",
+            payload: { editingUser: user, isDialogOpen: true },
+        })
     }
 
     const handleDeleteUser = async (user: UserRolesAndEntities) => {
@@ -138,7 +172,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
             return
         }
 
-        setIsDeleting(true)
+        dispatch({ type: "merge", payload: { isDeleting: true } })
 
         try {
             const result = await deleteUserAction({ id: user.id })
@@ -157,64 +191,89 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
             toast.success(t("dialog.success.DeleteUserSuccess"))
 
             // Clear selection if deleted user was selected
-            if (selectedUser?.id === user.id) {
-                setSelectedUser(null)
+            if (state.selectedUser?.id === user.id) {
+                dispatch({
+                    type: "merge",
+                    payload: { selectedUser: null, selectedRoles: [] },
+                })
             }
 
             // Refresh the users list
             const usersData = await getUsersAction()
-            setUsers(usersData)
+            dispatch({ type: "merge", payload: { users: usersData } })
         } catch (error) {
             console.error(error)
             toast.error(t("dialog.error.DeleteUserFail"))
         } finally {
-            setIsDeleting(false)
+            dispatch({ type: "merge", payload: { isDeleting: false } })
         }
     }
 
     const handleUserDialogClose = (newUser?: UserRolesAndEntities) => {
-        setIsDialogOpen(false)
+        dispatch({ type: "merge", payload: { isDialogOpen: false } })
 
         if (newUser) {
             // If we're editing the currently selected user, update the selection
-            if (selectedUser && selectedUser.id === newUser.id) {
-                setSelectedUser(newUser)
+            if (state.selectedUser && state.selectedUser.id === newUser.id) {
+                dispatch({
+                    type: "merge",
+                    payload: {
+                        selectedUser: newUser,
+                        selectedRoles: getUserRoleIds(newUser),
+                    },
+                })
             }
 
             // Refresh the users list
-            getUsersAction().then(setUsers)
+            getUsersAction().then((usersData) => {
+                dispatch({ type: "merge", payload: { users: usersData } })
+            })
         }
     }
 
     const handleRoleToggle = (roleId: string) => {
-        setSelectedRoles((current) => {
-            if (current.includes(roleId)) {
-                return current.filter((id) => id !== roleId)
-            } else {
-                return [...current, roleId]
-            }
+        if (state.selectedRoles.includes(roleId)) {
+            dispatch({
+                type: "merge",
+                payload: {
+                    selectedRoles: state.selectedRoles.filter((id) => id !== roleId),
+                },
+            })
+            return
+        }
+        dispatch({
+            type: "merge",
+            payload: {
+                selectedRoles: [...state.selectedRoles, roleId],
+            },
         })
     }
 
     const handleSaveRoles = async () => {
-        if (!selectedUser) return
+        if (!state.selectedUser) return
 
-        setIsSubmitting(true)
+        dispatch({ type: "merge", payload: { isSubmitting: true } })
 
         try {
             await assignRolesToUserAction({
-                userId: selectedUser.id,
-                roleIds: selectedRoles,
+                userId: state.selectedUser.id,
+                roleIds: state.selectedRoles,
             })
 
             // Refresh the users list
             const usersData = await getUsersAction()
-            setUsers(usersData)
+            dispatch({ type: "merge", payload: { users: usersData } })
 
             // Update the selected user
-            const updatedUser = usersData.find((u) => u.id === selectedUser.id)
+            const updatedUser = usersData.find((u) => u.id === state.selectedUser?.id)
             if (updatedUser) {
-                setSelectedUser(updatedUser)
+                dispatch({
+                    type: "merge",
+                    payload: {
+                        selectedUser: updatedUser,
+                        selectedRoles: getUserRoleIds(updatedUser),
+                    },
+                })
             }
 
             toast.success("Roles updated successfully")
@@ -222,21 +281,26 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
             console.error(error)
             toast.error("Failed to update roles")
         } finally {
-            setIsSubmitting(false)
+            dispatch({ type: "merge", payload: { isSubmitting: false } })
         }
     }
 
     const handleCancelRoles = () => {
-        if (selectedUser) {
-            setSelectedRoles(selectedUser.Roles.map((role) => role.id))
+        if (state.selectedUser) {
+            dispatch({
+                type: "merge",
+                payload: {
+                    selectedRoles: state.selectedUser.Roles.map((role) => role.id),
+                },
+            })
         }
     }
 
     const hasRolesChanged = () => {
-        if (!selectedUser) return false
+        if (!state.selectedUser) return false
 
-        const currentRoleIds = selectedUser.Roles.map((r) => r.id).sort()
-        const newRoleIds = [...selectedRoles].sort()
+        const currentRoleIds = state.selectedUser.Roles.map((r) => r.id).sort()
+        const newRoleIds = [...state.selectedRoles].sort()
 
         return (
             currentRoleIds.length !== newRoleIds.length ||
@@ -259,7 +323,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                             <CardTitle>{t("users")}</CardTitle>
                             {process.env.NEXT_PUBLIC_MAX_USER && (
                                 <div className="text-sm text-muted-foreground">
-                                    {users.length} / {process.env.NEXT_PUBLIC_MAX_USER}
+                                    {state.users.length} / {process.env.NEXT_PUBLIC_MAX_USER}
                                 </div>
                             )}
                         </div>
@@ -268,7 +332,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                             onClick={handleCreateUser}
                             disabled={
                                 process.env.NEXT_PUBLIC_MAX_USER
-                                    ? users.length >= parseInt(process.env.NEXT_PUBLIC_MAX_USER)
+                                    ? state.users.length >= parseInt(process.env.NEXT_PUBLIC_MAX_USER)
                                     : false
                             }
                         >
@@ -282,14 +346,19 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                             <Input
                                 id="search-filter-users"
                                 placeholder={t("search")}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={state.searchQuery}
+                                onChange={(e) =>
+                                    dispatch({
+                                        type: "merge",
+                                        payload: { searchQuery: e.target.value },
+                                    })
+                                }
                                 className="pl-8"
                             />
                         </div>
                         <Popover
-                            open={filterOpen}
-                            onOpenChange={setFilterOpen}
+                            open={state.filterOpen}
+                            onOpenChange={(filterOpen) => dispatch({ type: "merge", payload: { filterOpen } })}
                         >
                             <PopoverTrigger asChild>
                                 <Button
@@ -300,7 +369,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                     <Filter className="h-4 w-4" />
                                     {hasActiveFilters && (
                                         <span className="ml-1 text-xs">
-                                            {(statusFilter !== "all" ? 1 : 0) + entityFilter.length}
+                                            {(state.statusFilter !== "all" ? 1 : 0) + state.entityFilter.length}
                                         </span>
                                     )}
                                 </Button>
@@ -328,8 +397,13 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                                 {t("filters.status")}
                                             </label>
                                             <RadioGroup
-                                                value={statusFilter}
-                                                onValueChange={setStatusFilter}
+                                                value={state.statusFilter}
+                                                onValueChange={(statusFilter) =>
+                                                    dispatch({
+                                                        type: "merge",
+                                                        payload: { statusFilter },
+                                                    })
+                                                }
                                                 className="flex space-x-4"
                                             >
                                                 <div className="flex items-center space-x-2">
@@ -377,8 +451,13 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                             </label>
                                             <Combobox
                                                 options={availableEntities}
-                                                value={entityFilter}
-                                                onChange={(value) => setEntityFilter(value as string[])}
+                                                value={state.entityFilter}
+                                                onChange={(value) =>
+                                                    dispatch({
+                                                        type: "merge",
+                                                        payload: { entityFilter: value as string[] },
+                                                    })
+                                                }
                                                 placeholder={t("filters.selectEntities")}
                                                 emptyMessage={t("filters.noEntities")}
                                                 multiple={true}
@@ -397,13 +476,21 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                 <div key={user.id}>
                                     <div
                                         className={`flex items-center space-x-2 p-2 m-1 rounded-md cursor-pointer ${
-                                            selectedUser?.id === user.id ? "bg-primary/10" : "hover:bg-muted"
+                                            state.selectedUser?.id === user.id ? "bg-primary/10" : "hover:bg-muted"
                                         }`}
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => handleUserSelect(user)}
                                         onDoubleClick={() => handleEditUser(user)}
+                                        onKeyDown={(event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                                event.preventDefault()
+                                                handleUserSelect(user)
+                                            }
+                                        }}
                                     >
                                         <Checkbox
-                                            checked={selectedUser?.id === user.id}
+                                            checked={state.selectedUser?.id === user.id}
                                             onCheckedChange={() => handleUserSelect(user)}
                                         />
                                         <div className="flex-1">
@@ -504,7 +591,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                                 disabled={
                                                     user.id === userSuperAdmin.id ||
                                                     user.id === sessionUser.id ||
-                                                    isDeleting
+                                                    state.isDeleting
                                                 }
                                             >
                                                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -514,10 +601,10 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                     <Separator className="my-0" />
                                 </div>
                             ))}
-                            {filteredUsers.length === 0 && searchQuery && (
+                            {filteredUsers.length === 0 && state.searchQuery && (
                                 <div className="text-center py-4 text-muted-foreground">{t("noUsersFound")}</div>
                             )}
-                            {users.length === 0 && !searchQuery && (
+                            {state.users.length === 0 && !state.searchQuery && (
                                 <div className="text-center py-4 text-muted-foreground">{t("noUsers")}</div>
                             )}
                         </div>
@@ -528,15 +615,15 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
             {/* Roles Panel */}
             <Card>
                 <CardHeader className="flex flex-col justify-between space-y-2 pb-2">
-                    <div className="flex flex-row items-center justify-between space-x-2 w-full">
+                    <div className="flex flex-row items-center justify-between space-x-2 w-full relative">
                         <CardTitle>{t("roles")}</CardTitle>
-                        {selectedUser && hasRolesChanged() && (
-                            <div className="flex space-x-2">
+                        {state.selectedUser && hasRolesChanged() && (
+                            <div className="absolute right-0 space-x-2">
                                 <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={handleCancelRoles}
-                                    disabled={isSubmitting}
+                                    disabled={state.isSubmitting}
                                 >
                                     <X className="h-4 w-4 mr-2" />
                                     Cancel
@@ -544,7 +631,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                 <Button
                                     size="sm"
                                     onClick={handleSaveRoles}
-                                    disabled={isSubmitting}
+                                    disabled={state.isSubmitting}
                                 >
                                     <Check className="h-4 w-4 mr-2" />
                                     Save
@@ -552,35 +639,41 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                             </div>
                         )}
                     </div>
-                    {selectedUser && (
+                    {state.selectedUser && (
                         <div className="relative w-full">
                             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t("searchRoles")}
-                                value={roleSearchQuery}
-                                onChange={(e) => setRoleSearchQuery(e.target.value)}
+                                value={state.roleSearchQuery}
+                                onChange={(e) =>
+                                    dispatch({
+                                        type: "merge",
+                                        payload: { roleSearchQuery: e.target.value },
+                                    })
+                                }
                                 className="pl-8"
                             />
                         </div>
                     )}
                 </CardHeader>
                 <CardContent>
-                    {selectedUser ? (
+                    {state.selectedUser ? (
                         <>
                             <div className="mb-4 p-3 bg-muted rounded-md">
                                 <div className="font-medium">{t("assignRolesTo")}</div>
-                                <div className="text-sm text-muted-foreground">{selectedUser.name}</div>
+                                <div className="text-sm text-muted-foreground">{state.selectedUser.name}</div>
                             </div>
                             <ScrollArea className="h-full pr-4">
                                 <div className="space-y-2">
                                     {filteredRoles.map((role) => (
                                         <div
                                             key={role.id}
-                                            className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted"
+                                            className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted cursor-pointer"
+                                            onClick={() => handleRoleToggle(role.id)}
                                         >
                                             <Checkbox
                                                 id={role.id}
-                                                checked={selectedRoles.includes(role.id)}
+                                                checked={state.selectedRoles.includes(role.id)}
                                                 onCheckedChange={() => handleRoleToggle(role.id)}
                                             />
                                             <div className="flex-1">
@@ -596,12 +689,12 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                             </div>
                                         </div>
                                     ))}
-                                    {filteredRoles.length === 0 && roleSearchQuery && (
+                                    {filteredRoles.length === 0 && state.roleSearchQuery && (
                                         <div className="text-center py-4 text-muted-foreground">
                                             {t("noRolesFoundSearch")}
                                         </div>
                                     )}
-                                    {roles.length === 0 && !roleSearchQuery && (
+                                    {roles.length === 0 && !state.roleSearchQuery && (
                                         <div className="text-center py-4 text-muted-foreground">
                                             {t("noRolesFound")}
                                         </div>
@@ -618,9 +711,9 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
             </Card>
 
             <UserDialog
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                user={editingUser}
+                open={state.isDialogOpen}
+                onOpenChange={(isDialogOpen) => dispatch({ type: "merge", payload: { isDialogOpen } })}
+                user={state.editingUser}
                 entitiesCanUse={sessionUser.Entities}
                 onClose={handleUserDialogClose}
             />

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 export type Column<T> = {
     key: string
@@ -33,30 +33,18 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(defaultPageSize)
-    const [paginatedData, setPaginatedData] = useState<T[]>([])
-    const [totalPages, setTotalPages] = useState(1)
+    const [itemsPerPage, setItemsPerPage] = useState<number>(defaultPageSize)
+    const totalPages = Math.max(1, Math.ceil(data.length / itemsPerPage))
 
-    // Mettre à jour la pagination quand les données ou les paramètres de pagination changent
     useEffect(() => {
-        if (data.length === 0) {
-            setPaginatedData([])
-            setTotalPages(1)
-            return
-        }
+        setCurrentPage((previousPage) => Math.min(previousPage, totalPages))
+    }, [totalPages])
 
-        const totalPages = Math.ceil(data.length / itemsPerPage)
-        setTotalPages(totalPages)
-
-        // Ajuster la page courante si nécessaire
-        if (currentPage > totalPages) {
-            setCurrentPage(totalPages)
-        }
-
+    const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage
         const endIndex = Math.min(startIndex + itemsPerPage, data.length)
-        setPaginatedData(data.slice(startIndex, endIndex))
-    }, [data, currentPage, itemsPerPage])
+        return data.slice(startIndex, endIndex)
+    }, [currentPage, data, itemsPerPage])
 
     // Navigation de pagination
     const goToPage = (page: number) => {

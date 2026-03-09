@@ -7,7 +7,7 @@ interface InvitationSignUpProps {
 }
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "NEXT_PUBLIC_APP_NAME"
 
-export const InvitationSignUp = ({ name, inviteLink, appUrl }: InvitationSignUpProps) => (
+const InvitationSignUp = ({ name, inviteLink, appUrl }: InvitationSignUpProps) => (
     <Html>
         <Head />
         <Preview>Invitation à rejoindre {appName}</Preview>
