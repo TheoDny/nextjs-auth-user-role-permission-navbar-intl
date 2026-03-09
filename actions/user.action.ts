@@ -1,5 +1,7 @@
 "use server"
 
+import { PasswordsMatchingError } from "@/errors/PasswordsMatchingError"
+import { TokenInvalidError } from "@/errors/TokenInvalidError"
 import { auth } from "@/lib/auth"
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
@@ -185,34 +187,22 @@ export const assignRolesToUserAction = actionClient
 export const changeEntitySelectedAction = actionClient
     .inputSchema(changeEntitySelectedSchema)
     .action(async ({ parsedInput }) => {
-        try {
-            // Get current session
-            const session = await auth.api.getSession({
-                headers: await headers(),
-            })
+        const session = await checkAuth()
 
-            if (!session) {
-                throw new Error("You must be logged in to change entity")
-            }
+        // Update the user profile
+        const updatedUser = await changeEntitySelected(session.user.id, parsedInput.entityId)
 
-            // Update the user profile
-            const updatedUser = await changeEntitySelected(session.user.id, parsedInput.entityId)
-
-            return updatedUser
-        } catch (error) {
-            console.error("Failed to change entity:", error)
-            throw new Error("Failed to change entity")
-        }
+        return updatedUser
     })
 
 export const signUpAction = actionClient.inputSchema(signUpSchema).action(async ({ parsedInput }) => {
     if (parsedInput.password !== parsedInput.passwordConfirmation) {
-        throw new Error("Passwords do not match")
+        throw new PasswordsMatchingError()
     }
 
     const decoded = await checkToken(parsedInput.token, parsedInput.email)
     if (!decoded) {
-        throw new Error("Token invalid")
+        throw new TokenInvalidError()
     }
 
     try {

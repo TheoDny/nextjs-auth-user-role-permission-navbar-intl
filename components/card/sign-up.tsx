@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { InputConceal } from "@/components/ui/input-conceal"
 import { Label } from "@/components/ui/label"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CircleAlert, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -66,18 +67,16 @@ export function SignUp({ token, name, email }: SignUpProps) {
             token,
         })
 
-        if (result?.serverError) {
-            setLoading(false)
-            return setError(result?.serverError)
-        } else if (result?.validationErrors) {
-            setLoading(false)
-            return setError("Failed to sign up role")
-        } else if (!result?.data) {
-            setLoading(false)
-            return setError("Failed to sign up role")
-        }
-
+        const handledResult = handleSafeActionResult(result, {
+            error: setError,
+            t: tSignUp,
+            fallbackErrorMessage: tSignUp("error.default"),
+            errorKeyPrefix: "error.",
+        })
         setLoading(false)
+
+        if (!handledResult.ok) return
+
         window.location.href = "/sign-in"
     }
 

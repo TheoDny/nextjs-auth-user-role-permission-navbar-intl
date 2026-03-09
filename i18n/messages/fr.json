@@ -36,7 +36,12 @@
         "passwordLength": "Le mot de passe doit contenir entre 16 et 64 caractères",
         "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
         "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
-        "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial"
+        "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial",
+        "error": {
+            "PasswordsMatchingError": "Erreur lors de l'inscription: les mots de passe ne correspondent pas",
+            "TokenInvalidError": "Erreur lors de l'inscription: le token est invalide",
+            "default": "Erreur lors de l'inscription"
+        }
     },
     "ForgotPassword": {
         "title": "Mot de passe oublié",

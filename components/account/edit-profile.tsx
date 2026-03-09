@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderCircle, Pencil, Upload } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -119,13 +120,13 @@ export function EditProfile({ currentName, currentEmail, currentImage }: EditPro
                 image: values.image,
             })
 
-            if (result?.serverError) {
-                return toast.error(t("profileUpdate.error"))
-            } else if (result?.validationErrors) {
-                return toast.error(t("profileUpdate.error"))
-            } else if (!result?.data) {
-                return toast.error(t("profileUpdate.error"))
-            }
+            const handledResult = handleSafeActionResult(result, {
+                error: toast.error,
+                errorKeyPrefix: "profileUpdate.error.",
+                t,
+                fallbackErrorMessage: t("profileUpdate.error"),
+            })
+            if (!handledResult.ok) return
 
             toast.success(t("profileUpdate.success"))
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Combobox, ComboboxOption } from "@/components/ui/combobox"
 import { Column, DataTable } from "@/components/ui/data-table"
 import { DatePickerRange } from "@/components/ui/date-picker-range"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { LogType } from "@/prisma/generated/enums"
 import { LogEntry } from "@/types/log.type"
 import { format, subDays } from "date-fns"
@@ -136,20 +137,12 @@ export function LogTable({ logs }: { logs: LogEntry[] }) {
                 endDate: (dateRange.to ?? dateRange.from).toISOString(),
             })
 
-            if (result?.serverError) {
-                console.error("Server error:", result.serverError)
-                result.data = []
-            } else if (result?.validationErrors) {
-                console.error("Validation errors:", result.validationErrors)
-                result.data = []
-            } else if (!result?.data) {
-                console.error("No data returned from server")
-                result = { data: [] }
-            }
+            const handledResult = handleSafeActionResult(result)
+            if (!handledResult.ok) return
 
             if (requestId !== latestRequestRef.current) return
 
-            setAllLogs(result.data as LogEntry[])
+            setAllLogs(handledResult.data)
             setIsLoadingData(false)
         } catch (error) {
             if (requestId !== latestRequestRef.current) return

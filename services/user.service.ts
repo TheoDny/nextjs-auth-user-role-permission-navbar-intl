@@ -250,6 +250,7 @@ export async function verifyUserEmail(userId: string) {
 
 // Sign up user with token validation and user recreation
 export async function signUpUser(name: string, email: string, password: string) {
+    // find the user created from user-management
     const user = await prisma.user.findUnique({
         where: {
             email: email,
@@ -280,23 +281,13 @@ export async function signUpUser(name: string, email: string, password: string) 
             },
         })
 
-        // Find the recreated user
-        const recreatedUser = await prisma.user.findUnique({
+        // Restore user's entities and roles and createdAt
+        await prisma.user.update({
             where: {
                 id: accountUser.user.id,
             },
-        })
-
-        if (!recreatedUser) {
-            throw new Error("Failed to find recreated user")
-        }
-
-        // Restore user's entities and roles
-        await prisma.user.update({
-            where: {
-                id: recreatedUser.id,
-            },
             data: {
+                createdAt: user.createdAt,
                 Entities: {
                     connect: user.Entities.map((entity) => ({ id: entity.id })),
                 },

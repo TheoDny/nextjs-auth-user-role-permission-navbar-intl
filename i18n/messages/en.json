@@ -36,7 +36,12 @@
         "passwordLength": "Password must be between 16 and 64 characters",
         "passwordUppercase": "Password must contain at least 1 uppercase letter",
         "passwordNumber": "Password must contain at least 1 number",
-        "passwordSpecialChar": "Password must contain at least 1 special character"
+        "passwordSpecialChar": "Password must contain at least 1 special character",
+        "error": {
+            "PasswordsMatchingError": "Failed to sign up: passwords do not match",
+            "TokenInvalidError": "Failed to sign up: token invalid",
+            "default": "Failed to sign up"
+        }
     },
     "ForgotPassword": {
         "title": "Forgot Password",

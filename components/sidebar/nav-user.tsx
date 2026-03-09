@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { signOut } from "@/lib/auth-client"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
 import { Building, ChevronsUpDown, LogOut, SquareUserRound } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -39,7 +40,11 @@ export function NavUser({
 
     const handleEntityChange = async (entityId: string) => {
         try {
-            await changeEntitySelectedAction({ entityId })
+            const result = await changeEntitySelectedAction({ entityId })
+            const handledResult = handleSafeActionResult(result)
+            if (!handledResult.ok) {
+                return toast.error("Failed to change entity")
+            }
             // Reload the page to reflect the changes
             window.location.reload()
         } catch (error) {
