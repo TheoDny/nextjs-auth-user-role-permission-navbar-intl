@@ -1,5 +1,6 @@
 import { DeleteRoleUserAssignedError } from "@/errors/DeleteRoleUserAssignedError"
 import { prisma } from "@/lib/prisma"
+import { assertNotSuperAdminRoleId } from "@/lib/utils"
 import {
     addRoleCreateLog,
     addRoleDeleteLog,
@@ -54,14 +55,7 @@ export async function createRole(data: { name: string; description: string }) {
 // Update an existing role
 export async function updateRole(id: string, data: { name: string; description: string }) {
     try {
-        // Check if it's the Super Admin role
-        const existingRole = await prisma.role.findUnique({
-            where: { id },
-        })
-
-        if (existingRole?.name === "Super Admin") {
-            throw new Error("Cannot modify the Super Admin role")
-        }
+        assertNotSuperAdminRoleId(id)
 
         const role = await prisma.role.update({
             where: { id },
@@ -87,6 +81,8 @@ export async function updateRole(id: string, data: { name: string; description: 
 
 // Delete a role
 export async function deleteRole(id: string) {
+    assertNotSuperAdminRoleId(id)
+
     // Get role details first
     const roleToDelete = await prisma.role.findUnique({
         where: { id },
@@ -124,14 +120,7 @@ export async function deleteRole(id: string) {
 // Assign permissions to a role
 export async function assignPermissionsToRole(roleId: string, permissionCodes: string[]) {
     try {
-        // Check if it's the Super Admin role
-        const existingRole = await prisma.role.findUnique({
-            where: { id: roleId },
-        })
-
-        if (existingRole?.name === "Super Admin") {
-            throw new Error("Cannot modify permissions for the Super Admin role")
-        }
+        assertNotSuperAdminRoleId(roleId)
 
         const role = await prisma.role.update({
             where: { id: roleId },

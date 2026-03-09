@@ -23,3 +23,18 @@ export function generateInviteToken(name: string, email: string, expiresAt: Date
 export async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+import { roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
+
+export function assertNotSuperAdminUserId(userId: string) {
+    if (userId === userSuperAdmin.id) {
+        throw new Error("Cannot modify Super Admin user")
+    }
+}
+
+export function assertNotSuperAdminRoleId(roleId: string) {
+    if (roleId === roleSuperAdmin.id) {
+        throw new Error("Cannot modify Super Admin role")
+    }
+}
+

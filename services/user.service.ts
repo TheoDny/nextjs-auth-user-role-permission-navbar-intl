@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { assertNotSuperAdminUserId } from "@/lib/utils"
 import {
     addUserCreateLog,
     addUserDisableLog,
@@ -89,6 +90,8 @@ export async function updateUser(
         entitiesToRemove: string[]
     },
 ) {
+    assertNotSuperAdminUserId(id)
+
     const existingUser = await prisma.user.findFirst({
         where: {
             email: data.email,
@@ -138,6 +141,8 @@ export async function updateUser(
 
 // Assign roles to a user
 export async function assignRolesToUser(userId: string, roleIds: string[]) {
+    assertNotSuperAdminUserId(userId)
+
     try {
         const user = await prisma.user.update({
             where: { id: userId },
@@ -247,6 +252,8 @@ export async function changeEntitySelected(userId: string, entityId: string) {
 
 // Verify user email
 export async function verifyUserEmail(userId: string) {
+    assertNotSuperAdminUserId(userId)
+
     try {
         const user = await prisma.user.update({
             where: { id: userId },
@@ -331,6 +338,8 @@ export async function signUpUser(name: string, email: string, password: string) 
 
 // Delete a user
 export async function deleteUser(id: string, currentUserId: string) {
+    assertNotSuperAdminUserId(id)
+
     try {
         // Get user details first
         const userToDelete = await prisma.user.findUnique({

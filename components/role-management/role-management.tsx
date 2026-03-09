@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { roleSuperAdmin } from "@/prisma/data-seed"
 import { Permission, Role } from "@/prisma/generated/client"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { RolePermissions } from "@/types/role.type"
@@ -179,10 +178,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
     }
 
     const handleEditRole = (role: Role) => {
-        if (role.id === roleSuperAdmin.id) {
-            toast.error(t("dialog.error.cannotModifySuperAdmin"))
-            return
-        }
         dispatch({
             type: "merge",
             payload: { editingRole: role, isDialogOpen: true },
@@ -190,11 +185,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
     }
 
     const handleDeleteRole = async (role: Role) => {
-        if (role.id === roleSuperAdmin.id) {
-            toast.error(t("dialog.error.cannotDeleteSuperAdmin"))
-            return
-        }
-
         if (!(await confirm(t("confirmDelete")))) {
             return
         }
@@ -286,11 +276,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
     const handleSavePermissions = async () => {
         if (!state.selectedRole) return
 
-        if (state.selectedRole.id === roleSuperAdmin.id) {
-            toast.error(t("dialog.error.cannotModifySuperAdmin"))
-            return
-        }
-
         dispatch({ type: "merge", payload: { isSubmitting: true } })
 
         try {
@@ -344,8 +329,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
             currentPermissionCodes.some((code, index) => code !== newPermissionCodes[index])
         )
     }
-
-    const isSuperAdminSelected = state.selectedRole?.name === "Super Admin"
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
@@ -420,7 +403,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                     e.stopPropagation()
                                                     handleEditRole(role)
                                                 }}
-                                                disabled={role.name === "Super Admin"}
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
@@ -431,7 +413,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                     e.stopPropagation()
                                                     handleDeleteRole(role)
                                                 }}
-                                                disabled={role.name === "Super Admin" || state.isDeleting}
                                             >
                                                 <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
@@ -471,7 +452,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                 <Button
                                     size="sm"
                                     onClick={handleSavePermissions}
-                                    disabled={state.isSubmitting || isSuperAdminSelected}
+                                    disabled={state.isSubmitting}
                                 >
                                     <Check className="h-4 w-4 mr-2" />
                                     {t("save")}
@@ -502,11 +483,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                             <div className="mb-4 p-3 bg-muted rounded-md">
                                 <div className="font-medium">{t("assignPermissionsTo")}</div>
                                 <div className="text-sm text-muted-foreground">{state.selectedRole.name}</div>
-                                {isSuperAdminSelected && (
-                                    <div className="text-xs text-orange-600 mt-1">
-                                        {t("dialog.error.cannotModifySuperAdmin")}
-                                    </div>
-                                )}
                             </div>
                             <ScrollArea className="h-full pr-4">
                                 <Table>
@@ -545,7 +521,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                                         onCheckedChange={() =>
                                                                             handlePermissionToggle(permissionCode)
                                                                         }
-                                                                        disabled={isSuperAdminSelected}
                                                                     />
                                                                     <label
                                                                         htmlFor={checkboxId}

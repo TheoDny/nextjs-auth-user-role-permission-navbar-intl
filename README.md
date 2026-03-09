@@ -177,3 +177,4 @@ Le projet enregistre les actions metier (utilisateur, role, entite) dans la tabl
 - L'endpoint cron de reset est sensible: ne jamais exposer `CRON_SECRET`.
 - En production, definir des secrets robustes pour `BETTER_AUTH_SECRET` et `JWT_SECRET`.
 - Pour l'envoi d'emails, configurer les variables SMTP (`MAIL_*`).
+- Le compte et le role `Super Admin` sont proteges contre les modification (services).
