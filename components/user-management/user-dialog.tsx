@@ -21,6 +21,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
 import { UserRolesAndEntities } from "@/types/user.type"
 import { CirclePlus, X } from "lucide-react"
@@ -98,10 +99,6 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
         try {
             let result
             if (user) {
-                if (user.email === "admin@admin.com") {
-                    return toast.error(t("error.adminUserEdit"))
-                }
-
                 // Update existing user
                 result = await updateUserAction({
                     id: user.id,
@@ -121,13 +118,13 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
                 })
             }
 
-            if (result?.serverError) {
-                return toast.error(user ? t("error.UpdateUserFail") : t("error.CreateUserFail"))
-            } else if (result?.validationErrors) {
-                return toast.error(user ? t("error.UpdateUserFail") : t("error.CreateUserFail"))
-            } else if (!result?.data) {
-                return toast.error(user ? t("error.UpdateUserFail") : t("error.CreateUserFail"))
-            }
+            const handledResult = handleSafeActionResult(result, {
+                error: toast.error,
+                errorKeyPrefix: "dialog.error.",
+                t,
+                fallbackErrorMessage: user ? t("dialog.error.UpdateUserFail") : t("dialog.error.CreateUserFail"),
+            })
+            if (!handledResult.ok) return
 
             if (user) {
                 toast.success(t("success.UpdateUserSuccess"))
@@ -137,7 +134,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
 
             form.reset()
             handleOpenChange(false)
-            onClose(result.data)
+            onClose(handledResult.data)
         } catch (error) {
             console.error(error)
             toast.error(user ? "Failed to update user" : "Failed to create user")

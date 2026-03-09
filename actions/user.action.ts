@@ -131,79 +131,59 @@ export async function getUsersAction() {
 
 // Create a new user
 export const createUserAction = actionClient.inputSchema(createUserSchema).action(async ({ parsedInput }) => {
-    try {
-        // Check for user_create permission
-        await checkAuth({ requiredPermission: "user_create" })
+    // Check for user_create permission
+    await checkAuth({ requiredPermission: "user_create" })
 
-        // Check user limit if NEXT_PUBLIC_MAX_USER is defined
-        if (process.env.NEXT_PUBLIC_MAX_USER) {
-            const maxUsers = parseInt(process.env.NEXT_PUBLIC_MAX_USER)
-            const currentUserCount = await countUsers()
+    // Check user limit if NEXT_PUBLIC_MAX_USER is defined
+    if (process.env.NEXT_PUBLIC_MAX_USER) {
+        const maxUsers = parseInt(process.env.NEXT_PUBLIC_MAX_USER)
+        const currentUserCount = await countUsers()
 
-            if (currentUserCount >= maxUsers) {
-                throw new Error(`Maximum number of users reached (${maxUsers})`)
-            }
+        if (currentUserCount >= maxUsers) {
+            throw new Error(`Maximum number of users reached (${maxUsers})`)
         }
-
-        return await createUser(parsedInput)
-    } catch (error) {
-        console.error("Failed to create user:", error)
-        throw new Error("Failed to create user")
     }
+
+    return await createUser(parsedInput)
 })
 
 // Update an existing user
 export const updateUserAction = actionClient.inputSchema(updateUserSchema).action(async ({ parsedInput }) => {
-    try {
-        // Check for user_edit permission
-        const session = await checkAuth({ requiredPermission: "user_edit" })
+    // Check for user_edit permission
+    const session = await checkAuth({ requiredPermission: "user_edit" })
 
-        if (session.user.id === parsedInput.id) {
-            throw new Error("You cannot create a user with the same ID as yourself")
-        }
-
-        const { id, ...data } = parsedInput
-        return await updateUser(id, data)
-    } catch (error) {
-        console.error("Failed to update user:", error)
-        throw new Error("Failed to update user")
+    if (session.user.id === parsedInput.id) {
+        throw new Error("You cannot create a user with the same ID as yourself")
     }
+
+    const { id, ...data } = parsedInput
+    return await updateUser(id, data)
 })
 
 // Delete a user
 export const deleteUserAction = actionClient.inputSchema(deleteUserSchema).action(async ({ parsedInput }) => {
-    try {
-        // Check for user_create permission (same as creation for deletion)
-        const session = await checkAuth({ requiredPermission: "user_create" })
+    // Check for user_create permission (same as creation for deletion)
+    const session = await checkAuth({ requiredPermission: "user_create" })
 
-        if (parsedInput.id === session.user.id) {
-            throw new Error("You cannot delete yourself")
-        }
-
-        return await deleteUser(parsedInput.id, session.user.id)
-    } catch (error) {
-        console.error("Failed to delete user:", error)
-        throw new Error("Failed to delete user")
+    if (parsedInput.id === session.user.id) {
+        throw new Error("You cannot delete yourself")
     }
+
+    return await deleteUser(parsedInput.id, session.user.id)
 })
 
 // Assign roles to a user
 export const assignRolesToUserAction = actionClient
-    .schema(assignRolesSchema)
+    .inputSchema(assignRolesSchema)
     .action(async ({ parsedInput: { userId, roleIds } }) => {
-        try {
-            // Check for user_edit permission
-            await checkAuth({ requiredPermission: "user_edit" })
+        // Check for user_edit permission
+        await checkAuth({ requiredPermission: "user_edit" })
 
-            return await assignRolesToUser(userId, roleIds)
-        } catch (error) {
-            console.error("Failed to assign roles:", error)
-            throw new Error("Failed to assign roles")
-        }
+        return await assignRolesToUser(userId, roleIds)
     })
 
 export const changeEntitySelectedAction = actionClient
-    .schema(changeEntitySelectedSchema)
+    .inputSchema(changeEntitySelectedSchema)
     .action(async ({ parsedInput }) => {
         try {
             // Get current session

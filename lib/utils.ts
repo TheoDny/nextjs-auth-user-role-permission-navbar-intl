@@ -1,3 +1,6 @@
+import { NoEditSuperAdminRole } from "@/errors/NoEditSuperAdminRole"
+import { NoEditSuperAdminUser } from "@/errors/NoEditSuperAdminUser"
+import { roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
 import { clsx, type ClassValue } from "clsx"
 import jwt from "jsonwebtoken"
 import { twMerge } from "tailwind-merge"
@@ -24,17 +27,14 @@ export async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-import { roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
-
 export function assertNotSuperAdminUserId(userId: string) {
     if (userId === userSuperAdmin.id) {
-        throw new Error("Cannot modify Super Admin user")
+        throw new NoEditSuperAdminUser()
     }
 }
 
 export function assertNotSuperAdminRoleId(roleId: string) {
     if (roleId === roleSuperAdmin.id) {
-        throw new Error("Cannot modify Super Admin role")
+        throw new NoEditSuperAdminRole()
     }
 }
-

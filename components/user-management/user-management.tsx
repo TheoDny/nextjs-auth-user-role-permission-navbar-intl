@@ -22,6 +22,7 @@ import { UserModel as User } from "@/prisma/generated/models/User"
 import { RolePermissions } from "@/types/role.type"
 import { UserRolesAndEntities } from "@/types/user.type"
 
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { userSuperAdmin } from "@/prisma/data-seed"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { UserDialog } from "./user-dialog"
@@ -177,16 +178,13 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
         try {
             const result = await deleteUserAction({ id: user.id })
 
-            if (result?.serverError) {
-                console.error(result?.serverError)
-                return toast.error(t("dialog.error.DeleteUserFail"))
-            } else if (result?.validationErrors) {
-                console.error(result?.validationErrors)
-                return toast.error(t("dialog.error.DeleteUserFail"))
-            } else if (!result?.data) {
-                console.error("No data returned")
-                return toast.error(t("dialog.error.DeleteUserFail"))
-            }
+            const handledResult = handleSafeActionResult(result, {
+                error: toast.error,
+                errorKeyPrefix: "dialog.error.",
+                t,
+                fallbackErrorMessage: t("dialog.error.DeleteRoleFail"),
+            })
+            if (!handledResult.ok) return
 
             toast.success(t("dialog.success.DeleteUserSuccess"))
 

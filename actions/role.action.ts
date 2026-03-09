@@ -59,43 +59,33 @@ export async function getRolesAction() {
 
 // Create a new role
 export const createRoleAction = actionClient.inputSchema(createRoleSchema).action(async ({ parsedInput }) => {
-    try {
-        // Check for role_create permission
-        await checkAuth({ requiredPermission: "role_create" })
+    // Check for role_create permission
+    await checkAuth({ requiredPermission: "role_create" })
 
-        // Check role limit if NEXT_PUBLIC_MAX_ROLE is defined
-        if (process.env.NEXT_PUBLIC_MAX_ROLE) {
-            const maxRoles = parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
-            const currentRoleCount = await countRoles()
+    // Check role limit if NEXT_PUBLIC_MAX_ROLE is defined
+    if (process.env.NEXT_PUBLIC_MAX_ROLE) {
+        const maxRoles = parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
+        const currentRoleCount = await countRoles()
 
-            if (currentRoleCount >= maxRoles) {
-                throw new Error(`Maximum number of roles reached (${maxRoles})`)
-            }
+        if (currentRoleCount >= maxRoles) {
+            throw new Error(`Maximum number of roles reached (${maxRoles})`)
         }
-
-        return await createRole({
-            ...parsedInput,
-        })
-    } catch (error) {
-        console.error("Failed to create role:", error)
-        throw new Error("Failed to create role")
     }
+
+    return await createRole({
+        ...parsedInput,
+    })
 })
 
 // Update an existing role
 export const updateRoleAction = actionClient.inputSchema(updateRoleSchema).action(async ({ parsedInput }) => {
-    try {
-        // Check for role_edit permission
-        await checkAuth({ requiredPermission: "role_edit" })
+    // Check for role_edit permission
+    await checkAuth({ requiredPermission: "role_edit" })
 
-        return await updateRole(parsedInput.id, {
-            name: parsedInput.name,
-            description: parsedInput.description,
-        })
-    } catch (error) {
-        console.error("Failed to update role:", error)
-        throw new Error("Failed to update role")
-    }
+    return await updateRole(parsedInput.id, {
+        name: parsedInput.name,
+        description: parsedInput.description,
+    })
 })
 
 // Delete a role
@@ -108,15 +98,10 @@ export const deleteRoleAction = actionClient.inputSchema(deleteRoleSchema).actio
 
 // Assign permissions to a role
 export const assignPermissionsToRoleAction = actionClient
-    .schema(assignPermissionsSchema)
+    .inputSchema(assignPermissionsSchema)
     .action(async ({ parsedInput: { roleId, permissionCodes } }) => {
-        try {
-            // Check for role_edit permission
-            await checkAuth({ requiredPermission: "role_edit" })
+        // Check for role_edit permission
+        await checkAuth({ requiredPermission: "role_edit" })
 
-            return await assignPermissionsToRole(roleId, permissionCodes)
-        } catch (error) {
-            console.error("Failed to assign permissions:", error)
-            throw new Error("Failed to assign permissions")
-        }
+        return await assignPermissionsToRole(roleId, permissionCodes)
     })

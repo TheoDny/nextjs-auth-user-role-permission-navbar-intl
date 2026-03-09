@@ -167,12 +167,11 @@
             "active": "Active",
             "commentActive": "User can login and access the system",
             "error": {
-                "adminUserEdit": "You cannot update the admin user",
                 "UpdateUserFail": "Error while updating user",
                 "CreateUserFail": "Error while creating user",
                 "DeleteUserFail": "Error while deleting user",
                 "cannotDeleteSelf": "You cannot delete yourself",
-                "cannotDeleteAdmin": "You cannot delete the admin user",
+                "NoEditSuperAdminUser": "You cannot modify the Super Admin user",
                 "maxUsersReached": "Maximum number of users reached"
             },
             "success": {
@@ -228,8 +227,7 @@
                 "UpdateRoleFail": "Error while updating role",
                 "CreateRoleFail": "Error while creating role",
                 "DeleteRoleFail": "Error while deleting role",
-                "cannotModifySuperAdmin": "Cannot modify the Super Admin role",
-                "cannotDeleteSuperAdmin": "Cannot delete the Super Admin role",
+                "NoEditSuperAdminRole": "Cannot modify the Super Admin role",
                 "roleHasUsers": "Cannot delete a role that is assigned to users",
                 "maxRolesReached": "Maximum number of roles reached"
             },

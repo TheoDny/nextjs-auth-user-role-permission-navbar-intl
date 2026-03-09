@@ -1,3 +1,4 @@
+import { NeedEntityAttributedError } from "@/errors/NeedEntityAttributed"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { assertNotSuperAdminUserId } from "@/lib/utils"
@@ -39,44 +40,39 @@ export async function getUsers() {
 // Create a new user
 export async function createUser(data: { name: string; email: string; active: boolean; entities: string[] }) {
     if (!data.entities[0]) {
-        throw new Error("Please select at least one entity for the user")
+        throw new NeedEntityAttributedError()
     }
-    try {
-        const user = await prisma.user.create({
-            data: {
-                name: data.name,
-                email: data.email,
-                active: data.active,
-                entitySelectedId: data.entities[0], // Set the first entity as selected
-                Entities: {
-                    connect: data.entities.map((entityId) => ({ id: entityId })),
-                },
+    const user = await prisma.user.create({
+        data: {
+            name: data.name,
+            email: data.email,
+            active: data.active,
+            entitySelectedId: data.entities[0], // Set the first entity as selected
+            Entities: {
+                connect: data.entities.map((entityId) => ({ id: entityId })),
             },
-            include: {
-                Roles: true,
-                Entities: true,
-            },
+        },
+        include: {
+            Roles: true,
+            Entities: true,
+        },
+    })
+
+    const tokenUser = await createTokenUser(user.name as string, user.email)
+    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/sign-up?token=${tokenUser.token}`
+    const resMail = await sendInvitationSignUp(user.name as string, user.email, inviteLink)
+    if (resMail === false) {
+        await prisma.user.delete({
+            where: { id: user.id },
         })
-
-        const tokenUser = await createTokenUser(user.name as string, user.email)
-        const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/sign-up?token=${tokenUser.token}`
-        const resMail = await sendInvitationSignUp(user.name as string, user.email, inviteLink)
-        if (resMail === false) {
-            await prisma.user.delete({
-                where: { id: user.id },
-            })
-            throw new Error("Failed to send invitation email, user deleted")
-        }
-
-        // Add log
-        addUserCreateLog({ name: user.name || "", id: user.id })
-
-        revalidatePath("/administration/users")
-        return user
-    } catch (error) {
-        console.error("Failed to create user:", error)
-        throw new Error("Failed to create user")
+        throw new Error("Failed to send invitation email, user deleted")
     }
+
+    // Add log
+    addUserCreateLog({ name: user.name || "", id: user.id })
+
+    revalidatePath("/administration/users")
+    return user
 }
 
 // Update an existing user
@@ -105,66 +101,56 @@ export async function updateUser(
         throw new Error("Email is already in use by another account")
     }
 
-    try {
-        const user = await prisma.user.update({
-            where: { id },
-            data: {
-                name: data.name,
-                email: data.email,
-                active: data.active,
-                Entities: {
-                    connect: data.entitiesToAdd.map((entityId) => ({ id: entityId })),
-                    disconnect: data.entitiesToRemove.map((entityId) => ({ id: entityId })),
-                },
+    const user = await prisma.user.update({
+        where: { id },
+        data: {
+            name: data.name,
+            email: data.email,
+            active: data.active,
+            Entities: {
+                connect: data.entitiesToAdd.map((entityId) => ({ id: entityId })),
+                disconnect: data.entitiesToRemove.map((entityId) => ({ id: entityId })),
             },
-            include: {
-                Roles: true,
-                Entities: true,
-            },
-        })
+        },
+        include: {
+            Roles: true,
+            Entities: true,
+        },
+    })
 
-        // Add log
-        addUserUpdateLog({ id: user.id, name: user.name || "" })
+    // Add log
+    addUserUpdateLog({ id: user.id, name: user.name || "" })
 
-        // If user active status changed to false, add disable log
-        if (data.active === false) {
-            addUserDisableLog({ id: user.id, name: user.name || "" })
-        }
-
-        revalidatePath("/administration/users")
-        return user
-    } catch (error) {
-        console.error("Failed to update user:", error)
-        throw new Error("Failed to update user")
+    // If user active status changed to false, add disable log
+    if (data.active === false) {
+        addUserDisableLog({ id: user.id, name: user.name || "" })
     }
+
+    revalidatePath("/administration/users")
+    return user
 }
 
 // Assign roles to a user
 export async function assignRolesToUser(userId: string, roleIds: string[]) {
     assertNotSuperAdminUserId(userId)
 
-    try {
-        const user = await prisma.user.update({
-            where: { id: userId },
-            data: {
-                Roles: {
-                    set: roleIds.map((id) => ({ id })),
-                },
+    const user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            Roles: {
+                set: roleIds.map((id) => ({ id })),
             },
-            include: {
-                Roles: true,
-            },
-        })
+        },
+        include: {
+            Roles: true,
+        },
+    })
 
-        // Add log
-        addUserSetRoleLog({ id: user.id, name: user.name || "" })
+    // Add log
+    addUserSetRoleLog({ id: user.id, name: user.name || "" })
 
-        revalidatePath("/administration/users")
-        return user
-    } catch (error) {
-        console.error("Failed to assign roles:", error)
-        throw new Error("Failed to assign roles")
-    }
+    revalidatePath("/administration/users")
+    return user
 }
 
 /**
@@ -216,60 +202,50 @@ export async function updateUserProfile(
 }
 
 export async function changeEntitySelected(userId: string, entityId: string) {
-    try {
-        //check if user has the new entity in their entities
-        let user = await prisma.user.findFirst({
-            where: {
-                id: userId,
-                Entities: {
-                    some: {
-                        id: entityId,
-                    },
+    //check if user has the new entity in their entities
+    let user = await prisma.user.findFirst({
+        where: {
+            id: userId,
+            Entities: {
+                some: {
+                    id: entityId,
                 },
             },
-        })
+        },
+    })
 
-        if (!user) {
-            throw new Error("User does not have access to the selected entity")
-        }
-
-        user = await prisma.user.update({
-            where: { id: userId },
-            data: {
-                entitySelectedId: entityId,
-            },
-        })
-
-        // Add log
-        addUserSetEntityLog({ id: user.id, name: user.name || "" })
-
-        return user
-    } catch (error) {
-        console.error("Failed to change entity selected:", error)
-        throw new Error("Failed to change entity selected")
+    if (!user) {
+        throw new Error("User does not have access to the selected entity")
     }
+
+    user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            entitySelectedId: entityId,
+        },
+    })
+
+    // Add log
+    addUserSetEntityLog({ id: user.id, name: user.name || "" })
+
+    return user
 }
 
 // Verify user email
 export async function verifyUserEmail(userId: string) {
     assertNotSuperAdminUserId(userId)
 
-    try {
-        const user = await prisma.user.update({
-            where: { id: userId },
-            data: {
-                emailVerified: true,
-            },
-        })
+    const user = await prisma.user.update({
+        where: { id: userId },
+        data: {
+            emailVerified: true,
+        },
+    })
 
-        // Add log
-        addUserEmailVerifiedLog({ id: user.id, name: user.name || "" })
+    // Add log
+    addUserEmailVerifiedLog({ id: user.id, name: user.name || "" })
 
-        return user
-    } catch (error) {
-        console.error("Failed to verify user email:", error)
-        throw new Error("Failed to verify user email")
-    }
+    return user
 }
 
 // Sign up user with token validation and user recreation
@@ -340,32 +316,27 @@ export async function signUpUser(name: string, email: string, password: string) 
 export async function deleteUser(id: string, currentUserId: string) {
     assertNotSuperAdminUserId(id)
 
-    try {
-        // Get user details first
-        const userToDelete = await prisma.user.findUnique({
-            where: { id, deletedAt: null },
-        })
+    // Get user details first
+    const userToDelete = await prisma.user.findUnique({
+        where: { id, deletedAt: null },
+    })
 
-        if (!userToDelete) {
-            throw new Error("User not found")
-        }
-
-        const user = await prisma.user.update({
-            where: { id },
-            data: {
-                deletedAt: new Date(),
-                email: userToDelete.email + "_deleted_" + new Date().toISOString(),
-            },
-        })
-
-        addUserDisableLog({ id: user.id, name: userToDelete.name || "" })
-
-        revalidatePath("/administration/users")
-        return user
-    } catch (error) {
-        console.error("Failed to delete user:", error)
-        throw new Error("Failed to delete user")
+    if (!userToDelete) {
+        throw new Error("User not found")
     }
+
+    const user = await prisma.user.update({
+        where: { id },
+        data: {
+            deletedAt: new Date(),
+            email: userToDelete.email + "_deleted_" + new Date().toISOString(),
+        },
+    })
+
+    addUserDisableLog({ id: user.id, name: userToDelete.name || "" })
+
+    revalidatePath("/administration/users")
+    return user
 }
 
 export async function countUsers() {

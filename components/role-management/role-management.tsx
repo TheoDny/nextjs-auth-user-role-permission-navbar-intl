@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { Permission, Role } from "@/prisma/generated/client"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { RolePermissions } from "@/types/role.type"
@@ -194,20 +195,13 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
         try {
             const result = await deleteRoleAction({ id: role.id })
 
-            if (result?.serverError) {
-                let errorMessage: string = t("dialog.error." + result?.serverError)
-                if (!errorMessage) {
-                    errorMessage = t("dialog.error.DeleteRoleFail")
-                }
-                console.error(errorMessage)
-                return toast.error(errorMessage)
-            } else if (result?.validationErrors) {
-                console.error(result?.validationErrors)
-                return toast.error(t("dialog.error.DeleteRoleFail"))
-            } else if (!result?.data) {
-                console.error("No data returned")
-                return toast.error(t("dialog.error.DeleteRoleFail"))
-            }
+            const handledResult = handleSafeActionResult(result, {
+                error: toast.error,
+                errorKeyPrefix: "dialog.error.",
+                t,
+                fallbackErrorMessage: t("dialog.error.DeleteRoleFail"),
+            })
+            if (!handledResult.ok) return
 
             toast.success(t("dialog.success.DeleteRoleSuccess"))
 
@@ -279,10 +273,18 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
         dispatch({ type: "merge", payload: { isSubmitting: true } })
 
         try {
-            await assignPermissionsToRoleAction({
+            const result = await assignPermissionsToRoleAction({
                 roleId: state.selectedRole.id,
                 permissionCodes: state.selectedPermissions,
             })
+
+            const handledResult = handleSafeActionResult(result, {
+                error: toast.error,
+                errorKeyPrefix: "dialog.error.",
+                t,
+                fallbackErrorMessage: t("dialog.error.UpdateRoleFail"),
+            })
+            if (!handledResult.ok) return
 
             // Refresh the roles list
             const rolesData = await getRolesAction()

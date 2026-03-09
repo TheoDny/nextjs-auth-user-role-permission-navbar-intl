@@ -1,17 +1,19 @@
-import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from "next-safe-action";
+import { SafeHandleActionError } from "@/errors/SafeHandleActionError"
+import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from "next-safe-action"
 
 export const actionClient = createSafeActionClient({
     // Can also be an async function.
     handleServerError(e) {
         // Log to console.
-        console.error("Action error:", e.name, e.message)
+        console.error("Action error:", e.name, e.message, typeof e, "\n\n", e)
+        console.log(e instanceof SafeHandleActionError)
 
-        if (HandleServerError.has(e.name) && "code" in e && typeof e.code === "string") {
-            return e.code
+        if (e instanceof SafeHandleActionError) {
+            console.log("SafeHandleActionError", e.name)
+
+            return { errorName: e.name }
         }
 
         return DEFAULT_SERVER_ERROR_MESSAGE
     },
 })
-
-const HandleServerError = new Set(["DeleteRoleUserAssignedError"])

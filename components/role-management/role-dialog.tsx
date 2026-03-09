@@ -20,6 +20,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { handleSafeActionResult } from "@/lib/utils.client"
 import { RoleModel as Role } from "@/prisma/generated/models/Role"
 import { RolePermissions } from "@/types/role.type"
 
@@ -109,13 +110,13 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
                 })
             }
 
-            if (result?.serverError) {
-                return toast.error(role ? t("error.UpdateRoleFail") : t("error.CreateRoleFail"))
-            } else if (result?.validationErrors) {
-                return toast.error(role ? t("error.UpdateRoleFail") : t("error.CreateRoleFail"))
-            } else if (!result?.data) {
-                return toast.error(role ? t("error.UpdateRoleFail") : t("error.CreateRoleFail"))
-            }
+            const handledResult = handleSafeActionResult(result, {
+                error: toast.error,
+                errorKeyPrefix: "dialog.error.",
+                t,
+                fallbackErrorMessage: role ? t("dialog.error.UpdateRoleFail") : t("dialog.error.CreateRoleFail"),
+            })
+            if (!handledResult.ok) return
 
             if (role) {
                 toast.success(t("success.UpdateRoleSuccess"))
@@ -125,7 +126,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
 
             form.reset()
             handleOpenChange(false)
-            onClose(result.data)
+            onClose(handledResult.data)
         } catch (error) {
             console.error(error)
             toast.error(role ? "Failed to update role" : "Failed to create role")
