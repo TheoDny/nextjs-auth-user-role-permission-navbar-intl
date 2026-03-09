@@ -3,7 +3,6 @@
 import { auth } from "@/lib/auth"
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
-import { userSuperAdmin } from "@/prisma/data-seed"
 import { checkToken } from "@/services/auth.service"
 import {
     assignRolesToUser,
@@ -179,10 +178,6 @@ export const deleteUserAction = actionClient.inputSchema(deleteUserSchema).actio
 
         if (parsedInput.id === session.user.id) {
             throw new Error("You cannot delete yourself")
-        }
-
-        if (parsedInput.id === userSuperAdmin.id) {
-            throw new Error("You cannot delete the admin user")
         }
 
         return await deleteUser(parsedInput.id, session.user.id)

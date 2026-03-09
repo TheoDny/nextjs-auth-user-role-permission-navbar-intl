@@ -2,7 +2,6 @@
 
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
-import { roleSuperAdmin } from "@/prisma/data-seed"
 import {
     assignPermissionsToRole,
     countRoles,
@@ -103,11 +102,6 @@ export const updateRoleAction = actionClient.inputSchema(updateRoleSchema).actio
 export const deleteRoleAction = actionClient.inputSchema(deleteRoleSchema).action(async ({ parsedInput }) => {
     // Check for role_create permission (same as creation for deletion)
     await checkAuth({ requiredPermission: "role_create" })
-
-    // Check if it's the Super Admin role
-    if (parsedInput.id === roleSuperAdmin.id) {
-        throw new Error("Cannot delete the Super Admin role")
-    }
 
     return await deleteRole(parsedInput.id)
 })
