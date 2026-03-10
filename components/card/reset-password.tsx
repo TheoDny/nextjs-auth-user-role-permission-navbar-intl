@@ -115,7 +115,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="password">{tResetPassword("confirmPassword")}</Label>
+                            <Label htmlFor="password_confirmation">{tResetPassword("confirmPassword")}</Label>
                             <InputConceal
                                 id="password_confirmation"
                                 name="password_confirmation"

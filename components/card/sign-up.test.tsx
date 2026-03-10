@@ -126,4 +126,26 @@ describe("SignUp", () => {
         })
         expect(handleSafeActionResultMock).toHaveBeenCalledTimes(1)
     })
+
+    it("toggles password visibility with InputConceal", async () => {
+        const user = userEvent.setup()
+        render(
+            <SignUp
+                token="invitation-token"
+                name="Test"
+                email="test@test.com"
+            />
+        )
+
+        const passwordInput = screen.getByLabelText("password")
+        expect(passwordInput).toHaveAttribute("type", "password")
+
+        const showButtons = screen.getAllByRole("button", { name: "Show password" })
+        await user.click(showButtons[0])
+        expect(passwordInput).toHaveAttribute("type", "text")
+
+        const hideButtons = screen.getAllByRole("button", { name: "Hide password" })
+        await user.click(hideButtons[0])
+        expect(passwordInput).toHaveAttribute("type", "password")
+    })
 })

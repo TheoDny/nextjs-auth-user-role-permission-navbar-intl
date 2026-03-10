@@ -61,4 +61,18 @@ describe("SignIn", () => {
             })
         )
     })
+
+    it("toggles password visibility with InputConceal", async () => {
+        const user = userEvent.setup()
+        render(<SignIn />)
+
+        const passwordInput = screen.getByLabelText("password")
+        expect(passwordInput).toHaveAttribute("type", "password")
+
+        await user.click(screen.getByRole("button", { name: "Show password" }))
+        expect(passwordInput).toHaveAttribute("type", "text")
+
+        await user.click(screen.getByRole("button", { name: "Hide password" }))
+        expect(passwordInput).toHaveAttribute("type", "password")
+    })
 })

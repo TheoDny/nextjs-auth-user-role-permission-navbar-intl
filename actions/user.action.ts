@@ -2,7 +2,6 @@
 
 import { PasswordsMatchingError } from "@/errors/PasswordsMatchingError"
 import { TokenInvalidError } from "@/errors/TokenInvalidError"
-import { auth } from "@/lib/auth"
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
 import { checkToken } from "@/services/auth.service"
@@ -18,7 +17,6 @@ import {
     updateUserProfile,
 } from "@/services/user.service"
 import { revalidatePath } from "next/cache"
-import { headers } from "next/headers"
 import { z } from "zod"
 
 // Schema for creating a user
@@ -91,31 +89,20 @@ const signUpSchema = z.object({
 
 // Server action for updating user profile
 export const updateProfileAction = actionClient.inputSchema(updateProfileSchema).action(async ({ parsedInput }) => {
-    try {
-        // Get current session
-        const session = await auth.api.getSession({
-            headers: await headers(),
-        })
+    // Get current session
+    const session = await checkAuth()
 
-        if (!session) {
-            throw new Error("You must be logged in to update your profile")
-        }
+    // Update the user profile
+    const updatedUser = await updateUserProfile(session.user.id, {
+        name: parsedInput.name,
+        email: parsedInput.email,
+        image: parsedInput.image,
+    })
 
-        // Update the user profile
-        const updatedUser = await updateUserProfile(session.user.id, {
-            name: parsedInput.name,
-            email: parsedInput.email,
-            image: parsedInput.image,
-        })
+    // Revalidate the account page
+    revalidatePath("/account")
 
-        // Revalidate the account page
-        revalidatePath("/account")
-
-        return updatedUser
-    } catch (error) {
-        console.error("Failed to update profile:", error)
-        throw new Error("Failed to update profile")
-    }
+    return updatedUser
 })
 
 // Get all users with their roles
