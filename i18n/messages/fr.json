@@ -373,6 +373,7 @@
         "maxRolesReached": "Nombre maximum de rôles atteint",
         "UpdateProfileFail": "Un problème est survenu lors de la mise à jour de votre profil",
         "UpdateEmailFail": "Un problème est survenu lors de la mise à jour de votre email",
-        "DeleteSessionFail": "Impossible de supprimer la session"
+        "DeleteSessionFail": "Impossible de supprimer la session",
+        "MaxNumberUserError": "Nombre maximum d'utilisateurs atteint"
     }
 }

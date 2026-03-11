@@ -371,6 +371,7 @@
         "maxRolesReached": "Maximum number of roles reached",
         "UpdateProfileFail": "There was a problem updating your profile",
         "UpdateEmailFail": "There was a problem updating your email",
-        "DeleteSessionFail": "Failed to delete session"
+        "DeleteSessionFail": "Failed to delete session",
+        "MaxNumberUserError": "Maximum number of users reached"
     }
 }

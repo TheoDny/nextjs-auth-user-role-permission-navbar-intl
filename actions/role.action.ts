@@ -1,5 +1,6 @@
 "use server"
 
+import { MaxNumberUserError } from "@/errors/MaxNumberUserError"
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
 import {
@@ -68,7 +69,7 @@ export const createRoleAction = actionClient.inputSchema(createRoleSchema).actio
         const currentRoleCount = await countRoles()
 
         if (currentRoleCount >= maxRoles) {
-            throw new Error(`Maximum number of roles reached (${maxRoles})`)
+            throw new MaxNumberUserError(maxRoles)
         }
     }
 
