@@ -174,24 +174,6 @@ describe("other user actions", () => {
         expect(result.serverError).toBeTruthy()
     })
 
-    it("updateUserAction rejects self update by id", async () => {
-        const { updateUserAction } = await import("./user.action")
-        checkAuthMock.mockResolvedValue({ user: { id: "u1" } })
-
-        const result = await updateUserAction({
-            id: "u1",
-            name: "Jane Doe",
-            email: "jane@example.com",
-            active: true,
-            entitiesToAdd: [],
-            entitiesToRemove: [],
-        })
-
-        expect(checkAuthMock).toHaveBeenCalledWith({ requiredPermission: "user_edit" })
-        expect(updateUserMock).not.toHaveBeenCalled()
-        expect(result.serverError).toBeTruthy()
-    })
-
     it("deleteUserAction rejects deleting current user", async () => {
         const { deleteUserAction } = await import("./user.action")
         checkAuthMock.mockResolvedValue({ user: { id: "u2" } })

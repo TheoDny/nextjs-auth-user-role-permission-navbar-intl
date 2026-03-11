@@ -148,10 +148,6 @@ export const updateUserAction = actionClient.inputSchema(updateUserSchema).actio
     // Check for user_edit permission
     const session = await checkAuth({ requiredPermission: "user_edit" })
 
-    if (session.user.id === parsedInput.id) {
-        throw new Error("You cannot create a user with the same ID as yourself")
-    }
-
     const { id, ...data } = parsedInput
     return await updateUser(id, data)
 })
