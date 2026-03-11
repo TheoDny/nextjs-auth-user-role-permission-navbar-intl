@@ -22,7 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { handleSafeActionResult } from "@/lib/utils.client"
-import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
+import { EntitySmall } from "@/types/entity.type"
 import { UserRolesAndEntities } from "@/types/user.type"
 import { CirclePlus, X } from "lucide-react"
 
@@ -38,14 +38,14 @@ interface UserDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     user: UserRolesAndEntities | null
-    entitiesCanUse: Entity[]
+    entitiesCanUse: EntitySmall[]
     onClose: (user?: UserRolesAndEntities) => void
 }
 
 export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }: UserDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [entitiesToAdd, setEntitiesToAdd] = useState<Entity[] | []>([])
-    const [entitiesToRemove, setEntitiesToRemove] = useState<Entity[] | []>([])
+    const [entitiesToAdd, setEntitiesToAdd] = useState<EntitySmall[] | []>([])
+    const [entitiesToRemove, setEntitiesToRemove] = useState<EntitySmall[] | []>([])
     const t = useTranslations("UserManagement.dialog")
     const tCommon = useTranslations("Common")
 
@@ -195,7 +195,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
                             <FormLabel>{t("entities")}</FormLabel>
                             <FormControl>
                                 <div className="max-h-[150px] flex flex-wrap gap-2">
-                                    {entitiesCanUse.map((entity) => {
+                                    {entitiesCanUse.map((entity: { id: string; name: string }) => {
                                         const isToAdd = entitiesToAdd.some((e) => e.id === entity.id)
                                         const isToRemove = entitiesToRemove.some((e) => e.id === entity.id)
                                         const isSelected =

@@ -9,7 +9,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "next lint",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "email": "email dev",

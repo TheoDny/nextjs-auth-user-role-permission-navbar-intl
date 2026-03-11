@@ -18,6 +18,7 @@ import { handleSafeActionResult } from "@/lib/utils.client"
 import { Permission, Role } from "@/prisma/generated/client"
 import { useConfirm } from "@/provider/ConfirmationProvider"
 import { RolePermissions } from "@/types/role.type"
+import { SessionUser } from "@/types/user.type"
 import { RoleDialog } from "./role-dialog"
 
 type PermissionMatrixItem = {
@@ -56,6 +57,7 @@ const getRolePermissionCodes = (role: RolePermissions | null) =>
 
 
 type RoleManagementProps = {
+    sessionUser: SessionUser
     preloadedRoles: RolePermissions[]
     permissions: Permission[]
 }
@@ -96,7 +98,7 @@ const roleManagementReducer = (
     }
 }
 
-export function RoleManagement({ preloadedRoles, permissions }: RoleManagementProps) {
+export function RoleManagement({ sessionUser, preloadedRoles, permissions }: RoleManagementProps) {
     const [state, dispatch] = useReducer(roleManagementReducer, {
         roles: preloadedRoles,
         selectedRole: null,
@@ -108,6 +110,10 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
         searchQuery: "",
         permissionSearchQuery: "",
     })
+
+    const canCreateRole = sessionUser.Permissions.some((permission) => permission.code === "role_create")
+    const canEditRole = sessionUser.Permissions.some((permission) => permission.code === "role_edit")
+
     const t = useTranslations("RoleManagement")
     const tPermissions = useTranslations("Permissions")
 
@@ -350,9 +356,10 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                             size="sm"
                             onClick={handleCreateRole}
                             disabled={
-                                process.env.NEXT_PUBLIC_MAX_ROLE
+                                !canCreateRole ||
+                                (process.env.NEXT_PUBLIC_MAX_ROLE
                                     ? state.roles.length >= parseInt(process.env.NEXT_PUBLIC_MAX_ROLE)
-                                    : false
+                                    : false)
                             }
                         >
                             <Plus className="h-4 w-4 mr-2" />
@@ -381,7 +388,10 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                         role="button"
                                         tabIndex={0}
                                         onClick={() => handleRoleSelect(role)}
-                                        onDoubleClick={() => handleEditRole(role)}
+                                        onDoubleClick={() => {
+                                            if (!canEditRole) return
+                                            handleEditRole(role)
+                                        }}
                                         onKeyDown={(event) => {
                                             if (event.key === "Enter" || event.key === " ") {
                                                 event.preventDefault()
@@ -397,28 +407,34 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                             <div className="font-medium">{role.name}</div>
                                             <div className="text-sm text-muted-foreground">{role.description}</div>
                                         </div>
-                                        <div className="flex gap-1">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleEditRole(role)
-                                                }}
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleDeleteRole(role)
-                                                }}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
+                                        {canEditRole && (
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    className="cursor-pointer"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        if (!canEditRole) return
+                                                        handleEditRole(role)
+                                                    }}
+                                                    disabled={!canEditRole}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    className="cursor-pointer"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleDeleteRole(role)
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                     <Separator className="my-0" />
                                 </div>
@@ -441,7 +457,7 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                 <CardHeader className="flex flex-col justify-between space-y-2 pb-2">
                     <div className="flex flex-row items-center justify-between space-x-2 w-full relative">
                         <CardTitle>{t("permissions")}</CardTitle>
-                        {state.selectedRole && hasPermissionsChanged() && (
+                        {state.selectedRole && canEditRole && hasPermissionsChanged() && (
                             <div className="absolute right-0 space-x-2">
                                 <Button
                                     variant="outline"
@@ -515,7 +531,6 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                             {permissionCode ? (
                                                                 <div className="flex flex-col items-center gap-1">
                                                                     <Checkbox
-                                                                        className="cursor-pointer"
                                                                         id={checkboxId}
                                                                         checked={state.selectedPermissions.includes(
                                                                             permissionCode,
@@ -523,10 +538,12 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                                                                         onCheckedChange={() =>
                                                                             handlePermissionToggle(permissionCode)
                                                                         }
+                                                                        className={`disabled:opacity-100 ${canEditRole ? "cursor-pointer" : "disabled:cursor-default"}`}
+                                                                        disabled={!canEditRole}
                                                                     />
                                                                     <label
                                                                         htmlFor={checkboxId}
-                                                                        className="text-[11px] text-muted-foreground cursor-pointer"
+                                                                        className={`text-[11px] text-muted-foreground ${canEditRole ? "cursor-pointer" : "disabled:cursor-default"}`}
                                                                     >
                                                                         {permissionCode}
                                                                     </label>
@@ -564,13 +581,14 @@ export function RoleManagement({ preloadedRoles, permissions }: RoleManagementPr
                     )}
                 </CardContent>
             </Card>
-
-            <RoleDialog
-                open={state.isDialogOpen}
-                onOpenChange={(open) => dispatch({ type: "merge", payload: { isDialogOpen: open } })}
-                role={state.editingRole}
-                onClose={handleRoleDialogClose}
-            />
+            {(canCreateRole || canEditRole) && (
+                <RoleDialog
+                    open={state.isDialogOpen}
+                    onOpenChange={(open) => dispatch({ type: "merge", payload: { isDialogOpen: open } })}
+                    role={state.editingRole}
+                    onClose={handleRoleDialogClose}
+                />
+            )}
         </div>
     )
 }

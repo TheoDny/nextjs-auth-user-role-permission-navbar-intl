@@ -1,9 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { UserManagement } from "@/components/user-management/user-management"
 import { pageCheckAuth } from "@/lib/auth-guard"
-import { Entity, User } from "@/prisma/generated/client"
 import { getRoles } from "@/services/role/role.service"
 import { getUsers } from "@/services/user/user.service"
+import { SessionUser } from "@/types/user.type"
 import { getTranslations } from "next-intl/server"
 import { Suspense } from "react"
 
@@ -21,7 +21,6 @@ export default async function UsersPage() {
             </div>
             <div className="h-[calc(100vh-100px)]">
                 <Suspense fallback={<UserManagementSkeleton />}>
-                    {/* @ts-expect-error because i removed image */}
                     <UserManagementContent sessionUser={session.user} />
                 </Suspense>
             </div>
@@ -29,7 +28,7 @@ export default async function UsersPage() {
     )
 }
 
-async function UserManagementContent({ sessionUser }: { sessionUser: User & { Entities: Entity[] } }) {
+async function UserManagementContent({ sessionUser }: { sessionUser: SessionUser }) {
     const [users, roles] = await Promise.all([getUsers(), getRoles()])
 
     return <UserManagement sessionUser={sessionUser} preloadedUsers={users} roles={roles} />

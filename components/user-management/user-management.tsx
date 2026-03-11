@@ -17,10 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { EntityModel as Entity } from "@/prisma/generated/models/Entity"
-import { UserModel as User } from "@/prisma/generated/models/User"
 import { RolePermissions } from "@/types/role.type"
-import { UserRolesAndEntities } from "@/types/user.type"
+import { SessionUser, UserRolesAndEntities } from "@/types/user.type"
 
 import { handleSafeActionResult } from "@/lib/utils.client"
 import { userSuperAdmin } from "@/prisma/data-seed"
@@ -28,7 +26,7 @@ import { useConfirm } from "@/provider/ConfirmationProvider"
 import { UserDialog } from "./user-dialog"
 
 type UserManagementProps = {
-    sessionUser: User & { Entities: Entity[] }
+    sessionUser: SessionUser
     preloadedUsers: UserRolesAndEntities[]
     roles: RolePermissions[]
 }
@@ -76,6 +74,9 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
         entityFilter: [],
         filterOpen: false,
     })
+
+    const canCreateUser = sessionUser.Permissions.some((permission) => permission.code === "user_create")
+    const canEditUser = sessionUser.Permissions.some((permission) => permission.code === "user_edit")
 
     const { confirm } = useConfirm()
 
@@ -329,9 +330,10 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                             size="sm"
                             onClick={handleCreateUser}
                             disabled={
-                                process.env.NEXT_PUBLIC_MAX_USER
+                                !canCreateUser ||
+                                (process.env.NEXT_PUBLIC_MAX_USER
                                     ? state.users.length >= parseInt(process.env.NEXT_PUBLIC_MAX_USER)
-                                    : false
+                                    : false)
                             }
                         >
                             <Plus className="h-4 w-4 mr-2" />
@@ -479,7 +481,10 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                         role="button"
                                         tabIndex={0}
                                         onClick={() => handleUserSelect(user)}
-                                        onDoubleClick={() => handleEditUser(user)}
+                                        onDoubleClick={() => {
+                                            if (!canEditUser) return
+                                            handleEditUser(user)
+                                        }}
                                         onKeyDown={(event) => {
                                             if (event.key === "Enter" || event.key === " ") {
                                                 event.preventDefault()
@@ -568,33 +573,39 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                                 </HoverCard>
                                             )}
                                         </div>
-                                        <div className="flex gap-1">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleEditUser(user)
-                                                }}
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleDeleteUser(user)
-                                                }}
-                                                disabled={
-                                                    user.id === userSuperAdmin.id ||
-                                                    user.id === sessionUser.id ||
-                                                    state.isDeleting
-                                                }
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
+                                        {canEditUser && (
+                                            <div className="flex gap-1">
+                                                <Button
+                                                    className="cursor-pointer"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        if (!canEditUser) return
+                                                        handleEditUser(user)
+                                                    }}
+                                                    disabled={!canEditUser}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    className="cursor-pointer"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleDeleteUser(user)
+                                                    }}
+                                                    disabled={
+                                                        user.id === userSuperAdmin.id ||
+                                                        user.id === sessionUser.id ||
+                                                        state.isDeleting
+                                                    }
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                     <Separator className="my-0" />
                                 </div>
@@ -615,7 +626,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                 <CardHeader className="flex flex-col justify-between space-y-2 pb-2">
                     <div className="flex flex-row items-center justify-between space-x-2 w-full relative">
                         <CardTitle>{t("roles")}</CardTitle>
-                        {state.selectedUser && hasRolesChanged() && (
+                        {state.selectedUser && canEditUser && hasRolesChanged() && (
                             <div className="absolute right-0 space-x-2">
                                 <Button
                                     size="sm"
@@ -666,21 +677,25 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                                     {filteredRoles.map((role) => (
                                         <div
                                             key={role.id}
-                                            className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted cursor-pointer"
-                                            onClick={() => handleRoleToggle(role.id)}
+                                            className={`flex items-center space-x-2 p-2 rounded-md hover:bg-muted ${canEditUser ? "cursor-pointer" : ""}`}
+                                            onClick={() => {
+                                                if (!canEditUser) return
+                                                handleRoleToggle(role.id)
+                                            }}
                                         >
                                             <Checkbox
                                                 id={role.id}
                                                 checked={state.selectedRoles.includes(role.id)}
                                                 onCheckedChange={() => handleRoleToggle(role.id)}
+                                                disabled={!canEditUser}
+                                                className={`disabled:opacity-100 ${canEditUser ? "cursor-pointer" : "disabled:cursor-default"}`}
                                             />
                                             <div className="flex-1">
-                                                <label
-                                                    htmlFor={role.id}
-                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                                <div
+                                                    className="text-sm font-medium"
                                                 >
                                                     {role.name}
-                                                </label>
+                                                </div>
                                                 <div className="text-xs text-muted-foreground mt-1">
                                                     {role.description}
                                                 </div>
@@ -707,14 +722,15 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
                     )}
                 </CardContent>
             </Card>
-
-            <UserDialog
-                open={state.isDialogOpen}
-                onOpenChange={(isDialogOpen) => dispatch({ type: "merge", payload: { isDialogOpen } })}
-                user={state.editingUser}
-                entitiesCanUse={sessionUser.Entities}
-                onClose={handleUserDialogClose}
-            />
+            {(canCreateUser || canEditUser) && (
+                <UserDialog
+                    open={state.isDialogOpen}
+                    onOpenChange={(isDialogOpen) => dispatch({ type: "merge", payload: { isDialogOpen } })}
+                    user={state.editingUser}
+                    entitiesCanUse={sessionUser.Entities}
+                    onClose={handleUserDialogClose}
+                />
+            )}
         </div>
     )
 }

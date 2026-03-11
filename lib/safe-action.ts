@@ -5,12 +5,9 @@ export const actionClient = createSafeActionClient({
     // Can also be an async function.
     handleServerError(e) {
         // Log to console.
-        console.error("Action error:", e.name, e.message, typeof e, "\n\n", e)
-        console.log(e instanceof SafeHandleActionError)
+        console.error("Action error:", e.name, e.message)
 
         if (e instanceof SafeHandleActionError) {
-            console.log("SafeHandleActionError", e.name)
-
             return { errorName: e.name }
         }
 

@@ -85,11 +85,6 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
     }
 
     const onSubmit = async (values: RoleFormValues) => {
-        if (isSuperAdmin) {
-            toast.error(t("error.cannotModifySuperAdmin"))
-            return
-        }
-
         setIsSubmitting(true)
 
         try {
@@ -145,11 +140,6 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
                     <DialogTitle>{role ? t("edit") : t("create")}</DialogTitle>
                     <DialogDescription>
                         {role ? t("editDescription") : t("createDescription")}
-                        {isSuperAdmin && (
-                            <div className="text-orange-600 text-sm mt-2">
-                                ⚠️ {t("error.cannotModifySuperAdmin")}
-                            </div>
-                        )}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>

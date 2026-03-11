@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { pageCheckAuth } from "@/lib/auth-guard"
 import { getPermissions } from "@/services/permission/permission.service"
 import { getRoles } from "@/services/role/role.service"
+import { SessionUser } from "@/types/user.type"
 import { getTranslations } from "next-intl/server"
 import { Suspense } from "react"
 
@@ -18,17 +19,17 @@ export default async function RolesPage() {
             </div>
             <div className="h-[calc(100vh-100px)]">
                 <Suspense fallback={<RoleManagementSkeleton />}>
-                    <RoleManagementContent />
+                    <RoleManagementContent sessionUser={session.user} />
                 </Suspense>
             </div>
         </div>
     )
 }
 
-async function RoleManagementContent() {
+async function RoleManagementContent({ sessionUser }: { sessionUser: SessionUser }) {
     const [roles, permissions] = await Promise.all([getRoles(), getPermissions()])
 
-    return <RoleManagement preloadedRoles={roles} permissions={permissions} />
+    return <RoleManagement sessionUser={sessionUser} preloadedRoles={roles} permissions={permissions} />
 }
 
 function RoleManagementSkeleton() {

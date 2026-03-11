@@ -109,7 +109,6 @@ Identifiants admin de demonstration (affiches aussi sur l'ecran de connexion):
 - `pnpm test`: execute les tests unitaires/integration avec Vitest
 - `pnpm test:watch`: lance Vitest en mode watch
 - `pnpm test:coverage`: genere un rapport de couverture
-- `pnpm lint`: lint Next.js
 - `pnpm prettier`: formatage du code
 - `pnpm docker:up` / `pnpm docker:down`: gestion du conteneur PostgreSQL
 - `pnpm prisma:generate`: genere le client Prisma
