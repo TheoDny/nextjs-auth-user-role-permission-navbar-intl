@@ -6,7 +6,7 @@ import {
     addRoleDeleteLog,
     addRoleSetPermissionLog,
     addRoleUpdateLog,
-} from "@/services/log.service"
+} from "@/services/log/log.service"
 import { revalidatePath } from "next/cache"
 
 // Get all roles with their permissions

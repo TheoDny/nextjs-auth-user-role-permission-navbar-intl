@@ -9,10 +9,10 @@ import {
     addUserSetEntityLog,
     addUserSetRoleLog,
     addUserUpdateLog,
-} from "@/services/log.service"
+} from "@/services/log/log.service"
 import { revalidatePath } from "next/cache"
-import { createTokenUser } from "./auth.service"
-import { sendInvitationSignUp } from "./mail.service"
+import { createTokenUser } from "../auth/auth.service"
+import { sendInvitationSignUp } from "../mail/mail.service"
 
 // Get all users with their roles and entities
 export async function getUsers() {

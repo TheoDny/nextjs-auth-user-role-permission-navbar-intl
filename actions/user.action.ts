@@ -4,7 +4,7 @@ import { PasswordsMatchingError } from "@/errors/PasswordsMatchingError"
 import { TokenInvalidError } from "@/errors/TokenInvalidError"
 import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
-import { checkToken } from "@/services/auth.service"
+import { checkToken } from "@/services/auth/auth.service"
 import {
     assignRolesToUser,
     changeEntitySelected,
@@ -15,7 +15,7 @@ import {
     signUpUser,
     updateUser,
     updateUserProfile,
-} from "@/services/user.service"
+} from "@/services/user/user.service"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 

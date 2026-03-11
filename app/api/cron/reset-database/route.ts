@@ -1,4 +1,4 @@
-import { resetDatabase } from "@/services/reset.service"
+import { resetDatabase } from "@/services/reset/reset.service"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 

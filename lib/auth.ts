@@ -1,5 +1,5 @@
-import { getUserRolesPermissionsAndEntities } from "@/services/auth.service"
-import { sendResetPassword } from "@/services/mail.service"
+import { getUserRolesPermissionsAndEntities } from "@/services/auth/auth.service"
+import { sendResetPassword } from "@/services/mail/mail.service"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"

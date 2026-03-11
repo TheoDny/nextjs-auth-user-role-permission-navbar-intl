@@ -1,5 +1,5 @@
 "use server"
-import { SignUp } from "@/components/card/sign-up"
+import { SignUp } from "@/components/card/sign-up/sign-up"
 import { auth } from "@/lib/auth"
 import jwt from "jsonwebtoken"
 import { headers } from "next/headers"

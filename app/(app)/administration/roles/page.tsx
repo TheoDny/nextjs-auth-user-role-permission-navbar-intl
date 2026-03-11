@@ -1,8 +1,8 @@
 import { RoleManagement } from "@/components/role-management/role-management"
 import { Skeleton } from "@/components/ui/skeleton"
 import { pageCheckAuth } from "@/lib/auth-guard"
-import { getPermissions } from "@/services/permission.service"
-import { getRoles } from "@/services/role.service"
+import { getPermissions } from "@/services/permission/permission.service"
+import { getRoles } from "@/services/role/role.service"
 import { getTranslations } from "next-intl/server"
 import { Suspense } from "react"
 

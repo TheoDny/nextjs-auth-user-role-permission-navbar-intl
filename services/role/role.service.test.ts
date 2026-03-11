@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma"
 import { DeleteRoleUserAssignedError } from "@/errors/DeleteRoleUserAssignedError"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { prisma } from "@/lib/prisma"
 import { withRollbackTransaction } from "@/tests/helpers/prisma-transaction"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { assignPermissionsToRole, createRole, deleteRole, updateRole } from "./role.service"
 
 vi.mock("next/cache", () => ({

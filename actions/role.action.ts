@@ -9,7 +9,7 @@ import {
     deleteRole,
     getRoles,
     updateRole,
-} from "@/services/role.service"
+} from "@/services/role/role.service"
 import { z } from "zod"
 
 // Schema for creating a role

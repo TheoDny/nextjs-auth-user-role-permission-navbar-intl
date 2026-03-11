@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth"
 import { actionClient } from "@/lib/safe-action"
-import { getLogs } from "@/services/log.service"
+import { getLogs } from "@/services/log/log.service"
 import { subDays } from "date-fns"
 import { headers } from "next/headers"
 import { z } from "zod"

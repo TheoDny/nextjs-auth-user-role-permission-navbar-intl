@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
+import { withRollbackTransaction } from "@/tests/helpers/prisma-transaction"
 import jwt from "jsonwebtoken"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { withRollbackTransaction } from "@/tests/helpers/prisma-transaction"
 import { checkToken, createTokenUser, getUserRolesPermissionsAndEntities } from "./auth.service"
 
 describe.sequential("auth.service (db transaction)", () => {

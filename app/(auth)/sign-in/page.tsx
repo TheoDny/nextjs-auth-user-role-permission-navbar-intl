@@ -1,5 +1,5 @@
 "use server"
-import { SignIn } from "@/components/card/sign-in"
+import { SignIn } from "@/components/card/sign-in/sign-in"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"

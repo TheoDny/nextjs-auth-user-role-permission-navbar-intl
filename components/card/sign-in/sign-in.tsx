@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { InputConceal } from "../ui/input-conceal"
+import { InputConceal } from "../../ui/input-conceal"
 
 const signInSchema = z.object({
     email: z.email("Please enter a valid email"),

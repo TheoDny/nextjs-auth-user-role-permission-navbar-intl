@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma"
 import { NeedEntityAttributedError } from "@/errors/NeedEntityAttributed"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { prisma } from "@/lib/prisma"
 import { withRollbackTransaction } from "@/tests/helpers/prisma-transaction"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
     changeEntitySelected,
     createUser,

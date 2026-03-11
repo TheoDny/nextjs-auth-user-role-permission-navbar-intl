@@ -1,5 +1,5 @@
 "use server"
-import ResetPassword from "@/components/card/reset-password"
+import ResetPassword from "@/components/card/reset-password/reset-password"
 import { redirect } from "next/navigation"
 
 type ResetPasswordProps = {
