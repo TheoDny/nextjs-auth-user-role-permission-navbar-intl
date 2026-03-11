@@ -47,6 +47,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
     const [entitiesToAdd, setEntitiesToAdd] = useState<EntitySmall[] | []>([])
     const [entitiesToRemove, setEntitiesToRemove] = useState<EntitySmall[] | []>([])
     const t = useTranslations("UserManagement.dialog")
+    const tErrors = useTranslations("Errors")
     const tCommon = useTranslations("Common")
 
     const form = useForm<UserFormValues>({
@@ -120,9 +121,8 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
 
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                errorKeyPrefix: "dialog.error.",
-                t,
-                fallbackErrorMessage: user ? t("dialog.error.UpdateUserFail") : t("dialog.error.CreateUserFail"),
+                t: tErrors,
+                fallbackErrorMessage: user ? tErrors("UpdateUserFail") : tErrors("CreateUserFail"),
             })
             if (!handledResult.ok) return
 
@@ -137,7 +137,7 @@ export function UserDialog({ open, onOpenChange, user, entitiesCanUse, onClose }
             onClose(handledResult.data)
         } catch (error) {
             console.error(error)
-            toast.error(user ? "Failed to update user" : "Failed to create user")
+            toast.error(user ? tErrors("UpdateUserFail") : tErrors("CreateUserFail"))
         } finally {
             setIsSubmitting(false)
         }

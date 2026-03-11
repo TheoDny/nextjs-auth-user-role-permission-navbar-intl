@@ -41,6 +41,7 @@ export function EditProfile({ currentName, currentEmail, currentImage }: EditPro
     const [open, setOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const t = useTranslations("Account")
+    const tErrors = useTranslations("Errors")
     const tCommon = useTranslations("Common")
     const [imagePreview, setImagePreview] = useState<string | null>(currentImage || null)
 
@@ -122,9 +123,8 @@ export function EditProfile({ currentName, currentEmail, currentImage }: EditPro
 
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                errorKeyPrefix: "profileUpdate.error.",
-                t,
-                fallbackErrorMessage: t("profileUpdate.error"),
+                t: tErrors,
+                fallbackErrorMessage: tErrors("UpdateProfileFail"),
             })
             if (!handledResult.ok) return
 
@@ -134,7 +134,7 @@ export function EditProfile({ currentName, currentEmail, currentImage }: EditPro
             window.location.reload()
         } catch (error) {
             console.error("Failed to update profile:", error)
-            toast.error(t("profileUpdate.error"))
+            toast.error(tErrors("UpdateProfileFail"))
         } finally {
             setIsSubmitting(false)
         }

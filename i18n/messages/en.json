@@ -36,12 +36,7 @@
         "passwordLength": "Password must be between 16 and 64 characters",
         "passwordUppercase": "Password must contain at least 1 uppercase letter",
         "passwordNumber": "Password must contain at least 1 number",
-        "passwordSpecialChar": "Password must contain at least 1 special character",
-        "error": {
-            "PasswordsMatchingError": "Failed to sign up: passwords do not match",
-            "TokenInvalidError": "Failed to sign up: token invalid",
-            "default": "Failed to sign up"
-        }
+        "passwordSpecialChar": "Password must contain at least 1 special character"
     },
     "ForgotPassword": {
         "title": "Forgot Password",
@@ -86,8 +81,7 @@
             "description": "Update your account email address",
             "emailLabel": "Email Address",
             "editButton": "Edit email",
-            "success": "Your email has been updated successfully",
-            "error": "There was a problem updating your email"
+            "success": "Your email has been updated successfully"
         },
         "profileUpdate": {
             "title": "Edit Profile",
@@ -97,8 +91,7 @@
             "uploadImage": "Upload Profile Image",
             "imageTypeError": "Please upload an image file",
             "editButton": "Edit Profile",
-            "success": "Your profile has been updated successfully",
-            "error": "There was a problem updating your profile"
+            "success": "Your profile has been updated successfully"
         },
         "permissions": {
             "title": "Roles & Permissions",
@@ -137,7 +130,6 @@
             "confirmDeleteTitle": "Delete this session?",
             "confirmDeleteDescription": "This session will be signed out immediately.",
             "deleteSuccess": "Session deleted successfully",
-            "deleteError": "Failed to delete session",
             "noSessions": "No session found"
         }
     },
@@ -190,14 +182,6 @@
             "selectEntities": "Select Entities",
             "active": "Active",
             "commentActive": "User can login and access the system",
-            "error": {
-                "UpdateUserFail": "Error while updating user",
-                "CreateUserFail": "Error while creating user",
-                "DeleteUserFail": "Error while deleting user",
-                "cannotDeleteSelf": "You cannot delete yourself",
-                "NoEditSuperAdminUser": "You cannot modify the Super Admin user",
-                "maxUsersReached": "Maximum number of users reached"
-            },
             "success": {
                 "UpdateUserSuccess": "User updated successfully",
                 "CreateUserSuccess": "User created successfully",
@@ -246,14 +230,6 @@
             "descriptionPlaceholder": "Role description",
             "warning": {
                 "noPermissions": "This role has no permissions assigned"
-            },
-            "error": {
-                "UpdateRoleFail": "Error while updating role",
-                "CreateRoleFail": "Error while creating role",
-                "DeleteRoleFail": "Error while deleting role",
-                "NoEditSuperAdminRole": "Cannot modify the Super Admin role",
-                "roleHasUsers": "Cannot delete a role that is assigned to users",
-                "maxRolesReached": "Maximum number of roles reached"
             },
             "success": {
                 "UpdateRoleSuccess": "Role updated successfully",
@@ -376,5 +352,25 @@
         "title": "Forbidden",
         "description": "You do not have the necessary permissions to access this page.",
         "backToHome": "Back to Home"
+    },
+    "Errors": {
+        "default": "An unexpected error occurred",
+        "PasswordsMatchingError": "Failed to sign up: passwords do not match",
+        "TokenInvalidError": "Failed to sign up: token invalid",
+        "UpdateUserFail": "Error while updating user",
+        "CreateUserFail": "Error while creating user",
+        "DeleteUserFail": "Error while deleting user",
+        "cannotDeleteSelf": "You cannot delete yourself",
+        "NoEditSuperAdminUser": "You cannot modify the Super Admin user",
+        "maxUsersReached": "Maximum number of users reached",
+        "UpdateRoleFail": "Error while updating role",
+        "CreateRoleFail": "Error while creating role",
+        "DeleteRoleFail": "Error while deleting role",
+        "NoEditSuperAdminRole": "Cannot modify the Super Admin role",
+        "DeleteRoleUserAssignedError": "Cannot delete a role that is assigned to users",
+        "maxRolesReached": "Maximum number of roles reached",
+        "UpdateProfileFail": "There was a problem updating your profile",
+        "UpdateEmailFail": "There was a problem updating your email",
+        "DeleteSessionFail": "Failed to delete session"
     }
 }

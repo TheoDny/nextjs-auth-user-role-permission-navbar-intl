@@ -41,6 +41,7 @@ interface RoleDialogProps {
 export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const t = useTranslations("RoleManagement.dialog")
+    const tErrors = useTranslations("Errors")
     const tCommon = useTranslations("Common")
 
     const form = useForm<RoleFormValues>({
@@ -107,9 +108,8 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
 
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                errorKeyPrefix: "dialog.error.",
-                t,
-                fallbackErrorMessage: role ? t("dialog.error.UpdateRoleFail") : t("dialog.error.CreateRoleFail"),
+                t: tErrors,
+                fallbackErrorMessage: role ? tErrors("UpdateRoleFail") : tErrors("CreateRoleFail"),
             })
             if (!handledResult.ok) return
 
@@ -124,7 +124,7 @@ export function RoleDialog({ open, onOpenChange, role, onClose }: RoleDialogProp
             onClose(handledResult.data)
         } catch (error) {
             console.error(error)
-            toast.error(role ? "Failed to update role" : "Failed to create role")
+            toast.error(role ? tErrors("UpdateRoleFail") : tErrors("CreateRoleFail"))
         } finally {
             setIsSubmitting(false)
         }

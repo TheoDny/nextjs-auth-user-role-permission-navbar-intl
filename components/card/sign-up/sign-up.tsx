@@ -42,6 +42,7 @@ export function SignUp({ token, name, email }: SignUpProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
     const tSignUp = useTranslations("SignUp")
+    const tErrors = useTranslations("Errors")
 
     const signUpSchema = createSignUpSchema(tSignUp)
 
@@ -69,9 +70,8 @@ export function SignUp({ token, name, email }: SignUpProps) {
 
         const handledResult = handleSafeActionResult(result, {
             error: setError,
-            t: tSignUp,
-            fallbackErrorMessage: tSignUp("error.default"),
-            errorKeyPrefix: "error.",
+            t: tErrors,
+            fallbackErrorMessage: tErrors("default"),
         })
         setLoading(false)
 

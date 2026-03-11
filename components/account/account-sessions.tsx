@@ -19,6 +19,7 @@ type AccountSessionsProps = {
 
 export function AccountSessions({ sessions, currentSessionId }: AccountSessionsProps) {
     const t = useTranslations("Account")
+    const tErrors = useTranslations("Errors")
     const { confirm } = useConfirm()
     const [sessionList, setSessionList] = useState(sessions)
     const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
@@ -38,7 +39,7 @@ export function AccountSessions({ sessions, currentSessionId }: AccountSessionsP
             const result = await deleteUserSessionAction({ sessionId })
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                fallbackErrorMessage: t("sessions.deleteError"),
+                fallbackErrorMessage: tErrors("DeleteSessionFail"),
             })
             if (!handledResult.ok) {
                 return
@@ -48,7 +49,7 @@ export function AccountSessions({ sessions, currentSessionId }: AccountSessionsP
             toast.success(t("sessions.deleteSuccess"))
         } catch (error) {
             console.error(error)
-            toast.error(t("sessions.deleteError"))
+            toast.error(tErrors("DeleteSessionFail"))
         } finally {
             setDeletingSessionId(null)
         }

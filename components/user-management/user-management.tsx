@@ -60,6 +60,7 @@ const userManagementReducer = (
 
 export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManagementProps) {
     const t = useTranslations("UserManagement")
+    const tErrors = useTranslations("Errors")
     const [state, dispatch] = useReducer(userManagementReducer, {
         users: preloadedUsers,
         selectedUser: null,
@@ -161,12 +162,12 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
 
     const handleDeleteUser = async (user: UserRolesAndEntities) => {
         if (user.id === userSuperAdmin.id) {
-            toast.error(t("dialog.error.cannotDeleteAdmin"))
+            toast.error(tErrors("NoEditSuperAdminUser"))
             return
         }
 
         if (user.id === sessionUser.id) {
-            toast.error(t("dialog.error.cannotDeleteSelf"))
+            toast.error(tErrors("cannotDeleteSelf"))
             return
         }
 
@@ -181,9 +182,8 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
 
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                errorKeyPrefix: "dialog.error.",
-                t,
-                fallbackErrorMessage: t("dialog.error.DeleteRoleFail"),
+                t: tErrors,
+                fallbackErrorMessage: tErrors("DeleteUserFail"),
             })
             if (!handledResult.ok) return
 
@@ -202,7 +202,7 @@ export function UserManagement({ sessionUser, preloadedUsers, roles }: UserManag
             dispatch({ type: "merge", payload: { users: usersData } })
         } catch (error) {
             console.error(error)
-            toast.error(t("dialog.error.DeleteUserFail"))
+            toast.error(tErrors("DeleteUserFail"))
         } finally {
             dispatch({ type: "merge", payload: { isDeleting: false } })
         }

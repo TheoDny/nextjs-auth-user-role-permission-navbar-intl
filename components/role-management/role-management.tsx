@@ -115,6 +115,7 @@ export function RoleManagement({ sessionUser, preloadedRoles, permissions }: Rol
     const canEditRole = sessionUser.Permissions.some((permission) => permission.code === "role_edit")
 
     const t = useTranslations("RoleManagement")
+    const tErrors = useTranslations("Errors")
     const tPermissions = useTranslations("Permissions")
 
     const { confirm } = useConfirm()
@@ -203,9 +204,8 @@ export function RoleManagement({ sessionUser, preloadedRoles, permissions }: Rol
 
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                errorKeyPrefix: "dialog.error.",
-                t,
-                fallbackErrorMessage: t("dialog.error.DeleteRoleFail"),
+                t: tErrors,
+                fallbackErrorMessage: tErrors("DeleteRoleFail"),
             })
             if (!handledResult.ok) return
 
@@ -224,7 +224,7 @@ export function RoleManagement({ sessionUser, preloadedRoles, permissions }: Rol
             dispatch({ type: "merge", payload: { roles: rolesData } })
         } catch (error) {
             console.error(error)
-            toast.error(t("dialog.error.DeleteRoleFail"))
+            toast.error(tErrors("DeleteRoleFail"))
         } finally {
             dispatch({ type: "merge", payload: { isDeleting: false } })
         }
@@ -286,9 +286,8 @@ export function RoleManagement({ sessionUser, preloadedRoles, permissions }: Rol
 
             const handledResult = handleSafeActionResult(result, {
                 error: toast.error,
-                errorKeyPrefix: "dialog.error.",
-                t,
-                fallbackErrorMessage: t("dialog.error.UpdateRoleFail"),
+                t: tErrors,
+                fallbackErrorMessage: tErrors("UpdateRoleFail"),
             })
             if (!handledResult.ok) return
 
@@ -311,7 +310,7 @@ export function RoleManagement({ sessionUser, preloadedRoles, permissions }: Rol
             toast.success(t("dialog.success.UpdateRoleSuccess"))
         } catch (error) {
             console.error(error)
-            toast.error(t("dialog.error.UpdateRoleFail"))
+            toast.error(tErrors("UpdateRoleFail"))
         } finally {
             dispatch({ type: "merge", payload: { isSubmitting: false } })
         }
