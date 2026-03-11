@@ -6,7 +6,7 @@ const { getLogsMock, getSessionMock, headersMock } = vi.hoisted(() => ({
     headersMock: vi.fn(async () => ({})),
 }))
 
-vi.mock("@/services/log.service", () => ({
+vi.mock("@/services/log/log.service", () => ({
     getLogs: getLogsMock,
 }))
 

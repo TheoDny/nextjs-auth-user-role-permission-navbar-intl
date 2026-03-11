@@ -22,7 +22,7 @@ vi.mock("@/lib/auth-guard", () => ({
     checkAuth: checkAuthMock,
 }))
 
-vi.mock("@/services/role.service", () => ({
+vi.mock("@/services/role/role.service", () => ({
     assignPermissionsToRole: assignPermissionsToRoleMock,
     countRoles: countRolesMock,
     createRole: createRoleMock,

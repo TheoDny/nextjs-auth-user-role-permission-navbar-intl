@@ -22,11 +22,11 @@ const {
     changeEntitySelectedMock: vi.fn(),
 }))
 
-vi.mock("@/services/auth.service", () => ({
+vi.mock("@/services/auth/auth.service", () => ({
     checkToken: checkTokenMock,
 }))
 
-vi.mock("@/services/user.service", () => ({
+vi.mock("@/services/user/user.service", () => ({
     assignRolesToUser: vi.fn(),
     changeEntitySelected: changeEntitySelectedMock,
     countUsers: countUsersMock,
