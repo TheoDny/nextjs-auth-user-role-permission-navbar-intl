@@ -1,4 +1,5 @@
 import { DeleteRoleUserAssignedError } from "@/errors/DeleteRoleUserAssignedError"
+import { RoleNotFound } from "@/errors/RoleNotFound"
 import { prisma } from "@/lib/prisma"
 import { assertNotSuperAdminRoleId } from "@/lib/utils"
 import {
@@ -11,21 +12,16 @@ import { revalidatePath } from "next/cache"
 
 // Get all roles with their permissions
 export async function getRoles() {
-    try {
-        const roles = await prisma.role.findMany({
-            include: {
-                Permissions: true,
-            },
-            orderBy: {
-                name: "asc",
-            },
-        })
+    const roles = await prisma.role.findMany({
+        include: {
+            Permissions: true,
+        },
+        orderBy: {
+            name: "asc",
+        },
+    })
 
-        return roles
-    } catch (error) {
-        console.error("Failed to fetch roles:", error)
-        throw new Error("Failed to fetch roles")
-    }
+    return roles
 }
 
 // Create a new role
@@ -79,7 +75,7 @@ export async function deleteRole(id: string) {
     })
 
     if (!roleToDelete) {
-        throw new Error("Role not found")
+        throw new RoleNotFound()
     }
 
     const userCount = await prisma.user.count({
@@ -93,7 +89,7 @@ export async function deleteRole(id: string) {
     })
 
     if (userCount > 0) {
-        throw new DeleteRoleUserAssignedError("Cannot delete a role that is assigned to users")
+        throw new DeleteRoleUserAssignedError()
     }
 
     const role = await prisma.role.delete({

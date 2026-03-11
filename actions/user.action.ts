@@ -1,5 +1,7 @@
 "use server"
 
+import { CannotDeleteYourselfError } from "@/errors/CannotDeleteYourselfError"
+import { MaxNumberUserError } from "@/errors/MaxNumberUserError"
 import { PasswordsMatchingError } from "@/errors/PasswordsMatchingError"
 import { TokenInvalidError } from "@/errors/TokenInvalidError"
 import { checkAuth } from "@/lib/auth-guard"
@@ -114,15 +116,9 @@ export const updateProfileAction = actionClient
 
 // Get all users with their roles
 export async function getUsersAction() {
-    try {
-        // Auth check without permission requirement for read operations
-        await checkAuth()
+    await checkAuth()
 
-        return await getUsers()
-    } catch (error) {
-        console.error("Failed to fetch users:", error)
-        throw new Error("Failed to fetch users")
-    }
+    return await getUsers()
 }
 
 // Create a new user
@@ -136,7 +132,7 @@ export const createUserAction = actionClient.inputSchema(createUserSchema).actio
         const currentUserCount = await countUsers()
 
         if (currentUserCount >= maxUsers) {
-            throw new Error(`Maximum number of users reached (${maxUsers})`)
+            throw new MaxNumberUserError(maxUsers)
         }
     }
 
@@ -158,7 +154,7 @@ export const deleteUserAction = actionClient.inputSchema(deleteUserSchema).actio
     const session = await checkAuth({ requiredPermission: "user_create" })
 
     if (parsedInput.id === session.user.id) {
-        throw new Error("You cannot delete yourself")
+        throw new CannotDeleteYourselfError()
     }
 
     return await deleteUser(parsedInput.id, session.user.id)

@@ -1,4 +1,7 @@
+import { EmailAlreadyInUseError } from "@/errors/EmailAlreadyInUseError"
 import { NeedEntityAttributedError } from "@/errors/NeedEntityAttributed"
+import { SendInvitationEmailError } from "@/errors/SendInvitationEmailError"
+import { UserNotFound } from "@/errors/UserNotFound"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { assertNotSuperAdminUserId } from "@/lib/utils"
@@ -16,25 +19,20 @@ import { sendInvitationSignUp } from "../mail/mail.service"
 
 // Get all users with their roles and entities
 export async function getUsers() {
-    try {
-        const users = await prisma.user.findMany({
-            where: {
-                deletedAt: null,
-            },
-            include: {
-                Roles: true,
-                Entities: true,
-            },
-            orderBy: {
-                name: "asc",
-            },
-        })
+    const users = await prisma.user.findMany({
+        where: {
+            deletedAt: null,
+        },
+        include: {
+            Roles: true,
+            Entities: true,
+        },
+        orderBy: {
+            name: "asc",
+        },
+    })
 
-        return users
-    } catch (error) {
-        console.error("Failed to fetch users:", error)
-        throw new Error("Failed to fetch users")
-    }
+    return users
 }
 
 // Create a new user
@@ -65,7 +63,7 @@ export async function createUser(data: { name: string; email: string; active: bo
         await prisma.user.delete({
             where: { id: user.id },
         })
-        throw new Error("Failed to send invitation email, user deleted")
+        throw new SendInvitationEmailError()
     }
 
     // Add log
@@ -98,7 +96,7 @@ export async function updateUser(
     })
 
     if (existingUser) {
-        throw new Error("Email is already in use by another account")
+        throw new EmailAlreadyInUseError()
     }
 
     const user = await prisma.user.update({
@@ -179,7 +177,7 @@ export async function updateUserProfile(
         })
 
         if (existingUser) {
-            throw new Error("Email is already in use by another account")
+            throw new EmailAlreadyInUseError()
         }
     }
 
@@ -313,7 +311,7 @@ export async function deleteUser(id: string, currentUserId: string) {
     })
 
     if (!userToDelete) {
-        throw new Error("User not found")
+        throw new UserNotFound()
     }
 
     const user = await prisma.user.update({
@@ -368,7 +366,7 @@ export async function deleteUserSession(userId: string, sessionId: string, curre
     if (sessionId === currentSessionId) {
         throw new Error("You cannot delete your current session")
     }
-    
+
     const sessionToDelete = await getOneSession(sessionId)
     if (!sessionToDelete) {
         // Session not found, do nothing

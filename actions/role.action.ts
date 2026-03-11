@@ -47,15 +47,9 @@ const assignPermissionsSchema = z.object({
 
 // Get all roles with their permissions
 export async function getRolesAction() {
-    try {
-        // Auth check without permission requirement for read operations
-        await checkAuth()
+    await checkAuth()
 
-        return await getRoles()
-    } catch (error) {
-        console.error("Failed to fetch roles:", error)
-        throw new Error("Failed to fetch roles")
-    }
+    return await getRoles()
 }
 
 // Create a new role

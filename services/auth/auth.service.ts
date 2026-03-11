@@ -1,3 +1,4 @@
+import { UserNotFound } from "@/errors/UserNotFound"
 import { prisma } from "@/lib/prisma"
 import { generateInviteToken } from "@/lib/utils"
 import { TokenCreateUserModel as TokenCreateUser } from "@/prisma/generated/models/TokenCreateUser"
@@ -35,7 +36,7 @@ export const getUserRolesPermissionsAndEntities = async (userId: string) => {
     })
 
     if (!user) {
-        throw new Error("User not found")
+        throw new UserNotFound()
     }
 
     // Create a Set to store unique permission codes

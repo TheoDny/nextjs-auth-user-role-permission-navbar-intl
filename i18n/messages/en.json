@@ -372,6 +372,11 @@
         "UpdateProfileFail": "There was a problem updating your profile",
         "UpdateEmailFail": "There was a problem updating your email",
         "DeleteSessionFail": "Failed to delete session",
-        "MaxNumberUserError": "Maximum number of users reached"
+        "MaxNumberUserError": "Maximum number of users reached",
+        "CannotDeleteYourselfError": "You cannot delete yourself",
+        "UserNotFound": "User not found",
+        "RoleNotFound": "Role not found",
+        "SendInvitationEmailError": "Failed to send invitation email, user deleted",
+        "EmailAlreadyInUseError": "Email is already in use by another account"
     }
 }

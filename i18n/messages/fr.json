@@ -374,6 +374,11 @@
         "UpdateProfileFail": "Un problème est survenu lors de la mise à jour de votre profil",
         "UpdateEmailFail": "Un problème est survenu lors de la mise à jour de votre email",
         "DeleteSessionFail": "Impossible de supprimer la session",
-        "MaxNumberUserError": "Nombre maximum d'utilisateurs atteint"
+        "MaxNumberUserError": "Nombre maximum d'utilisateurs atteint",
+        "CannotDeleteYourselfError": "Vous ne pouvez pas vous supprimer vous-même",
+        "UserNotFound": "Utilisateur non trouvé",
+        "RoleNotFound": "Rôle non trouvé",
+        "SendInvitationEmailError": "Erreur lors de l'envoi de l'email d'invitation, utilisateur supprimé",
+        "EmailAlreadyInUseError": "L'email est déjà utilisé par un autre compte"
     }
 }

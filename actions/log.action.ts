@@ -1,26 +1,19 @@
 "use server"
 
-import { auth } from "@/lib/auth"
+import { checkAuth } from "@/lib/auth-guard"
 import { actionClient } from "@/lib/safe-action"
 import { getLogs } from "@/services/log/log.service"
 import { subDays } from "date-fns"
-import { headers } from "next/headers"
 import { z } from "zod"
 
 // Schéma pour la validation des entrées
 const getLogsSchema = z.object({
     startDate: z.string().optional(),
-    endDate: z.string().optional(), 
+    endDate: z.string().optional(),
 })
 
 export const getLogsAction = actionClient.inputSchema(getLogsSchema).action(async ({ parsedInput }) => {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
-
-    if (!session) {
-        throw new Error("Unauthorized")
-    }
+    const session = await checkAuth()
 
     const entityIds = session.user.Entities.map((entity: { id: string }) => entity.id)
 

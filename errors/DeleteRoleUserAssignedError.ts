@@ -1,8 +1,8 @@
-export class DeleteRoleUserAssignedError extends Error {
-    code = "roleHasUsers"
+import { SafeHandleActionError } from "./SafeHandleActionError"
 
-    constructor(message: string) {
-        super(message)
+export class DeleteRoleUserAssignedError extends SafeHandleActionError {
+    constructor() {
+        super("Cannot delete a role that is assigned to users")
         this.name = "DeleteRoleUserAssignedError"
     }
 }
