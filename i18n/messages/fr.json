@@ -120,6 +120,25 @@
             "manager": "Peut gérer les utilisateurs et le contenu dans les entités assignées",
             "editor": "Peut créer et modifier du contenu mais pas le supprimer",
             "viewer": "Accès en lecture seule au contenu"
+        },
+        "sessions": {
+            "title": "Sessions actives",
+            "description": "Gérez les sessions ouvertes sur vos appareils",
+            "current": "Session actuelle",
+            "other": "Autre session",
+            "device": "Appareil",
+            "ipAddress": "Adresse IP",
+            "createdAt": "Créée le",
+            "updatedAt": "Mise à jour le",
+            "expiresAt": "Expire le",
+            "unknownDevice": "Appareil inconnu",
+            "unknownIpAddress": "IP inconnue",
+            "deleteAction": "Supprimer",
+            "confirmDeleteTitle": "Supprimer cette session ?",
+            "confirmDeleteDescription": "Cette session sera immédiatement déconnectée.",
+            "deleteSuccess": "Session supprimée avec succès",
+            "deleteError": "Impossible de supprimer la session",
+            "noSessions": "Aucune session trouvée"
         }
     },
     "UserManagement": {

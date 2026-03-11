@@ -1,3 +1,4 @@
+import { AccountSessions } from "@/components/account/account-sessions"
 import { EditProfile } from "@/components/account/edit-profile"
 import { LanguageSelector } from "@/components/select/select-language"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Session } from "@/lib/auth"
 import { useTranslations } from "next-intl"
+import type { SessionModel as UserSession } from "@/prisma/generated/models/Session"
 
 // Define the expected structure based on the custom session plugin
 interface SessionUser {
@@ -23,7 +25,13 @@ interface SessionUser {
     Permissions: { code: string }[]
 }
 
-export function Account({ session }: { session: Session }) {
+type AccountProps = {
+    session: Session
+    sessions: UserSession[]
+    currentSessionId: string
+}
+
+export function Account({ session, sessions, currentSessionId }: AccountProps) {
     // Cast user to SessionUser to access the custom fields
     const user = session.user as unknown as SessionUser
 
@@ -154,6 +162,11 @@ export function Account({ session }: { session: Session }) {
                     </div>
                 </CardContent>
             </Card>
+
+            <AccountSessions
+                sessions={sessions}
+                currentSessionId={currentSessionId}
+            />
         </div>
     )
 }

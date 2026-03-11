@@ -6,6 +6,8 @@ import {
     changeEntitySelected,
     createUser,
     deleteUser,
+    deleteUserSession,
+    getAllSessionsOfUser,
     signUpUser,
     updateUser,
     updateUserProfile,
@@ -20,7 +22,7 @@ vi.mock("next/cache", () => ({
     revalidatePath: vi.fn(),
 }))
 
-vi.mock("@/services/log.service", () => ({
+vi.mock("@/services/log/log.service", () => ({
     addUserCreateLog: vi.fn(),
     addUserDisableLog: vi.fn(),
     addUserEmailVerifiedLog: vi.fn(),
@@ -29,7 +31,7 @@ vi.mock("@/services/log.service", () => ({
     addUserUpdateLog: vi.fn(),
 }))
 
-vi.mock("@/services/mail.service", () => ({
+vi.mock("../mail/mail.service", () => ({
     sendInvitationSignUp: sendInvitationSignUpMock,
 }))
 
@@ -58,7 +60,7 @@ describe.sequential("user.service (db transaction)", () => {
                     email: "no-entity@example.com",
                     active: true,
                     entities: [],
-                })
+                }),
             ).rejects.toBeInstanceOf(NeedEntityAttributedError)
             return true
         })
@@ -182,6 +184,103 @@ describe.sequential("user.service (db transaction)", () => {
             expect(updated.Entities.some((e) => e.id === entityB.id)).toBe(true)
             expect(deleted.deletedAt).toBeTruthy()
             expect(deleted.email).toContain("_deleted_")
+            return true
+        })
+    })
+
+    it("lists only user sessions ordered by latest first", async () => {
+        await withRollbackTransaction(async () => {
+            const entity = await prisma.entity.create({ data: { name: "EntitySessionList" } })
+            const user = await prisma.user.create({
+                data: {
+                    email: "session-list-user@example.com",
+                    name: "Session List User",
+                    entitySelectedId: entity.id,
+                    Entities: { connect: [{ id: entity.id }] },
+                },
+            })
+            const otherUser = await prisma.user.create({
+                data: {
+                    email: "session-list-other@example.com",
+                    name: "Session List Other",
+                    entitySelectedId: entity.id,
+                    Entities: { connect: [{ id: entity.id }] },
+                },
+            })
+
+            const now = new Date()
+            const olderDate = new Date(now.getTime() - 60_000)
+            const newerDate = new Date(now.getTime() - 5_000)
+
+            await prisma.session.create({
+                data: {
+                    id: "session-list-older",
+                    token: "token-session-list-older",
+                    userId: user.id,
+                    createdAt: olderDate,
+                    updatedAt: olderDate,
+                    expiresAt: new Date(now.getTime() + 3_600_000),
+                },
+            })
+            await prisma.session.create({
+                data: {
+                    id: "session-list-newer",
+                    token: "token-session-list-newer",
+                    userId: user.id,
+                    createdAt: newerDate,
+                    updatedAt: newerDate,
+                    expiresAt: new Date(now.getTime() + 3_600_000),
+                },
+            })
+            await prisma.session.create({
+                data: {
+                    id: "session-list-other-user",
+                    token: "token-session-list-other-user",
+                    userId: otherUser.id,
+                    expiresAt: new Date(now.getTime() + 3_600_000),
+                },
+            })
+
+            const sessions = await getAllSessionsOfUser(user.id)
+            expect(sessions.map((session) => session.id)).toEqual(["session-list-newer", "session-list-older"])
+            return true
+        })
+    })
+
+    it("deletes another session but blocks current one", async () => {
+        await withRollbackTransaction(async () => {
+            const entity = await prisma.entity.create({ data: { name: "EntitySessionDelete" } })
+            const user = await prisma.user.create({
+                data: {
+                    email: "session-delete-user@example.com",
+                    name: "Session Delete User",
+                    entitySelectedId: entity.id,
+                    Entities: { connect: [{ id: entity.id }] },
+                },
+            })
+
+            const currentSession = await prisma.session.create({
+                data: {
+                    id: "session-delete-current",
+                    token: "token-session-delete-current",
+                    userId: user.id,
+                    expiresAt: new Date(Date.now() + 3_600_000),
+                },
+            })
+            const otherSession = await prisma.session.create({
+                data: {
+                    id: "session-delete-other",
+                    token: "token-session-delete-other",
+                    userId: user.id,
+                    expiresAt: new Date(Date.now() + 3_600_000),
+                },
+            })
+
+            const deleted = await deleteUserSession(user.id, otherSession.id, currentSession.id)
+            expect(deleted?.id).toBe(otherSession.id)
+            await expect(deleteUserSession(user.id, currentSession.id, currentSession.id)).rejects.toThrow(
+                "You cannot delete your current session",
+            )
             return true
         })
     })

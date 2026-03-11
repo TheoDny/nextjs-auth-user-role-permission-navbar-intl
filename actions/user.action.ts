@@ -11,6 +11,7 @@ import {
     countUsers,
     createUser,
     deleteUser,
+    deleteUserSession,
     getUsers,
     signUpUser,
     updateUser,
@@ -48,6 +49,10 @@ const updateUserSchema = z.object({
 // Schema for deleting a user
 const deleteUserSchema = z.object({
     id: z.string(),
+})
+
+const deleteSessionSchema = z.object({
+    sessionId: z.string(),
 })
 
 // Schema for assigning roles to a user
@@ -88,22 +93,24 @@ const signUpSchema = z.object({
 })
 
 // Server action for updating user profile
-export const updateProfileAction = actionClient.inputSchema(updateProfileSchema).action(async ({ parsedInput }) => {
-    // Get current session
-    const session = await checkAuth()
+export const updateProfileAction = actionClient
+    .inputSchema(updateProfileSchema)
+    .action(async ({ parsedInput }) => {
+        // Get current session
+        const session = await checkAuth()
 
-    // Update the user profile
-    const updatedUser = await updateUserProfile(session.user.id, {
-        name: parsedInput.name,
-        email: parsedInput.email,
-        image: parsedInput.image,
+        // Update the user profile
+        const updatedUser = await updateUserProfile(session.user.id, {
+            name: parsedInput.name,
+            email: parsedInput.email,
+            image: parsedInput.image,
+        })
+
+        // Revalidate the account page
+        revalidatePath("/account")
+
+        return updatedUser
     })
-
-    // Revalidate the account page
-    revalidatePath("/account")
-
-    return updatedUser
-})
 
 // Get all users with their roles
 export async function getUsersAction() {
@@ -160,6 +167,18 @@ export const deleteUserAction = actionClient.inputSchema(deleteUserSchema).actio
 
     return await deleteUser(parsedInput.id, session.user.id)
 })
+
+// Delete one session from the current user account.
+export const deleteUserSessionAction = actionClient
+    .inputSchema(deleteSessionSchema)
+    .action(async ({ parsedInput }) => {
+        const session = await checkAuth()
+
+        const deletedSession = await deleteUserSession(session.user.id, parsedInput.sessionId, session.session.id)
+        revalidatePath("/account")
+
+        return deletedSession
+    })
 
 // Assign roles to a user
 export const assignRolesToUserAction = actionClient

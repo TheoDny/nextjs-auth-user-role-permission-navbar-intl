@@ -120,6 +120,25 @@
             "manager": "Can manage users and content within assigned entities",
             "editor": "Can create and edit content but not delete",
             "viewer": "Read-only access to content"
+        },
+        "sessions": {
+            "title": "Active sessions",
+            "description": "Manage sessions opened on your devices",
+            "current": "Current session",
+            "other": "Other session",
+            "device": "Device",
+            "ipAddress": "IP address",
+            "createdAt": "Created at",
+            "updatedAt": "Updated at",
+            "expiresAt": "Expires at",
+            "unknownDevice": "Unknown device",
+            "unknownIpAddress": "Unknown IP",
+            "deleteAction": "Delete",
+            "confirmDeleteTitle": "Delete this session?",
+            "confirmDeleteDescription": "This session will be signed out immediately.",
+            "deleteSuccess": "Session deleted successfully",
+            "deleteError": "Failed to delete session",
+            "noSessions": "No session found"
         }
     },
     "UserManagement": {

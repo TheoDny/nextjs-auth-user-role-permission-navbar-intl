@@ -6,8 +6,10 @@ import { PrismaClient } from "./generated/client"
 import { permissions, PermissionSeed } from "./permission"
 
 const { Pool } = pg
-console.log(process.env.DATABASE_URL)
-const connectionString = process.env.DATABASE_USER ? `postgresql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}?schema=public` : process.env.DATABASE_URL!
+const connectionString = process.env.DATABASE_USER
+    ? `postgresql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_NAME}?schema=public`
+    : process.env.DATABASE_URL!
+console.log(connectionString)
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })

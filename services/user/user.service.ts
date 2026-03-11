@@ -337,3 +337,51 @@ export async function countUsers() {
         },
     })
 }
+
+/**
+ * Returns all sessions owned by a user, newest first.
+ */
+export async function getAllSessionsOfUser(userId: string) {
+    return await prisma.session.findMany({
+        where: {
+            userId: userId,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    })
+}
+
+export async function getOneSession(sessionId: string) {
+    return await prisma.session.findUnique({
+        where: {
+            id: sessionId,
+        },
+    })
+}
+
+/**
+ * Deletes one session owned by the provided user.
+ * Current active session cannot be deleted through this function.
+ */
+export async function deleteUserSession(userId: string, sessionId: string, currentSessionId: string) {
+    if (sessionId === currentSessionId) {
+        throw new Error("You cannot delete your current session")
+    }
+    
+    const sessionToDelete = await getOneSession(sessionId)
+    if (!sessionToDelete) {
+        // Session not found, do nothing
+        return null
+    }
+
+    if (sessionToDelete.userId !== userId) {
+        throw new Error("Session not found for this user")
+    }
+
+    return await prisma.session.delete({
+        where: {
+            id: sessionId,
+        },
+    })
+}
