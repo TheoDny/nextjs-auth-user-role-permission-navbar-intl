@@ -6,6 +6,8 @@ export const resetDatabase = async () => {
     await clearTokenCreateUser()
     await clearRolesExceptSuperAdmin()
     await clearUsersExceptSuperAdmin()
+    await clearAllSessions()
+    await clearAllAccountsExceptSuperAdmin()
 }
 
 export const clearUsersExceptSuperAdmin = async () => {
@@ -34,4 +36,18 @@ export const clearTokenCreateUser = async () => {
 
 export const clearLog = async () => {
     await prisma.log.deleteMany()
+}
+
+export const clearAllSessions = async () => {
+    await prisma.session.deleteMany()
+}
+
+export const clearAllAccountsExceptSuperAdmin = async () => {
+    await prisma.account.deleteMany({
+        where: {
+            userId: {
+                not: userSuperAdmin.id,
+            },
+        },
+    })
 }
