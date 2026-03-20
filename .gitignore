@@ -46,6 +46,7 @@ next-env.d.ts
 !/storage/.gitkeep
 
 # IDE
+.cursor/
 .vscode/
 .idea/
 *.swp

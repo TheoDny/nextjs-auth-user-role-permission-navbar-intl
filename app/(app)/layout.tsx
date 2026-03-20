@@ -18,7 +18,7 @@ interface RootLayoutProps {
     children: ReactNode
 }
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App name"
+const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "App name"
 
 export default async function RootLayout({ children }: RootLayoutProps) {
     const [session, locale, tSidebar] = await Promise.all([

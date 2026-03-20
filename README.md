@@ -83,9 +83,7 @@ Variables essentielles:
 - `JWT_SECRET`
 - `CRON_SECRET`
 - `NEXT_PUBLIC_APP_URL`
-- `NEXT_PUBLIC_NAME_APP` (utilise notamment pour les emails)
-
-Note: le layout lit `NEXT_PUBLIC_APP_NAME` pour le titre d'application. Pour eviter tout ecart d'affichage, definir **a la fois** `NEXT_PUBLIC_NAME_APP` et `NEXT_PUBLIC_APP_NAME` avec la meme valeur.
+- `NEXT_PUBLIC_NAME_APP`
 
 ## Donnees seedees
 

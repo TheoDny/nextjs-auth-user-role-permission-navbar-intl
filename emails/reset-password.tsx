@@ -4,7 +4,7 @@ interface ResetPasswordProps {
     resetLink: string
     appUrl: string
 }
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "NEXT_PUBLIC_APP_NAME"
+const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "NEXT_PUBLIC_NAME_APP"
 
 const ResetPassword = ({ resetLink, appUrl }: ResetPasswordProps) => (
     <Html>

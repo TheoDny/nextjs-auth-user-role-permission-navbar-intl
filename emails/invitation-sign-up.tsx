@@ -5,7 +5,7 @@ interface InvitationSignUpProps {
     appUrl: string
     name: string
 }
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "NEXT_PUBLIC_APP_NAME"
+const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "NEXT_PUBLIC_NAME_APP"
 
 const InvitationSignUp = ({ name, inviteLink, appUrl }: InvitationSignUpProps) => (
     <Html>

@@ -6,7 +6,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Boxes } from "lucide-react"
 import { ReactNode } from "react"
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "App name"
+const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "App name"
 
 export function AuthLayout({ children }: { children: ReactNode }) {
     const isMobile = useIsMobile()

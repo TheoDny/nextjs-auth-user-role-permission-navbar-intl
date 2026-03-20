@@ -49,6 +49,7 @@ describe("log.action", () => {
         const { getLogsAction } = await import("./log.action")
         getSessionMock.mockResolvedValue({
             user: {
+                active: true,
                 Entities: [{ id: "e1" }, { id: "e2" }],
             },
         })
@@ -68,6 +69,7 @@ describe("log.action", () => {
         const { getLogsAction } = await import("./log.action")
         getSessionMock.mockResolvedValue({
             user: {
+                active: true,
                 Entities: [{ id: "e1" }],
             },
         })
