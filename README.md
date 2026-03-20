@@ -8,7 +8,8 @@ Application Next.js 16 avec authentification, gestion des utilisateurs, gestion 
 - Session enrichie avec roles, permissions et entites utilisateur
 - Gestion des utilisateurs (creation, edition, activation/desactivation, verification email)
 - Gestion des roles (CRUD + attribution de permissions)
-- Permissions applicatives (ex: `user_read`, `role_edit`, `log_read`)
+- Gestion des entites (CRUD avec protection des entites seedees)
+- Permissions applicatives (ex: `user_read`, `role_edit`, `entity_edit`, `log_read`)
 - Journal d'audit des actions metier
 - Interface multilingue (`fr`, `en`) via `next-intl`
 - Reset de base via endpoint cron protege par secret
@@ -124,6 +125,7 @@ Identifiants admin de demonstration (affiches aussi sur l'ecran de connexion):
 - Application:
   - `/administration/users`
   - `/administration/roles`
+  - `/administration/entities`
   - `/administration/log`
 - Cron:
   - `GET /api/cron/reset-database`
@@ -135,6 +137,7 @@ La navigation est construite dynamiquement selon les permissions de session:
 
 - `role_read` -> menu roles
 - `user_read` -> menu utilisateurs
+- `entity_read` -> menu entites
 - `log_read` -> menu logs
 
 Les permissions sont dedupliquees depuis les roles utilisateur au moment de la creation de session.

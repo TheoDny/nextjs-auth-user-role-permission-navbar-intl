@@ -19,11 +19,17 @@ export const getUserRolesPermissionsAndEntities = async (userId: string) => {
                         },
                     },
                 },
+                where: {
+                    deletedAt: null,
+                },
             },
             Entities: {
                 select: {
                     id: true,
                     name: true,
+                },
+                where: {
+                    deletedAt: null,
                 },
             },
             EntitySelected: {

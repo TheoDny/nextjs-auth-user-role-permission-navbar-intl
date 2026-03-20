@@ -3,6 +3,7 @@
         "administration": "Administration",
         "users": "Gestion des utilisateurs",
         "roles": "Gestion des rôles",
+        "entities": "Gestion des entités",
         "logs": "Journaux d'êvenements"
     },
     "Navigation": {
@@ -244,6 +245,43 @@
             "actions": "Actions"
         }
     },
+    "EntityManagement": {
+        "title": "Gestion des Entités",
+        "description": "Créer, modifier et gérer les entités",
+        "entities": "Entités",
+        "newEntity": "Nouvelle Entité",
+        "search": "Rechercher des entités...",
+        "noEntitiesFound": "Aucune entité trouvée",
+        "noEntitiesFoundSearch": "Aucune entité trouvée correspondant à votre recherche",
+        "usersCount": "{count} utilisateur(s)",
+        "delete": "Supprimer",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette entité ?",
+        "dialog": {
+            "create": "Créer une Entité",
+            "edit": "Modifier une Entité",
+            "createDescription": "Remplissez les détails pour créer une nouvelle entité.",
+            "editDescription": "Mettez à jour les détails de l'entité ci-dessous.",
+            "name": "Nom",
+            "namePlaceholder": "Nom de l'entité",
+            "success": {
+                "UpdateEntitySuccess": "Entité mise à jour avec succès",
+                "CreateEntitySuccess": "Entité créée avec succès",
+                "DeleteEntitySuccess": "Entité supprimée avec succès"
+            }
+        },
+        "columns": {
+            "name": "Nom",
+            "usersCount": "Utilisateurs",
+            "createdAt": "Créé le",
+            "updatedAt": "Mis à jour le",
+            "actions": "Actions"
+        },
+        "rules": {
+            "title": "Règles de gestion des entités",
+            "uniqueName": "Une entité ne peut pas avoir le même nom qu'une autre",
+            "onlyAssignedEntities": "Vous ne voyez et ne gérez que les entités qui vous sont attribuées"
+        }
+    },
     "Permissions": {
         "user_read": "Accès à la page de gestion des utilisateurs",
         "user_create": "Envoyer un email permettant de créer un nouveau compte",
@@ -251,6 +289,9 @@
         "role_read": "Accès à la page de gestion des rôles",
         "role_create": "Créer un nouveau rôle",
         "role_edit": "Modifier les informations d'un rôle et les permissions associées",
+        "entity_read": "Accès à la page de gestion des entités",
+        "entity_create": "Créer une nouvelle entité",
+        "entity_edit": "Modifier les informations d'une entité",
         "log_read": "Accès à la page de gestion des journaux d'événements"
     },
     "Common": {
@@ -378,7 +419,16 @@
         "CannotDeleteYourselfError": "Vous ne pouvez pas vous supprimer vous-même",
         "UserNotFound": "Utilisateur non trouvé",
         "RoleNotFound": "Rôle non trouvé",
+        "EntityNotFound": "Entité non trouvée",
         "SendInvitationEmailError": "Erreur lors de l'envoi de l'email d'invitation, utilisateur supprimé",
-        "EmailAlreadyInUseError": "L'email est déjà utilisé par un autre compte"
+        "EmailAlreadyInUseError": "L'email est déjà utilisé par un autre compte",
+        "UpdateEntityFail": "Erreur lors de la mise à jour de l'entité",
+        "CreateEntityFail": "Erreur lors de la création de l'entité",
+        "DeleteEntityFail": "Erreur lors de la suppression de l'entité",
+        "NoEditSeededEntity": "Impossible de modifier une entité protégée",
+        "DeleteEntityUserAssignedError": "Impossible de supprimer une entité assignée à des utilisateurs",
+        "EntityAccessDeniedError": "Vous ne pouvez modifier/supprimer que les entités qui vous sont attribuées",
+        "EntityNameAlreadyInUseError": "Une entité avec ce nom existe déjà",
+        "MaxNumberEntityError": "Nombre maximum d'entités atteint"
     }
 }

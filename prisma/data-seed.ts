@@ -4,6 +4,19 @@ export const roleSuperAdmin = {
     description: "Role administreur with every permission",
 }
 
+export const protectedEntities = [
+    {
+        id: "cm8skzpbi0001e58ge65z1rkz",
+        name: "Entity 1",
+    },
+    {
+        id: "cmdz8e2or000008jsfl42208j",
+        name: "Entity 2",
+    },
+]
+
+export const protectedEntityIds = protectedEntities.map((entity) => entity.id)
+
 export const userSuperAdmin = {
     id: "UOOl0OSwsUWelQZxSOK8RxaOtb5dS71b",
     name: "Super Admin",

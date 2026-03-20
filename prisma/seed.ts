@@ -1,7 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import 'dotenv/config'
 import pg from 'pg'
-import { roleSuperAdmin, userSuperAdmin } from "./data-seed"
+import { protectedEntities, protectedEntityIds, roleSuperAdmin, userSuperAdmin } from "./data-seed"
 import { PrismaClient } from "./generated/client"
 import { permissions, PermissionSeed } from "./permission"
 
@@ -89,7 +89,7 @@ const seedAdminUser = async () => {
             email: userSuperAdmin.email,
             emailVerified: true,
             active: true,
-            entitySelectedId: "cm8skzpbi0001e58ge65z1rkz",
+            entitySelectedId: protectedEntityIds[0],
             Entities: {
                 connect: allEntities.map((entity) => {
                     return { id: entity.id }
@@ -113,7 +113,7 @@ const seedAdminUser = async () => {
             name: userSuperAdmin.name,
             emailVerified: true,
             active: true,
-            entitySelectedId: allEntities[0].id,
+            entitySelectedId: protectedEntityIds[0],
             Roles: {
                 set: {
                     id: roleSuperAdmin.id,
@@ -155,14 +155,12 @@ async function main() {
     console.log("\n == Seeding Admin Role == \n")
     await seedAdminRole()
     console.log("\n == Seeding Admin Entity == \n")
-    await seedEntity({
-        id: "cm8skzpbi0001e58ge65z1rkz",
-        name: "Entity 1",
-    })
-    await seedEntity({
-        id: "cmdz8e2or000008jsfl42208j",
-        name: "Entity 2",
-    })
+    for (const entity of protectedEntities) {
+        await seedEntity({
+            id: entity.id,
+            name: entity.name,
+        })
+    }
     console.log("\n == Seeding Admin User == \n")
     await seedAdminUser()
     console.log("\n ===== End Seeding ===== \n")

@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma"
-import { roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
+import { protectedEntityIds, roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
 
 export const resetDatabase = async () => {
     await clearLog()
     await clearTokenCreateUser()
-    await clearRolesExceptSuperAdmin()
     await clearUsersExceptSuperAdmin()
+    await clearRolesExceptSuperAdmin()
+    await clearEntitiesExceptProtected()
     await clearAllSessions()
     await clearAllAccountsExceptSuperAdmin()
 }
@@ -47,6 +48,16 @@ export const clearAllAccountsExceptSuperAdmin = async () => {
         where: {
             userId: {
                 not: userSuperAdmin.id,
+            },
+        },
+    })
+}
+
+export const clearEntitiesExceptProtected = async () => {
+    await prisma.entity.deleteMany({
+        where: {
+            id: {
+                notIn: protectedEntityIds,
             },
         },
     })

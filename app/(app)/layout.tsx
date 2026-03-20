@@ -6,7 +6,7 @@ import { pageCheckAuth } from "@/lib/auth-guard"
 import { PermissionModel as Permission } from "@/prisma/generated/models/Permission"
 import { ConfirmDialogProvider } from "@/provider/ConfirmationProvider"
 import { NavigationGroupType, NavigationType } from "@/types/navigation.type"
-import { Boxes, IdCard, Logs, Users } from "lucide-react"
+import { Boxes, Building2, IdCard, Logs, Users } from "lucide-react"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getTranslations } from "next-intl/server"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
@@ -43,7 +43,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         }
         const permissions = new Set(session.user.Permissions.map((permission: Permission) => permission.code))
 
-        if (permissions.has("user_read") || permissions.has("role_read") || permissions.has("log_read")) {
+        if (
+            permissions.has("user_read") ||
+            permissions.has("role_read") ||
+            permissions.has("entity_read") ||
+            permissions.has("log_read")
+        ) {
             const adminGroup: NavigationGroupType = {
                 title: "Administration",
                 items: [],
@@ -60,6 +65,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                     title: tSidebar("users"),
                     url: "/administration/users",
                     icon: <Users />,
+                })
+            }
+            if (permissions.has("entity_read")) {
+                adminGroup.items.push({
+                    title: tSidebar("entities"),
+                    url: "/administration/entities",
+                    icon: <Building2 />,
                 })
             }
             if (permissions.has("log_read")) {

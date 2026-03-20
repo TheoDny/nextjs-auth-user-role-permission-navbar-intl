@@ -418,7 +418,7 @@ export const addRoleSetPermissionLog = async (
     }
 }
 
-const addEntityUpdateLog = async (
+export const addEntityUpdateLog = async (
     entity: { id: string; name: string },
     entityId?: string,
     userId?: string,
@@ -455,7 +455,7 @@ const addEntityUpdateLog = async (
     }
 }
 
-const addEntityDisableLog = async (
+export const addEntityDisableLog = async (
     entity: { id: string; name: string },
     entityId?: string,
     userId?: string,

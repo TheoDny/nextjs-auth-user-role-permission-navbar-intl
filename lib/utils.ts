@@ -1,6 +1,7 @@
 import { NoEditSuperAdminRole } from "@/errors/NoEditSuperAdminRole"
 import { NoEditSuperAdminUser } from "@/errors/NoEditSuperAdminUser"
-import { roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
+import { NoEditSeededEntity } from "@/errors/NoEditSeededEntity"
+import { protectedEntityIds, roleSuperAdmin, userSuperAdmin } from "@/prisma/data-seed"
 import { clsx, type ClassValue } from "clsx"
 import jwt from "jsonwebtoken"
 import { twMerge } from "tailwind-merge"
@@ -36,5 +37,11 @@ export function assertNotSuperAdminUserId(userId: string) {
 export function assertNotSuperAdminRoleId(roleId: string) {
     if (roleId === roleSuperAdmin.id) {
         throw new NoEditSuperAdminRole()
+    }
+}
+
+export function assertNotProtectedEntityId(entityId: string) {
+    if (protectedEntityIds.includes(entityId)) {
+        throw new NoEditSeededEntity()
     }
 }
