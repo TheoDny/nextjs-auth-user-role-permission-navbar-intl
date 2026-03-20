@@ -1,33 +1,55 @@
 import { Body, Container, Head, Heading, Html, Link, Preview, Text } from "@react-email/components"
+import type { TranslationValues } from "next-intl"
 
 interface InvitationSignUpProps {
     inviteLink: string
     appUrl: string
     name: string
+    t?: (key: string, values?: TranslationValues) => string
 }
 const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "NEXT_PUBLIC_NAME_APP"
 
-const InvitationSignUp = ({ name, inviteLink, appUrl }: InvitationSignUpProps) => (
-    <Html>
+const defaultTranslations: Record<string, string> = {
+    preview: "Invitation à rejoindre {appName}",
+    heading: "Bienvenue {name} sur {appName}",
+    invitedDescription: "Vous avez été invité à créer un compte sur {appName}.",
+    ctaDescription: "Cliquez sur le lien ci-dessous pour finaliser votre inscription :",
+    ctaButton: "Créer mon compte",
+    copyLink: "Ou copiez-collez ce lien dans votre navigateur :",
+    seeYouSoon: "À bientôt sur",
+}
+
+function interpolate(template: string, values?: TranslationValues) {
+    if (!values) {
+        return template
+    }
+    return template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? `{${key}}`))
+}
+
+const InvitationSignUp = ({ name, inviteLink, appUrl, t }: InvitationSignUpProps) => {
+    const translate = (key: string, values?: TranslationValues) =>
+        t?.(key, values) ?? interpolate(defaultTranslations[key] ?? key, values)
+    return (
+        <Html>
         <Head />
-        <Preview>Invitation à rejoindre {appName}</Preview>
+        <Preview>{translate("preview", { appName })}</Preview>
         <Body style={styles.body}>
             <Container style={styles.container}>
                 <Heading style={styles.heading}>
-                    Bienvenue {name} sur {appName}
+                    {translate("heading", { name, appName })}
                 </Heading>
-                <Text style={styles.text}>Vous avez été invité à créer un compte sur {appName}.</Text>
-                <Text style={styles.text}>Cliquez sur le lien ci-dessous pour finaliser votre inscription :</Text>
+                <Text style={styles.text}>{translate("invitedDescription", { appName })}</Text>
+                <Text style={styles.text}>{translate("ctaDescription")}</Text>
                 <Link
                     href={inviteLink}
                     style={styles.button}
                 >
-                    Créer mon compte
+                    {translate("ctaButton")}
                 </Link>
-                <Text style={styles.text}>Ou copiez-collez ce lien dans votre navigateur :</Text>
+                <Text style={styles.text}>{translate("copyLink")}</Text>
                 <Text style={styles.link}>{inviteLink}</Text>
                 <Text style={styles.text}>
-                    À bientôt sur{" "}
+                    {translate("seeYouSoon")}{" "}
                     <Link
                         href={appUrl}
                         style={styles.link}
@@ -39,7 +61,8 @@ const InvitationSignUp = ({ name, inviteLink, appUrl }: InvitationSignUpProps) =
             </Container>
         </Body>
     </Html>
-)
+    )
+}
 
 InvitationSignUp.PreviewProps = {
     appUrl: "http://localhost:3000",

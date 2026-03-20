@@ -2,6 +2,7 @@ import InvitationSignUp from "@/emails/invitation-sign-up"
 import ResetPassword from "@/emails/reset-password"
 import { transporter } from "@/lib/mail"
 import { render } from "@react-email/render"
+import { getTranslations } from "next-intl/server"
 
 interface EmailOptions {
     to: string[]
@@ -10,7 +11,9 @@ interface EmailOptions {
     attachments?: { filename: string; path: string }[]
 }
 
+const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "NAME_APP"
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+
 async function sendEmail(options: EmailOptions) {
     let info: any = true
     if (process.env.MAILER_ACTIVE ?? true) {
@@ -27,10 +30,11 @@ async function sendEmail(options: EmailOptions) {
 }
 
 export async function sendResetPassword(email: string, resetLinkt: string) {
+    const t = await getTranslations("Emails.resetPassword")
     const options: EmailOptions = {
         to: [email],
-        subject: `${process.env.NEXT_PUBLIC_NAME_APP} - Reset Password`,
-        html: await render(ResetPassword({ resetLink: resetLinkt, appUrl: appUrl })),
+        subject: t("subject", { appName: appName }),
+        html: await render(ResetPassword({ resetLink: resetLinkt, appUrl: appUrl, t })),
     }
     try {
         return sendEmail(options)
@@ -42,10 +46,11 @@ export async function sendResetPassword(email: string, resetLinkt: string) {
 
 export async function sendInvitationSignUp(name: string, email: string, inviteLink: string) {
     try {
+        const t = await getTranslations("Emails.invitationSignUp")
         const options: EmailOptions = {
             to: [email],
-            subject: `${process.env.NEXT_PUBLIC_NAME_APP} - Invitation Sign Up`,
-            html: await render(InvitationSignUp({ name, inviteLink: inviteLink, appUrl: appUrl })),
+            subject: t("subject", { appName: appName }),
+            html: await render(InvitationSignUp({ name, inviteLink: inviteLink, appUrl: appUrl, t })),
         }
         return sendEmail(options)
     } catch (error) {

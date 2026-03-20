@@ -295,6 +295,27 @@
         "entity_edit": "Edit the information of an entity",
         "log_read": "Access to the log management page"
     },
+    "Emails": {
+        "resetPassword": {
+            "preview": "Reset your password",
+            "heading": "Reset password",
+            "requestReceived": "We received a request to reset your password.",
+            "ctaDescription": "Click the button below to create a new password:",
+            "ctaButton": "Reset my password",
+            "copyLink": "Or copy and paste this link into your browser:",
+            "ignoreIfNotYou": "If you did not make this request, you can ignore this email.",
+            "backToApp": "Back to"
+        },
+        "invitationSignUp": {
+            "preview": "Invitation to join {appName}",
+            "heading": "Welcome {name} to {appName}",
+            "invitedDescription": "You have been invited to create an account on {appName}.",
+            "ctaDescription": "Click the link below to complete your sign up:",
+            "ctaButton": "Create my account",
+            "copyLink": "Or copy and paste this link into your browser:",
+            "seeYouSoon": "See you soon on"
+        }
+    },
     "Common": {
         "update": "Update",
         "save": "Save",

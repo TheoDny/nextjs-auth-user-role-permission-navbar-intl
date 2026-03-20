@@ -1,35 +1,46 @@
 import { Body, Container, Head, Heading, Html, Link, Preview, Text } from "@react-email/components"
+import type { TranslationValues } from "next-intl"
 
 interface ResetPasswordProps {
     resetLink: string
     appUrl: string
+    t?: (key: string, values?: TranslationValues) => string
 }
 const appName = process.env.NEXT_PUBLIC_NAME_APP ?? "NEXT_PUBLIC_NAME_APP"
 
-const ResetPassword = ({ resetLink, appUrl }: ResetPasswordProps) => (
-    <Html>
+const defaultTranslations: Record<string, string> = {
+    preview: "Réinitialisation de votre mot de passe",
+    heading: "Réinitialisation de mot de passe",
+    requestReceived: "Nous avons reçu une demande de réinitialisation de votre mot de passe.",
+    ctaDescription: "Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :",
+    ctaButton: "Réinitialiser mon mot de passe",
+    copyLink: "Ou copiez-collez ce lien dans votre navigateur :",
+    ignoreIfNotYou: "Si vous n'avez pas fait cette demande, ignorez cet e-mail.",
+    backToApp: "Retour sur",
+}
+
+const ResetPassword = ({ resetLink, appUrl, t }: ResetPasswordProps) => {
+    const translate = (key: string, values?: TranslationValues) => t?.(key, values) ?? defaultTranslations[key] ?? key
+    return (
+        <Html>
         <Head />
-        <Preview>Réinitialisation de votre mot de passe</Preview>
+        <Preview>{translate("preview")}</Preview>
         <Body style={styles.body}>
             <Container style={styles.container}>
-                <Heading style={styles.heading}>Réinitialisation de mot de passe</Heading>
-                <Text style={styles.text}>
-                    Nous avons reçu une demande de réinitialisation de votre mot de passe.
-                </Text>
-                <Text style={styles.text}>
-                    Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :
-                </Text>
+                <Heading style={styles.heading}>{translate("heading")}</Heading>
+                <Text style={styles.text}>{translate("requestReceived")}</Text>
+                <Text style={styles.text}>{translate("ctaDescription")}</Text>
                 <Link
                     href={resetLink}
                     style={styles.button}
                 >
-                    Réinitialiser mon mot de passe
+                    {translate("ctaButton")}
                 </Link>
-                <Text style={styles.text}>Ou copiez-collez ce lien dans votre navigateur :</Text>
+                <Text style={styles.text}>{translate("copyLink")}</Text>
                 <Text style={styles.link}>{resetLink}</Text>
-                <Text style={styles.text}>Si vous n'avez pas fait cette demande, ignorez cet e-mail.</Text>
+                <Text style={styles.text}>{translate("ignoreIfNotYou")}</Text>
                 <Text style={styles.text}>
-                    Retour sur{" "}
+                    {translate("backToApp")}{" "}
                     <Link
                         href={appUrl}
                         style={styles.link}
@@ -40,7 +51,8 @@ const ResetPassword = ({ resetLink, appUrl }: ResetPasswordProps) => (
             </Container>
         </Body>
     </Html>
-)
+    ) 
+}
 
 ResetPassword.PreviewProps = {
     appUrl: "http://localhost:3000",

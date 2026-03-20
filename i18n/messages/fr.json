@@ -294,6 +294,29 @@
         "entity_edit": "Modifier les informations d'une entité",
         "log_read": "Accès à la page de gestion des journaux d'événements"
     },
+    "Emails": {
+        "resetPassword": {
+            "subject": "{appName} - Réinitialisation de votre mot de passe",
+            "preview": "Réinitialisation de votre mot de passe",
+            "heading": "Réinitialisation de mot de passe",
+            "requestReceived": "Nous avons reçu une demande de réinitialisation de votre mot de passe.",
+            "ctaDescription": "Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :",
+            "ctaButton": "Réinitialiser mon mot de passe",
+            "copyLink": "Ou copiez-collez ce lien dans votre navigateur :",
+            "ignoreIfNotYou": "Si vous n'avez pas fait cette demande, ignorez cet e-mail.",
+            "backToApp": "Retour sur"
+        },
+        "invitationSignUp": {
+            "subject": "{appName} - Invitation à rejoindre",
+            "preview": "Invitation à rejoindre {appName}",
+            "heading": "Bienvenue {name} sur {appName}",
+            "invitedDescription": "Vous avez été invité à créer un compte sur {appName}.",
+            "ctaDescription": "Cliquez sur le lien ci-dessous pour finaliser votre inscription :",
+            "ctaButton": "Créer mon compte",
+            "copyLink": "Ou copiez-collez ce lien dans votre navigateur :",
+            "seeYouSoon": "À bientôt sur"
+        }
+    },
     "Common": {
         "update": "Mettre à jour",
         "save": "Enregistrer",
