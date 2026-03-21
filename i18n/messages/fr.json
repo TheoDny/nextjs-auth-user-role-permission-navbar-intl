@@ -22,7 +22,16 @@
         "rememberMe": "Se souvenir de moi",
         "noAccount": "Vous n'avez pas de compte?",
         "signUp": "S'inscrire",
-        "cookieConsent": "En vous connectant, vous acceptez notre utilisation des cookies pour l'authentification et une expérience utilisateur améliorée."
+        "cookieConsent": "En vous connectant, vous acceptez notre utilisation des cookies pour l'authentification et une expérience utilisateur améliorée.",
+        "tabPassword": "Mot de passe",
+        "tabEmailCode": "Code par email",
+        "sendCode": "Envoyer le code",
+        "otp": "Code de vérification",
+        "otpPlaceholder": "Saisissez le code à 6 chiffres",
+        "signInWithOtp": "Connexion avec le code",
+        "resendCode": "Renvoyer le code",
+        "codeSent": "Un code vous a été envoyé par email.",
+        "useOtherEmail": "Utiliser une autre adresse"
     },
     "SignUp": {
         "title": "Inscription",
@@ -41,14 +50,18 @@
     },
     "ForgotPassword": {
         "title": "Mot de passe oublié",
-        "description": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+        "description": "Entrez votre adresse email et nous vous enverrons un code pour réinitialiser votre mot de passe",
         "email": "Email",
-        "sendLink": "Envoyer le lien",
-        "backToSignIn": "Retour à la connexion"
+        "sendLink": "Envoyer le code",
+        "backToSignIn": "Retour à la connexion",
+        "codeSentToast": "Si un compte existe, un code de réinitialisation a été envoyé"
     },
     "ResetPassword": {
         "title": "Réinitialiser le mot de passe",
-        "description": "Entrez votre nouveau mot de passe ci-dessous",
+        "description": "Saisissez le code reçu par email et votre nouveau mot de passe",
+        "email": "Email",
+        "otp": "Code de réinitialisation",
+        "otpPlaceholder": "Code reçu par email",
         "password": "Mot de passe",
         "confirmPassword": "Confirmer le mot de passe",
         "passwordPlaceholder": "Entrez le nouveau mot de passe",
@@ -56,11 +69,12 @@
         "changePassword": "Changer le mot de passe",
         "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
         "successMessage": "Mot de passe réinitialisé avec succès",
-        "passwordLength": "Le mot de passe doit contenir entre 16 et 64 caractères",
+        "passwordLength": "Le mot de passe doit contenir entre 16 et 128 caractères",
         "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
         "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
         "passwordSpecialChar": "Le mot de passe doit contenir au moins 1 caractère spécial (ex: !@#$%^&*()_+-=[];':\"\\|,.<>/?)",
-        "backToSignIn": "Retour à la connexion"
+        "backToSignIn": "Retour à la connexion",
+        "missingEmailOrOtp": "L’email et le code sont requis"
     },
     "Account": {
         "title": "Compte",
@@ -295,15 +309,23 @@
         "log_read": "Accès à la page de gestion des journaux d'événements"
     },
     "Emails": {
-        "resetPassword": {
-            "subject": "{appName} - Réinitialisation de votre mot de passe",
-            "preview": "Réinitialisation de votre mot de passe",
-            "heading": "Réinitialisation de mot de passe",
-            "requestReceived": "Nous avons reçu une demande de réinitialisation de votre mot de passe.",
-            "ctaDescription": "Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :",
-            "ctaButton": "Réinitialiser mon mot de passe",
-            "copyLink": "Ou copiez-collez ce lien dans votre navigateur :",
-            "ignoreIfNotYou": "Si vous n'avez pas fait cette demande, ignorez cet e-mail.",
+        "emailOtp": {
+            "subjectSignIn": "{appName} - Votre code de connexion",
+            "subjectForgetPassword": "{appName} - Code de réinitialisation du mot de passe",
+            "subjectEmailVerification": "{appName} - Votre code de vérification",
+            "subjectChangeEmail": "{appName} - Confirmer le changement d’email",
+            "headingChangeEmail": "Changement d’email",
+            "introChangeEmail": "Utilisez le code ci-dessous pour confirmer le changement d’email.",
+            "preview": "Votre code de vérification",
+            "headingSignIn": "Connexion par code",
+            "headingReset": "Réinitialisation du mot de passe",
+            "headingVerify": "Vérification de l’email",
+            "introSignIn": "Utilisez le code ci-dessous pour vous connecter.",
+            "introReset": "Utilisez le code ci-dessous pour réinitialiser votre mot de passe.",
+            "introVerify": "Utilisez le code ci-dessous pour vérifier votre adresse email.",
+            "codeLabel": "Votre code",
+            "expires": "Ce code expire dans {minutes} minutes.",
+            "ignoreIfNotYou": "Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail.",
             "backToApp": "Retour sur"
         },
         "invitationSignUp": {

@@ -1,5 +1,5 @@
+import EmailOtp, { type EmailOtpPurpose } from "@/emails/email-otp"
 import InvitationSignUp from "@/emails/invitation-sign-up"
-import ResetPassword from "@/emails/reset-password"
 import { transporter } from "@/lib/mail"
 import { render } from "@react-email/render"
 import { getTranslations } from "next-intl/server"
@@ -29,12 +29,42 @@ async function sendEmail(options: EmailOptions) {
     return info
 }
 
-export async function sendResetPassword(email: string, resetLinkt: string) {
-    const t = await getTranslations("Emails.resetPassword")
+/**
+ * Sends a one-time password email (Better Auth emailOTP plugin).
+ *
+ * @param email - Recipient address
+ * @param otp - Plain OTP shown in the email (not stored by this function)
+ * @param type - Better Auth OTP kind (includes `change-email` when that feature is enabled)
+ * @param expiresInSeconds - Must match `emailOTP.expiresIn` in auth config (default 300)
+ */
+export async function sendEmailOtp(
+    email: string,
+    otp: string,
+    type: EmailOtpPurpose,
+    expiresInSeconds: number = 300,
+) {
+    const t = await getTranslations("Emails.emailOtp")
+    const minutes = Math.max(1, Math.ceil(expiresInSeconds / 60))
+    const subjectKey =
+        type === "sign-in"
+            ? "subjectSignIn"
+            : type === "forget-password"
+              ? "subjectForgetPassword"
+              : type === "change-email"
+                ? "subjectChangeEmail"
+                : "subjectEmailVerification"
     const options: EmailOptions = {
         to: [email],
-        subject: t("subject", { appName: appName }),
-        html: await render(ResetPassword({ resetLink: resetLinkt, appUrl: appUrl, t })),
+        subject: t(subjectKey, { appName }),
+        html: await render(
+            EmailOtp({
+                otp,
+                appUrl,
+                purpose: type,
+                expiresMinutes: minutes,
+                t,
+            }),
+        ),
     }
     try {
         return sendEmail(options)

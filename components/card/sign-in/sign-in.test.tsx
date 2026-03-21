@@ -3,8 +3,10 @@ import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { SignIn } from "./sign-in"
 
-const { signInEmailMock } = vi.hoisted(() => ({
+const { signInEmailMock, signInEmailOtpMock, sendOtpMock } = vi.hoisted(() => ({
     signInEmailMock: vi.fn(),
+    signInEmailOtpMock: vi.fn(),
+    sendOtpMock: vi.fn(),
 }))
 
 vi.mock("next-intl", () => ({
@@ -25,12 +27,20 @@ vi.mock("next/link", () => ({
 vi.mock("@/lib/auth-client", () => ({
     signIn: {
         email: signInEmailMock,
+        emailOtp: signInEmailOtpMock,
+    },
+    authClient: {
+        emailOtp: {
+            sendVerificationOtp: sendOtpMock,
+        },
     },
 }))
 
 describe("SignIn", () => {
     beforeEach(() => {
         signInEmailMock.mockReset()
+        signInEmailOtpMock.mockReset()
+        sendOtpMock.mockReset()
     })
 
     it("shows validation messages for invalid form values", async () => {
@@ -58,7 +68,7 @@ describe("SignIn", () => {
             expect.objectContaining({
                 email: "test@test.com",
                 password: "Test0123456789!",
-            })
+            }),
         )
     })
 
@@ -74,5 +84,39 @@ describe("SignIn", () => {
 
         await user.click(screen.getByRole("button", { name: "Hide password" }))
         expect(passwordInput).toHaveAttribute("type", "password")
+    })
+
+    it("sends OTP and signs in with emailOtp on code tab", async () => {
+        const user = userEvent.setup()
+        sendOtpMock.mockImplementation((_data: unknown, opts: Record<string, (() => void) | undefined>) => {
+            opts.onRequest?.()
+            opts.onSuccess?.()
+            opts.onResponse?.()
+            return Promise.resolve()
+        })
+        signInEmailOtpMock.mockImplementation((_data: unknown, opts: Record<string, (() => void) | undefined>) => {
+            opts.onRequest?.()
+            opts.onSuccess?.()
+            opts.onResponse?.()
+            return Promise.resolve()
+        })
+        render(<SignIn />)
+
+        await user.click(screen.getByRole("button", { name: "tabEmailCode" }))
+        await user.type(screen.getByLabelText("email"), "otp@test.com")
+        await user.click(screen.getByRole("button", { name: "sendCode" }))
+
+        expect(sendOtpMock).toHaveBeenCalledWith(
+            { email: "otp@test.com", type: "sign-in" },
+            expect.any(Object),
+        )
+
+        await user.type(screen.getByLabelText("otp"), "123456")
+        await user.click(screen.getByRole("button", { name: "signInWithOtp" }))
+
+        expect(signInEmailOtpMock).toHaveBeenCalledWith(
+            expect.objectContaining({ email: "otp@test.com", otp: "123456" }),
+            expect.any(Object),
+        )
     })
 })

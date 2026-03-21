@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
                 <CardDescription className="text-xs md:text-sm">{t("description")}</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="absolute top-1 left-1 flex items-center gap-1 underline">
+                <div className="absolute text-sm top-1 left-1 flex items-center gap-1 underline">
                     <ArrowLeftIcon className="w-4 h-4" />
                     <Link
                         id="back"
@@ -35,17 +35,16 @@ export default function ForgotPasswordPage() {
                     action={async (formData) => {
                         const email = formData.get("email")
 
-                        await authClient.requestPasswordReset(
+                        await authClient.emailOtp.requestPasswordReset(
                             {
                                 email: email as string,
-                                redirectTo: "/reset-password",
                             },
                             {
                                 onSuccess: () => {
-                                    toast.success("Email sent")
+                                    toast.success(t("codeSentToast"))
                                     setTimeout(() => {
-                                        document.getElementById("back")?.click()
-                                    }, 1500)
+                                        window.location.href = "/reset-password"
+                                    }, 800)
                                 },
                                 onError: (ctx) => {
                                     console.error(ctx)

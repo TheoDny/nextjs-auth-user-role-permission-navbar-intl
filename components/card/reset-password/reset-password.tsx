@@ -2,21 +2,19 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { InputConceal } from "@/components/ui/input-conceal"
 import { authClient } from "@/lib/auth-client"
 import { Label } from "@radix-ui/react-label"
 import { ArrowLeftIcon, CircleAlert, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
-type ResetPasswordProps = {
-    token: string
-}
-
 const validatePassword = (password: string, t: (key: string) => string) => {
-    if (password.length < 16 || password.length > 64) {
+    if (password.length < 16 || password.length > 128) {
         return t("passwordLength")
     }
 
@@ -35,10 +33,12 @@ const validatePassword = (password: string, t: (key: string) => string) => {
     return null
 }
 
-export default function ResetPassword({ token }: ResetPasswordProps) {
+export default function ResetPassword() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
     const tResetPassword = useTranslations("ResetPassword")
+    const router = useRouter()
+
     return (
         <Card className="w-xs md:w-md relative">
             <CardHeader>
@@ -46,7 +46,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                 <CardDescription className="text-xs md:text-sm">{tResetPassword("description")}</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="absolute top-1 left-1 flex items-center gap-1 underline">
+                <div className="absolute text-sm top-1 left-1 flex items-center gap-1 underline">
                     <ArrowLeftIcon className="w-4 h-4" />
                     <Link
                         id="back"
@@ -59,10 +59,19 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                     action={async (formData) => {
                         setLoading(true)
                         setError("")
+                        const email = (formData.get("email") as string)?.trim()
+                        const otp = (formData.get("otp") as string)?.trim()
                         const password = formData.get("password") as string
                         const passwordConfirmation = formData.get("password_confirmation") as string
 
-                        // Validate password requirements
+                        if (!email || !otp) {
+                            setLoading(false)
+                            const msg = tResetPassword("missingEmailOrOtp")
+                            setError(msg)
+                            toast.error(msg)
+                            return
+                        }
+
                         const passwordError = validatePassword(password, tResetPassword)
                         if (passwordError) {
                             setLoading(false)
@@ -71,7 +80,6 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                             return
                         }
 
-                        // Check password confirmation
                         if (password !== passwordConfirmation) {
                             setLoading(false)
                             setError(tResetPassword("passwordsDoNotMatch"))
@@ -79,14 +87,16 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                             return
                         }
 
-                        await authClient.resetPassword(
+                        await authClient.emailOtp.resetPassword(
                             {
-                                token,
-                                newPassword: password,
+                                email,
+                                otp,
+                                password,
                             },
                             {
                                 onSuccess: () => {
                                     toast.success(tResetPassword("successMessage"))
+                                    router.push("/sign-in")
                                 },
                                 onError: (ctx) => {
                                     console.error(ctx)
@@ -105,6 +115,28 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                     }}
                 >
                     <div className="grid gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">{tResetPassword("email")}</Label>
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="otp">{tResetPassword("otp")}</Label>
+                            <Input
+                                id="otp"
+                                name="otp"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
+                                maxLength={12}
+                                placeholder={tResetPassword("otpPlaceholder")}
+                                required
+                            />
+                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="password">{tResetPassword("password")}</Label>
                             <InputConceal

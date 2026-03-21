@@ -1,11 +1,13 @@
 import { getUserRolesPermissionsAndEntities } from "@/services/auth/auth.service"
-import { sendResetPassword } from "@/services/mail/mail.service"
+import { sendEmailOtp } from "@/services/mail/mail.service"
 import { i18n } from "@better-auth/i18n"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
-import { customSession } from "better-auth/plugins"
+import { customSession, emailOTP } from "better-auth/plugins"
 import { prisma } from "./prisma"
+
+const emailOtpExpiresInSeconds = 300 // 5 minutes
 
 export const auth = betterAuth({
     rateLimit: {
@@ -47,11 +49,17 @@ export const auth = betterAuth({
         enabled: true,
         minPasswordLength: 16,
         maxPasswordLength: 128,
-        async sendResetPassword(data, _request) {
-            sendResetPassword(data.user.email, data.url)
-        },
     },
     plugins: [
+        emailOTP({
+            disableSignUp: true,
+            otpLength: 6,
+            expiresIn: emailOtpExpiresInSeconds,
+            allowedAttempts: 3,
+            async sendVerificationOTP({ email, otp, type }) {
+                void sendEmailOtp(email, otp, type, emailOtpExpiresInSeconds)
+            },
+        }),
         customSession(async ({ user, session }) => {
             const userInfer = user as typeof user & { entitySelectedId: string; active: boolean }
             const rolesPermissionAndEntities = await getUserRolesPermissionsAndEntities(session.userId)
