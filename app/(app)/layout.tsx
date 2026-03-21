@@ -50,7 +50,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             permissions.has("log_read")
         ) {
             const adminGroup: NavigationGroupType = {
-                title: "Administration",
+                title: tSidebar("administration"),
                 items: [],
             }
             if (permissions.has("role_read")) {

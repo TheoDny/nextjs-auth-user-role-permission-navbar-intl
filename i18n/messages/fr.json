@@ -19,8 +19,6 @@
         "password": "Mot de passe",
         "login": "Connexion",
         "forgotPassword": "Mot de passe oublié?",
-        "rememberMe": "Se souvenir de moi",
-        "noAccount": "Vous n'avez pas de compte?",
         "signUp": "S'inscrire",
         "cookieConsent": "En vous connectant, vous acceptez notre utilisation des cookies pour l'authentification et une expérience utilisateur améliorée.",
         "tabPassword": "Mot de passe",
@@ -41,8 +39,6 @@
         "password": "Mot de passe",
         "confirmPassword": "Confirmer le mot de passe",
         "createAccount": "Finaliser la création du compte",
-        "alreadyHaveAccount": "Vous avez déjà un compte?",
-        "signIn": "Se connecter",
         "passwordLength": "Le mot de passe doit contenir entre 16 et 64 caractères",
         "passwordUppercase": "Le mot de passe doit contenir au moins 1 lettre majuscule",
         "passwordNumber": "Le mot de passe doit contenir au moins 1 chiffre",
@@ -77,13 +73,10 @@
         "missingEmailOrOtp": "L’email et le code sont requis"
     },
     "Account": {
-        "title": "Compte",
-        "loginRequired": "Veuillez vous connecter pour voir votre compte",
         "profile": {
             "title": "Profil Utilisateur",
             "description": "Vos informations de compte et paramètres",
             "userAlt": "Utilisateur",
-            "statusActive": "Actif",
             "statusInactive": "Inactif",
             "selectedEntity": "Entité Sélectionnée",
             "availableEntities": "Entités Disponibles",
@@ -91,19 +84,11 @@
             "language": "Langue",
             "changeLanguage": "Changer de Langue"
         },
-        "emailUpdate": {
-            "title": "Changer l'Adresse Email",
-            "description": "Mettez à jour l'adresse email de votre compte",
-            "emailLabel": "Adresse Email",
-            "editButton": "Modifier l'email",
-            "success": "Votre email a été mis à jour avec succès"
-        },
         "profileUpdate": {
             "title": "Modifier le Profil",
             "description": "Mettez à jour vos informations de profil",
             "nameLabel": "Nom",
             "emailLabel": "Adresse Email",
-            "uploadImage": "Télécharger une Photo de Profil",
             "imageTypeError": "Veuillez télécharger un fichier image",
             "editButton": "Modifier le Profil",
             "success": "Votre profil a été mis à jour avec succès"
@@ -114,20 +99,6 @@
             "assignedRoles": "Rôles Assignés",
             "permissionsList": "Permissions",
             "noDescription": "Pas de description disponible"
-        },
-        "roles": {
-            "admin": "Administrateur",
-            "user": "Utilisateur",
-            "manager": "Gestionnaire",
-            "editor": "Éditeur",
-            "viewer": "Lecteur"
-        },
-        "roleDescriptions": {
-            "admin": "Accès complet à toutes les fonctionnalités et paramètres du système",
-            "user": "Utilisateur standard avec des permissions de base",
-            "manager": "Peut gérer les utilisateurs et le contenu dans les entités assignées",
-            "editor": "Peut créer et modifier du contenu mais pas le supprimer",
-            "viewer": "Accès en lecture seule au contenu"
         },
         "sessions": {
             "title": "Sessions actives",

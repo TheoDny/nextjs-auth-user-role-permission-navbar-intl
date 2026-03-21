@@ -19,8 +19,6 @@
         "password": "Password",
         "login": "Login",
         "forgotPassword": "Forgot password?",
-        "rememberMe": "Remember me",
-        "noAccount": "Don't have an account?",
         "signUp": "Sign up",
         "cookieConsent": "By signing in, you accept our use of cookies for authentication and enhanced user experience.",
         "tabPassword": "Password",
@@ -83,7 +81,6 @@
             "title": "User Profile",
             "description": "Your account information and settings",
             "userAlt": "User",
-            "statusActive": "Active",
             "statusInactive": "Inactive",
             "selectedEntity": "Selected Entity",
             "availableEntities": "Available Entities",
@@ -91,19 +88,11 @@
             "language": "Language",
             "changeLanguage": "Change Language"
         },
-        "emailUpdate": {
-            "title": "Change Email Address",
-            "description": "Update your account email address",
-            "emailLabel": "Email Address",
-            "editButton": "Edit email",
-            "success": "Your email has been updated successfully"
-        },
         "profileUpdate": {
             "title": "Edit Profile",
             "description": "Update your profile information",
             "nameLabel": "Name",
             "emailLabel": "Email Address",
-            "uploadImage": "Upload Profile Image",
             "imageTypeError": "Please upload an image file",
             "editButton": "Edit Profile",
             "success": "Your profile has been updated successfully"
@@ -114,20 +103,6 @@
             "assignedRoles": "Assigned Roles",
             "permissionsList": "Permissions",
             "noDescription": "No description available"
-        },
-        "roles": {
-            "admin": "Admin",
-            "user": "User",
-            "manager": "Manager",
-            "editor": "Editor",
-            "viewer": "Viewer"
-        },
-        "roleDescriptions": {
-            "admin": "Full access to all system features and settings",
-            "user": "Standard user with basic permissions",
-            "manager": "Can manage users and content within assigned entities",
-            "editor": "Can create and edit content but not delete",
-            "viewer": "Read-only access to content"
         },
         "sessions": {
             "title": "Active sessions",
