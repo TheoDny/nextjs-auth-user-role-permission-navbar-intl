@@ -1,10 +1,12 @@
 import { getUserRolesPermissionsAndEntities } from "@/services/auth/auth.service"
 import { sendResetPassword } from "@/services/mail/mail.service"
+import { i18n } from "@better-auth/i18n"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
 import { customSession } from "better-auth/plugins"
 import { prisma } from "./prisma"
+
 export const auth = betterAuth({
     rateLimit: {
         enabled: true,
@@ -65,6 +67,18 @@ export const auth = betterAuth({
             }
         }),
         nextCookies(),
+        i18n({
+            translations: {
+                en: {
+                    INVALID_EMAIL_OR_PASSWORD: "Invalid email or password",
+                    TOO_MANY_REQUESTS: "Too many requests",
+                },
+                fr: {
+                    INVALID_EMAIL_OR_PASSWORD: "Adresse email ou mot de passe invalide",
+                    TOO_MANY_REQUESTS: "Trop de tentatives de connexion",
+                },
+            },
+        }),
     ],
 })
 
