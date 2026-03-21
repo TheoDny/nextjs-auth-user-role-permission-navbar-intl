@@ -13,6 +13,7 @@ Application Next.js 16 avec authentification, gestion des utilisateurs, gestion 
 - Journal d'audit des actions metier
 - Interface multilingue (`fr`, `en`) via `next-intl`
 - Reset de base via endpoint cron protege par secret
+- En-tetes de securite (HSTS en production, nosniff, frame deny, referrer, permissions-policy) via `proxy.ts` et `next.config.ts`
 
 ## Stack technique
 

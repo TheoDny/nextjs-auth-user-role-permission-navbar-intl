@@ -6,6 +6,11 @@ import { nextCookies } from "better-auth/next-js"
 import { customSession } from "better-auth/plugins"
 import { prisma } from "./prisma"
 export const auth = betterAuth({
+    rateLimit: {
+        enabled: true,
+        max: 10,
+        window: 60,
+    },
     user: {
         additionalFields: {
             // firstname: {

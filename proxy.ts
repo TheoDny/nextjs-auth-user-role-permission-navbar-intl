@@ -1,14 +1,16 @@
 import { getSessionCookie } from "better-auth/cookies"
-import { NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
+
+import { applySecurityHeadersToResponse } from "@/lib/security-headers"
 
 export async function proxy(request: NextRequest) {
     const sessionCookie = getSessionCookie(request)
 
     if (!sessionCookie) {
-        return NextResponse.redirect(new URL("/sign-in", request.url))
+        return applySecurityHeadersToResponse(NextResponse.redirect(new URL("/sign-in", request.url)))
     }
 
-    return NextResponse.next()
+    return applySecurityHeadersToResponse(NextResponse.next())
 }
 
 export const config = {
