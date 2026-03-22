@@ -85,6 +85,7 @@ export async function deleteRole(id: string) {
                     id,
                 },
             },
+            deletedAt: null,
         },
     })
 
