@@ -16,7 +16,7 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
 async function sendEmail(options: EmailOptions) {
     let info: any = true
-    if (process.env.MAILER_ACTIVE ?? true) {
+    if (process.env.MAILER_ACTIVE === "true") {
         let mailOptions = {
             from: process.env.MAIL_EMAIL_USER,
             to: options.to.join(", "),
