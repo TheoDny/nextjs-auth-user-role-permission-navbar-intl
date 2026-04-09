@@ -13,7 +13,7 @@ const getLogsSchema = z.object({
 })
 
 export const getLogsAction = actionClient.inputSchema(getLogsSchema).action(async ({ parsedInput }) => {
-    const session = await checkAuth()
+    const session = await checkAuth({ requiredPermission: "log_read" })
 
     const entityIds = session.user.Entities.map((entity: { id: string }) => entity.id)
 

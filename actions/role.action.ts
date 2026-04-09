@@ -47,7 +47,7 @@ const assignPermissionsSchema = z.object({
 
 // Get all roles with their permissions
 export async function getRolesAction() {
-    await checkAuth()
+    await checkAuth({ requiredPermission: "role_read" })
 
     return await getRoles()
 }

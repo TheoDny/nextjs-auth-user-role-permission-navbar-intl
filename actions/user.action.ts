@@ -116,7 +116,7 @@ export const updateProfileAction = actionClient
 
 // Get all users with their roles
 export async function getUsersAction() {
-    await checkAuth()
+    await checkAuth({ requiredPermission: "user_read" })
 
     return await getUsers()
 }
